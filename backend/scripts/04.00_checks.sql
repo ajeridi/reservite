@@ -35,7 +35,7 @@ update reservations set number_of_guests = 0 where client = 2 and restaurant = 4
     -- not p or q : special_request == null OR length >= 10
 alter table reservations
 add constraint cs_special_request_length
-check ( special_requests is null OR length(special_requests) >= 10 );
+check ( special_requests is null OR length(trim(special_requests)) >= 10 );
 
 /*-- tests
 insert into reservations (client, restaurant, datetime, number_of_guests, special_requests) values (2, 3,  current_date, 2, null);
