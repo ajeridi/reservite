@@ -206,3 +206,25 @@ check ( end_time - start_time >= '01:00:00' );
 insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 3, '01:00:00', '01:30:00'); -- NOK
 insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 3, '01:00:00', '02:00:00'); -- OK
 */
+
+-- on ne peut pas modifier le restaurant d'un service
+create or replace function no_edit_restaurant_of_service() returns trigger as
+    $$
+    begin
+        if (new.restaurant <> old.restaurant) then
+            raise exception 'Cannot edit restaurant of service';
+        end if;
+        return new;
+    end;
+    $$ language plpgsql;
+
+create or replace trigger no_edit_restaurant_of_service
+    before update
+    on services
+    for each row
+    execute function no_edit_restaurant_of_service();
+
+-- tests
+/*update services set restaurant = 9 where id = 88;
+update services set day_of_week = 2 where id = 88;
+*/
