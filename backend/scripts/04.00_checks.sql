@@ -78,7 +78,7 @@ values ('Abcde','test123','city','+32 1 234 56 89','test description',5,1);
 delete from restaurants
     where city = 'city';*/
 
---description length >=10 if not null
+--contrainte description length >=10 if not null
 alter table restaurants
     add constraint cs_description_restaurants
     check ( (description is null) or (length(trim(description))>=10));
@@ -89,6 +89,15 @@ values ('Abcde','test123','city','+32 1 234 56 89',5,1);
 delete from restaurants
 where city = 'city';*/
 
+-- contrainte note if not null
+alter table restaurants
+    add constraint cs_note_restaurant
+    check ( (rating is null) or (rating >= 0.0 and rating <= 5.0));
+
+/*insert into restaurants(name, address, city, phone, rating, price_range)
+values ('Abcde','test123','city','+32 1 234 56 89',0.1,1);
+delete from restaurants
+where city = 'city';*/
 
 -- REGLES INVARIANTES DE LA TABLE RESERVATIONS
 -- contrainte de check sur le statut (le fait automatiquement car c'est un enum)
