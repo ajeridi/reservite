@@ -163,3 +163,18 @@ create or replace trigger no_edit_restaurant_table
 /*update tables set restaurant = 9 where id = 29;
 update tables set table_number = 9 where id = 29;
 */
+
+
+-- REGLES INVARIANTES DE LA TABLE SERVICES
+
+-- day_of_week doit etre compris entre 1 et 7
+alter table services
+add constraint cs_day_of_week_between_1_7
+check ( day_of_week between 1 and 7);
+/*
+insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 1, current_time, current_time);
+insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 7, current_time, current_time);
+insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 8, current_time, current_time);
+insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 0, current_time, current_time);
+*/
+
