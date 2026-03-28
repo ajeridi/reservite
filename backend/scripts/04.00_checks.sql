@@ -44,3 +44,30 @@ insert into reservations (client, restaurant, datetime, number_of_guests, specia
 
 delete from reservations where id > 22
 */
+
+-- trigger qui empeche la modification du client ou du restaurant d'une reservation
+create or replace function no_edit_client_restaurant_fct() returns trigger as
+    $$
+    begin
+        if (new.client <> old.client OR new.restaurant <> old.restaurant) then
+            raise exception 'Can''t edit client or restaurant of a reservation';
+        end if;
+        return new;
+    end;
+    $$language plpgsql;
+
+create or replace trigger no_edit_client_restaurant
+    before update
+    on reservations
+    for each row
+    execute function no_edit_client_restaurant_fct();
+
+/*update reservations set client = 2 where id = 22;
+update reservations set restaurant = 2 where id = 22;
+update reservations set client = 2, restaurant = 2 where id = 22;
+update reservations set client = 6, restaurant = 4 where id = 22;
+
+insert into reservations (client, restaurant, datetime, number_of_guests, special_requests) VALUES (3, 5, current_date, 3, null);
+*/
+
+
