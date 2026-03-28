@@ -25,7 +25,7 @@ where full_name ='Edy';
 set search_path to public;
 
 
--- Regles invariantes de la table Reservations
+-- REGLES INVARIANTES DE LA TABLE RESERVATIONS
 -- contrainte de check sur le statut (le fait automatiquement car c'est un enum)
 alter table reservations
 add constraint cs_statut_reservation
@@ -95,3 +95,47 @@ insert into reservations (client, restaurant, datetime, number_of_guests, specia
 */
 
 
+
+
+-- REGLE INVARIANTES DE LA TABLE TABLES
+
+-- un numero de table doit etre strictement positif
+alter table tables
+add constraint cs_strictly_positive_table_number
+check (table_number > 0);
+
+-- test
+/*insert into tables (restaurant, table_number, capacity) values (1, 0, 4);
+insert into tables (restaurant, table_number, capacity) values (1, 2, 4);
+*/
+
+-- la capacite doit etre strictement positive
+alter table tables
+add constraint cs_strictly_positive_capacity
+check ( capacity > 0 );
+
+/*insert into tables (restaurant, table_number, capacity) values (8, 5, 0);
+insert into tables (restaurant, table_number, capacity) values (8, 5, 4);
+*/
+
+-- le restaurant d'une table est non modifiable
+create or replace function no_edit_restaurant_table() returns trigger as
+    $$
+    begin
+        if (new.restaurant <> old.restaurant) then
+            raise exception 'Cannot edit the restaurant of an existing table';
+        end if;
+        return new;
+    end;
+    $$language plpgsql;
+
+create or replace trigger no_edit_restaurant_table
+    before update
+    on tables
+    for each row
+    execute function no_edit_restaurant_table();
+
+-- tests
+/*update tables set restaurant = 9 where id = 29;
+update tables set table_number = 9 where id = 29;
+*/
