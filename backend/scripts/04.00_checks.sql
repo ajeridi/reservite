@@ -154,3 +154,13 @@ insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 
 insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 0, current_time, current_time);
 */
 
+-- l'heure de fin doit etre posterieure a l'heure de debut d'au moins une heure
+alter table services
+add constraint cs_end_time_one_hour_min_after_start_time
+check ( end_time - start_time >= '01:00:00' );
+
+-- tests
+/*
+insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 3, '01:00:00', '01:30:00'); -- NOK
+insert into services (restaurant, day_of_week, start_time, end_time) VALUES (3, 3, '01:00:00', '02:00:00'); -- OK
+*/
