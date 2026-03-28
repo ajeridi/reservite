@@ -118,3 +118,24 @@ check ( capacity > 0 );
 insert into tables (restaurant, table_number, capacity) values (8, 5, 4);
 */
 
+-- le restaurant d'une table est non modifiable
+create or replace function no_edit_restaurant_table() returns trigger as
+    $$
+    begin
+        if (new.restaurant <> old.restaurant) then
+            raise exception 'Cannot edit the restaurant of an existing table';
+        end if;
+        return new;
+    end;
+    $$language plpgsql;
+
+create or replace trigger no_edit_restaurant_table
+    before update
+    on tables
+    for each row
+    execute function no_edit_restaurant_table();
+
+-- tests
+/*update tables set restaurant = 9 where id = 29;
+update tables set table_number = 9 where id = 29;
+*/
