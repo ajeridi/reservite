@@ -59,7 +59,13 @@ values ('Abcde','test','test','123','test description',5,1);
 delete from restaurants
     where name ='Abcde';*/
 
+--contrainte city name min 3 charactères
+    alter table restaurants
+    add constraint cs_city_length_restaurants
+    check ( length(trim(city)) >= 3);
 
+/*insert into restaurants(name, address, city, phone, description, rating, price_range)
+values ('Abcde','test123','ci','123','test description',5,1);*/
 
 -- REGLES INVARIANTES DE LA TABLE RESERVATIONS
 -- contrainte de check sur le statut (le fait automatiquement car c'est un enum)
