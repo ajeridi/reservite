@@ -67,6 +67,17 @@ delete from restaurants
 /*insert into restaurants(name, address, city, phone, description, rating, price_range)
 values ('Abcde','test123','ci','123','test description',5,1);*/
 
+--contrainte phone format belge avec ou sans éspaces
+alter table restaurants
+add constraint cs_phone_format_restaurants
+check ( phone ~ '^(\+32|0)[0-9\s]{10,17}$' );
+
+/*insert into restaurants(name, address, city, phone, description, rating, price_range)
+values ('Abcde','test123','city','+32 1 234 56 89','test description',5,1);
+
+delete from restaurants
+    where city = 'city';*/
+
 -- REGLES INVARIANTES DE LA TABLE RESERVATIONS
 -- contrainte de check sur le statut (le fait automatiquement car c'est un enum)
 alter table reservations
