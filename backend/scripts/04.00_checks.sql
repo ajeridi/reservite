@@ -9,21 +9,63 @@ add constraint cs_name_length
 check (length(trim(full_name)) >= 3);
 
 --tests
-insert into users( email, password, full_name, role, phone)
-values ('test_password', 'Projet123@','Test','client','12345');
+/*insert into users( email, password, full_name, role, phone)
+values ('test_password', 'Projet123@','Test','client','12345');*/
 
 --constraint user password
 alter table users
 add constraint cs_password_regex
 check ( password ~ '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[,;.:!?/$%&@#]).{8,}$' );
 
-delete from users
-where full_name ='Edy';
+--trigger pour empêcher le changement du 'rôle' d'un user
+create or replace function no_edit_user_role_fct() returns trigger as
+$$
+begin
+    if (new.role <> old.role) then
+        raise exception 'Can''t edit client''s role';
+    end if;
+    return new;
+end;
+$$language plpgsql;
 
+create or replace trigger no_edit_user_role
+    before update
+    on users
+    for each row
+execute function no_edit_user_role_fct();
 
+/*update users set role = 'manager' where id =6;*/
 
-set search_path to public;
+--REGLES INVARIANTES DE LA TABLE RESTAURANTS
+--contrainte nom min 5 charactères
+alter table restaurants
+add constraint cs_name_length_restaurants
+check ( length(trim(name)) >=5);
 
+/*insert into restaurants(name, address, city, phone, description, rating, price_range)
+values ('Abcde','test','test','123','test description',5,1);
+
+delete from restaurants
+    where name ='Abcde';*/
+
+--contrainte adresse min 5 charactères
+alter table restaurants
+add constraint cs_adress_length_restaurants
+check ( length(trim(address)) >= 5);
+
+/*insert into restaurants(name, address, city, phone, description, rating, price_range)
+values ('Abcde','test','test','123','test description',5,1);
+
+delete from restaurants
+    where name ='Abcde';*/
+
+--contrainte city name min 3 charactères
+    alter table restaurants
+    add constraint cs_city_length_restaurants
+    check ( length(trim(city)) >= 3);
+
+/*insert into restaurants(name, address, city, phone, description, rating, price_range)
+values ('Abcde','test123','ci','123','test description',5,1);*/
 
 -- REGLES INVARIANTES DE LA TABLE RESERVATIONS
 -- contrainte de check sur le statut (le fait automatiquement car c'est un enum)
