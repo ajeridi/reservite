@@ -21,7 +21,7 @@ Analyse :
             - DELETE : NON. Supprime juste la table.
 */
 
-create or replace funciton check_table_restaurant_match() returns trigger as
+create or replace function check_table_restaurant_match() returns trigger as
         $$
         declare
             res_restaurant_id int;
