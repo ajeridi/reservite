@@ -35,7 +35,7 @@ create or replace function verif_time_reserv_fct() returns trigger as
     $$language plpgsql security definer ;
 
 create or replace trigger verif_time_reseration
-    before insert or update of datetime
+    after insert or update of datetime
     on reservations
     for each row
     execute function verif_time_reserv_fct();
