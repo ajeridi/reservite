@@ -11,23 +11,23 @@ l'heure reserv en min depuis 00h % (Modulo) durré creneau == 0 OK
  */
 
 
-select extract(minutes from datetime )
-from reservations
-where id =3;
-select extract(hour from datetime )
-from reservations
-where id =3;
+-- select extract(minutes from datetime )
+-- from reservations
+-- where id =3;
+-- select extract(hour from datetime )
+-- from reservations
+-- where id =3;
 
-select * from reservations r
-                  join public.restaurants r2 on r.restaurant = r2.id
-                    where MOD(extract(hour from datetime)* 60 + extract(minutes from datetime),r2.slot_duration) = 0;
+-- select * from reservations r
+--                   join public.restaurants r2 on r.restaurant = r2.id
+--                     where MOD(extract(hour from datetime)* 60 + extract(minutes from datetime),r2.slot_duration) = 0;
 
 create or replace function verif_time_reserv_fct() returns trigger as
     $$
         begin
             if exists(select * from reservations r
                                join public.restaurants r2 on r.restaurant = r2.id
-                               where MOD(extract(hour from datetime)* 60+ extract(minutes from datetime),r2.slot_duration) <> 0) then
+                               where MOD(extract(hour from datetime)* 60 + extract(minutes from datetime),r2.slot_duration) <> 0) then
                 raise exception 'Reservation Hour does not respect de restaurant slot_duration';
             end if;
             return null;
@@ -35,7 +35,7 @@ create or replace function verif_time_reserv_fct() returns trigger as
     $$language plpgsql security definer ;
 
 create or replace trigger verif_time_reseration
-    after insert or update
+    before insert or update of datetime
     on reservations
     for each row
     execute function verif_time_reserv_fct();
