@@ -22,6 +22,8 @@ do $test$
 
         update reservations set status = 'confirmed'
         where id = 902;
+
+        set constraints all immediate;
     end;
 $test$;
 rollback;
@@ -48,6 +50,8 @@ do $test$
 
         update reservations set status = 'confirmed'
         where id = 904;
+
+        set constraints all immediate;
     end;
 $test$;
 rollback;
