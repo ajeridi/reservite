@@ -36,7 +36,7 @@ returns trigger as
         if exists(
             select s.id
             from services s join restaurants r on s.restaurant = r.id
-            where  MOD(extract(minute from (s.end_time - s.start_time)), slot_duration) <> 0
+            where  MOD(extract(EPOCH from (s.end_time - s.start_time))/60::int, slot_duration) <> 0
         ) then
             raise exception 'A service exists with start/end time not aligned with slot duration';
         end if;
