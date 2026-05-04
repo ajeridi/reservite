@@ -9,7 +9,7 @@ do $test$
 
         -- client 3 prend la table 1 à 12h30
         insert into reservations (id, client, restaurant, datetime, number_of_guests)
-        values (901, 3, 1, '2024-12-01 12:30:00', 2);
+        values (901, 3, 1, '2024-12-08 12:30:00', 2);
         insert into reservation_tables (reservation, "table") values (901, 1);
 
         update reservations set status = 'confirmed'
@@ -17,7 +17,7 @@ do $test$
 
         -- client 4 prend la table 2 à 12h30 (tout va bien)
         insert into reservations (id, client, restaurant, datetime, number_of_guests)
-        values (902, 4, 1, '2024-12-01 12:30:00', 2);
+        values (902, 4, 1, '2024-12-08 12:30:00', 2);
         insert into reservation_tables (reservation, "table") values (902, 2);
 
         update reservations set status = 'confirmed'
@@ -37,7 +37,7 @@ do $test$
 
         -- Client 3, Table 1, service de midi (12h30)
         insert into reservations (id, client, restaurant, datetime, number_of_guests)
-        values (903, 3, 1, '2024-12-02 12:30:00', 2);
+        values (903, 3, 1, '2024-12-09 12:30:00', 2);
         insert into reservation_tables (reservation, "table") values (903, 1);
 
         update reservations set status = 'confirmed'
@@ -45,7 +45,7 @@ do $test$
 
         -- Client 4, Table 1, service du soir (20h00) (Tout va bien)
         insert into reservations (id, client, restaurant, datetime, number_of_guests)
-        values (904, 4, 1, '2024-12-02 20:00:00', 2);
+        values (904, 4, 1, '2024-12-09 20:00:00', 2);
         insert into reservation_tables (reservation, "table") values (904, 1);
 
         update reservations set status = 'confirmed'
@@ -66,7 +66,7 @@ do $test$
         perform should_fail($$
             -- Client 3, Table 1 à 12h30
             insert into reservations (id, client, restaurant, datetime, number_of_guests)
-            values (905, 3, 1, '2024-12-01 12:30:00', 2);
+            values (905, 3, 1, '2024-12-08 12:30:00', 2);
             insert into reservation_tables (reservation, "table") values (905, 1);
 
             update reservations set status = 'confirmed'
@@ -74,7 +74,7 @@ do $test$
 
             -- Client 4, Table 1 à 13h00 (plein milieu du même service)
             insert into reservations (id, client, restaurant, datetime, number_of_guests)
-            values (906, 4, 1, '2024-12-01 13:00:00', 2);
+            values (906, 4, 1, '2024-12-08 13:00:00', 2);
             insert into reservation_tables (reservation, "table") values (906, 1);
 
             update reservations set status = 'confirmed'
