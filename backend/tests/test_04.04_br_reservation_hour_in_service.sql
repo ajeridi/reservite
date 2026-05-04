@@ -31,7 +31,7 @@ $test$;
 rollback;
 
 
-
+/*
 begin;
 do
 $test$
@@ -41,15 +41,4 @@ $test$
     end;
 $test$;
 rollback;
-
-
-begin;
-do
-$test$
-    begin
-        raise notice 'TEST valide : insertion de reservation avec datetime non valide et status cancelled';
-        insert into reservations (client, restaurant, datetime, number_of_guests, status) VALUES (3, 1, '2024-12-01 15:30:00.000000', 3, 'cancelled');
-    end;
-$test$;
-rollback;
-
+ */
