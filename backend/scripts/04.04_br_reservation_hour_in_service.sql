@@ -1,6 +1,5 @@
 set search_path to public;
 /*
-
 (BR-04) L'heure d'une réservation confirmée, terminée ou en attente doit être comprise entre l'heure de début et l'heure de fin d'un service pour le même jour de la semaine..
 
 Tables concernées : (sur quelle table et sur quelles opération dois-je declencher le trigger)
@@ -26,12 +25,12 @@ Tables concernées : (sur quelle table et sur quelles opération dois-je declenc
 
 
     DONC POUR CONCLURE :
-        SI il EXISTE UNE RESERVATION QUI EST PAS DANS LA LISTE DES RESERVATION QUI SE TROUVENT DANS UN SERVICE, ALORS MA RESERVATION N EST PAS DANS UN SERVICE */
+        SI il EXISTE UNE RESERVATION (non annulee) QUI EST PAS DANS LA LISTE DES RESERVATION QUI SE TROUVENT DANS UN SERVICE, ALORS MA RESERVATION N EST PAS DANS UN SERVICE */
 
 create or replace function reservation_time_inside_service_fct() returns trigger as
     $$
     begin
-        if exists (select reservations.id  from reservations where reservations.id not in (
+        if exists (select reservations.id  from reservations where reservations.status <> 'cancelled' and reservations.id not in (
             select  rsv.id
             from reservations rsv
                      join restaurants rst on rst.id = rsv.restaurant
@@ -46,9 +45,24 @@ create or replace function reservation_time_inside_service_fct() returns trigger
     $$ language plpgsql;
 
 
+create or replace trigger trigger_reservations_time_inside_service
+    after insert or update of datetime, status
+    on reservations
+    for each row
+    execute function reservation_time_inside_service_fct();
 
+create or replace trigger trigger_check_reservations_time_after_services_update
+    after update
+    on services
+    for each row
+    execute function reservation_time_inside_service_fct();
+
+
+/*
 select  rsv.id
 from reservations rsv
          join restaurants rst on rst.id = rsv.restaurant
          join services ser on ser.restaurant = rst.id
 where extract(isodow from rsv.datetime::date) = ser.day_of_week and rsv.datetime::time >= ser.start_time and rsv.datetime::time <= ser.end_time
+*/
+
