@@ -49,7 +49,8 @@ create or replace trigger check_reservation_status_cycle
 Tests :
 */
 
-/*insert into reservations(client, restaurant, datetime, number_of_guests, status) VALUES (3, 4, '2024-12-06 19:00:00.000000', 4, 'confirmed'); -- KO
+/*
+insert into reservations(client, restaurant, datetime, number_of_guests, status) VALUES (3, 4, '2024-12-06 19:00:00.000000', 4, 'confirmed'); -- KO
 insert into reservations(client, restaurant, datetime, number_of_guests) VALUES (3, 4, '2024-12-06 19:00:00.000000', 4); -- OK
 update reservations set status = 'completed' where id = 19; -- OK
 -- de completed a confirmed KO
