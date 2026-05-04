@@ -10,7 +10,7 @@ do $test$
 
         -- crée la réservation en 'pending'
         insert into reservations (id, client, restaurant, datetime, number_of_guests, status)
-        values (910, 1, 1, '2024-11-15 12:30:00', 2, 'pending');
+        values (910, 3, 1, '2024-11-15 12:30:00', 2, 'pending');
 
         -- le client change d'avis et modifie le nombre de guests
         update reservations set number_of_guests = 4 where id = 910;
@@ -29,7 +29,7 @@ do $test$
 
         -- on crée en pending
         insert into reservations (id, client, restaurant, datetime, number_of_guests, status)
-        values (911, 1, 1, '2024-11-15 12:30:00', 2, 'pending');
+        values (911, 3, 1, '2024-11-15 12:30:00', 2, 'pending');
 
         -- on l'annule (ca c'est tjrs autorisé)
         update reservations set status = 'cancelled' where id = 911;
@@ -52,10 +52,13 @@ do $test$
 
         -- on crée tjrs en pending
         insert into reservations (id, client, restaurant, datetime, number_of_guests, status)
-        values (912, 1, 1, '2024-11-15 12:30:00', 2, 'pending');
+        values (912, 3, 1, '2024-11-15 12:30:00', 2, 'pending');
 
-        -- on lui donne une table (OBLIGATOIRE pour que BR-02 laisse passer completed)
+        -- on lui donne une table (OBLIGATOIRE pour que BR-02 laisse passer confirmed et completed)
         insert into reservation_tables (reservation, "table") values (912, 1);
+
+        -- obligé de passé de pending à confirmed (pour ensuite aller plus tard vers completed)
+        update reservations set status = 'confirmed' where id = 912;
 
         -- on passe la réservation en completed (ca on peut tjrs)
         update reservations set status = 'completed' where id = 912;
