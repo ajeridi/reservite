@@ -20,7 +20,7 @@ begin
               and new.start_time < s.end_time)then
         raise exception 'Les services se chevauchent';
     end if;
-    return null;
+    return new;
 end;
 $$language plpgsql security definer ;
 

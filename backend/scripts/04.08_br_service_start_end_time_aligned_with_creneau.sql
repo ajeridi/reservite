@@ -33,10 +33,13 @@ create or replace function services_times_aligned_with_creneau_fct()
 returns trigger as
     $$
     begin
+        /*
+         S'il existe un service tel que son intervalle de temps (end - start) n'est pas un multiple du creneau -> exception
+        */
         if exists(
             select s.id
             from services s join restaurants r on s.restaurant = r.id
-            where  MOD(extract(minute from (s.end_time - s.start_time)), slot_duration) <> 0
+            where  MOD(extract(EPOCH from (s.end_time - s.start_time))/60::int, slot_duration) <> 0 -- EPOCH renvoie les secondes, puis /60 pour avoir en minutes et ::int pour convertir en int
         ) then
             raise exception 'A service exists with start/end time not aligned with slot duration';
         end if;
