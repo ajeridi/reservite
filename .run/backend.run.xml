@@ -13,6 +13,7 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/04.07_br_regle_services_resto.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.08_br_service_start_end_time_aligned_with_creneau.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.09_br_check_reservation_status_cycle.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.10_br_check_nb_managers_resto.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.11_br_no_update_completed_cancelled.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.12_br_no_reservation_pen_canc_in_reservation_tables.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.14_br_no_past_reservation.sql" />
