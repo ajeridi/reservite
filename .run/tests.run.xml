@@ -4,6 +4,7 @@
     <script-file value="$PROJECT_DIR$/backend/tests/test_02_impersonation.sql" />
     <script-file value="$PROJECT_DIR$/backend/tests/test_03_reset_database.sql" />
     <script-file value="$PROJECT_DIR$/backend/tests/test_04.00_br_email_unique.sql" />
+    <script-file value="$PROJECT_DIR$/backend/tests/test_04.02_br_nb_convives_res.sql" />
     <script-file value="$PROJECT_DIR$/backend/tests/test_04.03_br_table_restaurant.sql" />
     <script-file value="$PROJECT_DIR$/backend/tests/test_04.04_br_reservation_hour_in_service.sql" />
     <script-file value="$PROJECT_DIR$/backend/tests/test_04.05_br_creneau_reservation.sql" />
