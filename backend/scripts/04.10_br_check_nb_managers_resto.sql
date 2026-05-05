@@ -54,8 +54,8 @@ create constraint trigger check_nb_managers_on_resto
     for each row
     execute function check_nb_managers_fct();
 
-create constraint trigger check_nb_managers_on_resto_managers
-    after delete or update of restaurant on restaurant_managers
-    deferrable initially deferred
+create trigger check_nb_managers_on_resto_managers
+    after delete or update of restaurant
+    on restaurant_managers
     for each row
     execute function check_nb_managers_fct();
