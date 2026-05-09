@@ -52,7 +52,7 @@ create or replace trigger trigger_reservations_time_inside_service
     execute function reservation_time_inside_service_fct();
 
 create or replace trigger trigger_check_reservations_time_after_services_update
-    after update
+    after update or delete
     on services
     for each row
     execute function reservation_time_inside_service_fct();
