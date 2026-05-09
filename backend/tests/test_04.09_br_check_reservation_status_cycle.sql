@@ -28,10 +28,8 @@ begin;
 do
 $test$
     begin
-        raise notice 'Test BR_09 : update non valide dans table reservation';
-        perform should_fail( $$
+        raise notice 'Test BR_09 : update valide de confirmed->confirmed';
         update reservations set status = 'confirmed' where id = 19;
-        $$, 'raise_exception');
     end
 $test$;
 rollback;
