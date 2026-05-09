@@ -30,6 +30,19 @@ $test$
 $test$;
 rollback;
 
+/* test delete services */
+
+begin;
+do
+$test$
+    begin
+        raise notice 'TEST BR-04 non valide: suppression d''un service';
+        perform should_fail($$ delete from services where id = 23;
+        $$, 'raise_exception');
+    end;
+$test$;
+rollback;
+
 
 /*
 begin;

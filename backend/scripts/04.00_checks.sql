@@ -280,3 +280,40 @@ create or replace trigger no_edit_restaurant_of_service
 /*update services set restaurant = 9 where id = 88;
 update services set day_of_week = 2 where id = 88;
 */
+
+
+
+/*
+
+        TABLE RESTAURANT_MANAGERS ET RESERVATIONS TABLES : PREVENT UPDATE
+*/
+
+create or replace function prevent_update_fct()
+returns trigger as
+    $$
+    begin
+        if (tg_table_name = 'restaurant_managers') then
+            if (old.restaurant <> new.restaurant OR old.manager <> new.manager) then
+                raise exception 'Cannot update composed key of table %', tg_table_name;
+            end if;
+        end if;
+        if (tg_table_name = 'reservation_tables') then
+            if (old.reservation <> new.reservation OR old.table <> new.table) then
+                raise exception 'Cannot update composed key of table %', tg_table_name;
+            end if;
+        end if;
+        return new;
+    end;
+    $$ language plpgsql;
+
+create or replace trigger prevent_update_restaurant_managers_trigger
+    before update
+    on restaurant_managers
+    for each row
+    execute function prevent_update_fct();
+
+create or replace trigger prevent_update_reservation_tables_trigger
+    before update
+    on reservation_tables
+    for each row
+execute function prevent_update_fct();
