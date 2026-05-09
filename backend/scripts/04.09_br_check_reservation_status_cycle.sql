@@ -28,8 +28,8 @@ returns trigger as
     begin
         if  (tg_op = 'INSERT' and new.status = 'pending') OR
             (tg_op = 'UPDATE') AND
-                ((old.status = 'pending' AND (new.status = 'confirmed' OR new.status = 'cancelled')) OR
-                ((old.status = 'confirmed') AND (new.status = 'completed' OR new.status = 'cancelled')) OR
+                ((old.status = 'pending' AND (new.status = 'pending' OR new.status = 'confirmed' OR new.status = 'cancelled')) OR
+                ((old.status = 'confirmed') AND (new.status = 'confirmed' OR new.status = 'completed' OR new.status = 'cancelled')) OR
                 (new.datetime > (SELECT simulated_time FROM system_time) AND old.status = 'confirmed' AND new.status = 'pending')) THEN
             return new;
         end if;
