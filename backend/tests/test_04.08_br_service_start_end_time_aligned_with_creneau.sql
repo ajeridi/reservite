@@ -19,12 +19,12 @@ $test$
     begin
         raise notice 'Test BR_08 : Table service';
         -- insertion valide
-        insert into services (restaurant, day_of_week, start_time, end_time) VALUES (1, 7, '15:15:00', '16:45:00'); -- restaurant 1 a un slot de 30
+        insert into services (restaurant, day_of_week, start_time, end_time) VALUES (1, 7, '15:00:00', '16:30:00'); -- restaurant 1 a un slot de 30
         -- insertion non valide
         perform should_fail($$
             insert into services (restaurant, day_of_week, start_time, end_time) VALUES (1, 7, '15:15:00', '16:20:00');
             $$, 'raise_exception');
-        -- update non valide, restaurant 4 a un slot de 15, ajouter 10 au service du end_time du service 31
+        -- update non valide, restaurant 4 a un slot de 15, ajouter 10 au service du end_time du service 31, pour donner 14:40 qui n'est pas aligne avec un creneau de 15 min (14:45 oui)
         perform should_fail($$
             update services set end_time = end_time + '00:10:00' where id = 31;
             $$, 'raise_exception');

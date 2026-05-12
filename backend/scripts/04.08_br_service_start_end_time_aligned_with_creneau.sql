@@ -35,11 +35,15 @@ returns trigger as
     begin
         /*
          S'il existe un service tel que son intervalle de temps (end - start) n'est pas un multiple du creneau -> exception
+         CORRECTION !!! ALIGNES VEUT SIMPLEMENT DIRE QUE LE START ET END SONT SUR DES MULTIPLES DU CRENEAU
+            SI MON RESTAU A UN CRENAU DE 15 MIN, START PEUT UNIQUEMENT COMMENCER A H:00 H:15 H:30 H:45...
         */
         if exists(
             select s.id
             from services s join restaurants r on s.restaurant = r.id
-            where MOD(extract(hour from (s.end_time - s.start_time)) * 60 + extract(minutes from (s.end_time - s.start_time)), slot_duration) <> 0
+            -- where MOD(extract(hour from (s.end_time - s.start_time)) * 60 + extract(minutes from (s.end_time - s.start_time)), slot_duration) <> 0
+            -- on peut se permettre de ne pas faire extract(hour) * 60 car les creneau de 10,15,20,30,60 sont tous des multiples de 60
+            where MOD(extract(minutes from s.start_time), slot_duration) <> 0 OR MOD(extract(minutes from s.end_time), slot_duration) <> 0
         ) then
             raise exception 'A service exists with start/end time not aligned with slot duration';
         end if;
@@ -66,4 +70,6 @@ select s.id as service_id, s.start_time, s.end_time, MOD(extract(minute from (s.
 from services s join restaurants r on s.restaurant = r.id;
 
 insert into services (restaurant, day_of_week, start_time, end_time) VALUES (1, 7, '15:15:00', '16:20:00');
+
+insert into services (restaurant, day_of_week, start_time, end_time) VALUES (4, 7, '15:45:00', '17:15:00'); -- KO
  */
