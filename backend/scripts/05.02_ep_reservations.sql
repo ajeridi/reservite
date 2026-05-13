@@ -99,12 +99,12 @@ Confirmation d'une reservation et assignation des tables pour cette reservation
 create or replace function confirm_reservation(reservation_id int, tables_id int[]) returns json as
     $$
     begin
-    -- assigner les tables
-    insert into reservation_tables (reservation, "table") select reservation_id, t from unnest(tables_id) as t;
-    -- update le statut vers confirmed
-    update reservations set status = 'confirmed' where reservations.id = reservation_id;
-    -- retourner la reservation confirmee
-    return get_reservation(reservation_id);
+        -- assigner les tables
+        insert into reservation_tables (reservation, "table") select reservation_id, t from unnest(tables_id) as t;
+        -- update le statut vers confirmed
+        update reservations set status = 'confirmed' where reservations.id = reservation_id;
+        -- retourner la reservation confirmee
+        return get_reservation(reservation_id);
     end;
     $$ language plpgsql security definer;
 
