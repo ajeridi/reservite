@@ -1,5 +1,16 @@
 set search_path to public, auth;
 
+/*
+Operations possible pour une reservation
+    - lister (manager, client)
+    - voir (details) (manager, client), peut etre voir aussi si json retourne est different en fonction du role
+    - insert/update (client)
+    - confirm (manager)
+    - cancel (manager, client)
+    - complete (manager)
+
+*/
+
 -- types sur mesures
 create type client_details as
 (
@@ -113,7 +124,7 @@ create or replace function confirm_reservation(reservation_id int, tables_id int
             raise exception 'User is not manager at the reservation''s restaurant';
         end if;
         -- verifier si la table est bien dans le restaurant (en regardant comparant le nombre de lignes avec le nombre d'elements dans le tableau)
-        if (select count(*) from tables t where t.restaurant = restaurant_id and t.id = any(tables_id)) < array_length(tables_id, 1) then
+        if (select count(*) from tables t where t.restaurant = restaurant_id and t.id = any(tables_id)) < array_length(tables_id, 1) then -- le any est comme un 'OR'
             raise exception 'At least one of the tables is not in the restaurant of the reservation';
         end if;
         -- assigner les tables
