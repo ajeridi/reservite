@@ -27,7 +27,7 @@ end;
 $$ language plpgsql;
 
 
-perform get_restaurant(1);
+
 
 
 
