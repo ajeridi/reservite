@@ -98,7 +98,24 @@ Confirmation d'une reservation et assignation des tables pour cette reservation
 
 create or replace function confirm_reservation(reservation_id int, tables_id int[]) returns json as
     $$
+    declare restaurant_id int;
     begin
+        -- verifier si user connecte
+        perform auth.check_logged();
+        -- user doit etre un manager
+        if (auth.role() <> 'manager') then
+            raise exception 'Operation prohibited for non managers';
+        end if;
+        -- on recupere l'id du restaurant
+        select rsv.restaurant from reservations rsv where rsv.id = reservation_id into restaurant_id;
+        -- on regarde si le manager travaille dans le restaurant de la reservation a confirmer
+        if (auth.id() not in (select rm.manager from restaurant_managers rm where manager = auth.id() and restaurant = restaurant_id )) then
+            raise exception 'User is not manager at the reservation''s restaurant';
+        end if;
+        -- verifier si la table est bien dans le restaurant (en regardant comparant le nombre de lignes avec le nombre d'elements dans le tableau)
+        if (select count(*) from tables t where t.restaurant = restaurant_id and t.id = any(tables_id)) < array_length(tables_id, 1) then
+            raise exception 'At least one of the tables is not in the restaurant of the reservation';
+        end if;
         -- assigner les tables
         insert into reservation_tables (reservation, "table") select reservation_id, t from unnest(tables_id) as t;
         -- update le statut vers confirmed
