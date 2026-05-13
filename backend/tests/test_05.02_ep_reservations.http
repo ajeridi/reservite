@@ -1,2 +1,11 @@
 ###
-GET http://localhost:3000/rpc/get_reservation?reservation_id=1
+//GET http://localhost:3000/rpc/get_reservation?reservation_id=1
+
+###
+POST http://localhost:3000/rpc/confirm_reservation
+Content-Type: application/json
+
+{
+    "reservation_id" : 2,
+    "tables_id" : [5]
+}
