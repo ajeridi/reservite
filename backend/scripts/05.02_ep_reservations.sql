@@ -57,7 +57,7 @@ $$
         raise exception 'Manager cannot check a reservation inside a restaurant he is not working in';
     end if;
 
-    select json_build_object(
+    return (select json_build_object(
            'id', rsv.id,
            'client', (select json_build_object('id', u.id, 'name', u.full_name, 'email', u.email, 'phone', u.phone) from users u where u.id = rsv.client),
            'restaurant', (select json_agg(json_build_object('id', rsv.restaurant, 'name', rst.name, 'address', rst.address, 'city', rst.city, 'phone', rst.phone)) from restaurants rst where rst.id = rsv.restaurant),
@@ -68,7 +68,7 @@ $$
            'tables', (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number, 'capacity', t.capacity)) from reservation_tables rt join tables t on rt."table" = t.id where rt.reservation = reservation_id)
            )
     from reservations rsv
-    where rsv.id = reservation_id;
+    where rsv.id = reservation_id);
     end;
  $$ language plpgsql security definer;
 
@@ -88,19 +88,46 @@ select row (rsv.id,
     )::reservation_type from reservations rsv where rsv.id = 14;
 */
 
-/*-- test pour get_reservations
-select auth.login_anonymously_for_test();
-select auth.id();
+-- -- test pour get_reservations
+-- select auth.login_anonymously_for_test();
+-- select auth.id();
+--
+-- select auth.login_for_test('bepenelle@epfc.eu');
+-- select public.get_reservation(17);
+-- select public.get_reservation(2);
+-- select auth.logout_for_test();
+--
+--
+-- -- toutes les reservations dans le restaurant ou penelle n'est pas manager
+-- select * from reservations
+-- where reservations.restaurant not in (select rm.restaurant from restaurant_managers rm where manager = (select u.id from users u where email = 'bepenelle@epfc.eu'));
 
-select auth.login_for_test('bepenelle@epfc.eu');
-select public.get_reservation(17);
-select auth.logout_for_test();
 
 
--- toutes les reservations dans le restaurant ou penelle n'est pas manager
-select * from reservations
-where reservations.restaurant not in (select rm.restaurant from restaurant_managers rm where manager = (select u.id from users u where email = 'bepenelle@epfc.eu'));
+/*
+Confirmation d'une reservation et assignation des tables pour cette reservation
+    recoit un id de reservation et un liste d'id de tables
 */
 
+create or replace function confirm_reservation(reservation_id int, tables_id int[]) returns json as
+    $$
+    begin
+    -- assigner les tables
+    insert into reservation_tables (reservation, "table") select reservation_id, t from unnest(tables_id) as t;
+    -- update le statut vers confirmed
+    update reservations set status = 'confirmed' where reservations.id = reservation_id;
+    -- retourner la reservation confirmee
+    return get_reservation(reservation_id);
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function confirm_reservation(int, int[]) to manager;
+
+
+-- select * from tables t join restaurants r on r.id = t.restaurant
+--                         join reservations rsv on rsv.restaurant = r.id
+-- where rsv.status = 'pending' and rsv.number_of_guests < t.capacity;
+
+-- assigner table 5 a la reservation 2
 
 
