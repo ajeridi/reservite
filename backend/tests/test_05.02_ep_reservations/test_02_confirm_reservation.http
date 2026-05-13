@@ -1,0 +1,8 @@
+###
+POST http://localhost:3000/rpc/confirm_reservation
+Content-Type: application/json
+
+{
+  "reservation_id" : 2,
+  "tables_id" : [5]
+}
