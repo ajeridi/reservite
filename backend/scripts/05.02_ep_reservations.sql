@@ -88,19 +88,6 @@ select row (rsv.id,
     )::reservation_type from reservations rsv where rsv.id = 14;
 */
 
--- -- test pour get_reservations
--- select auth.login_anonymously_for_test();
--- select auth.id();
---
--- select auth.login_for_test('bepenelle@reservite.com');
--- select public.get_reservation(17);
--- select public.get_reservation(2);
--- select auth.logout_for_test();
---
---
--- -- toutes les reservations dans le restaurant ou penelle n'est pas manager
--- select * from reservations
--- where reservations.restaurant not in (select rm.restaurant from restaurant_managers rm where manager = (select u.id from users u where email = 'bepenelle@reservite.com'));
 
 
 
@@ -124,10 +111,5 @@ create or replace function confirm_reservation(reservation_id int, tables_id int
 grant execute on function confirm_reservation(int, int[]) to manager;
 
 
--- select * from tables t join restaurants r on r.id = t.restaurant
---                         join reservations rsv on rsv.restaurant = r.id
--- where rsv.status = 'pending' and rsv.number_of_guests < t.capacity;
-
--- assigner table 5 a la reservation 2
 
 
