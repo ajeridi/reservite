@@ -1,23 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/auth_provider.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+    ProviderScope(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        home: const LoginMockupScreen(),
       ),
-      home: const LoginMockupScreen(),
-    ),
+    )
   );
 }
 
-class LoginMockupScreen extends StatelessWidget {
+class LoginMockupScreen extends ConsumerStatefulWidget {
   const LoginMockupScreen({super.key});
+
+  @override
+  ConsumerState<LoginMockupScreen> createState() => _LoginMockupScreenState();
+}
+
+class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm(BuildContext context) {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez remplir tous les champs')),
+      );
+      return;
+    }
+    _login(context, email, password: password);
+  }
+
+  void _login(BuildContext context, String email, {String? password}) async {
+    await ref.read(authProvider.notifier).login(email, password ?? '');
+    final authState = ref.read(authProvider);
+
+    if (!context.mounted) return;
+
+    authState.when(
+      data: (token) {
+        if (token != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Connecté !')),
+          );
+          // Plus tard : Navigator.pushReplacementNamed(context, '/home');
+        }
+      },
+      error: (error, _) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur: $error')),
+      ),
+      loading: () {},
+    );
+  }
+
+  void _resetDatabase(BuildContext context) async {
+    await ref.read(authProvider.notifier).resetDatabase();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Base de données réinitialisée')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +154,7 @@ class LoginMockupScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
+                        controller: _emailController,
                         decoration: const InputDecoration(
                           labelText: 'Email',
                           border: OutlineInputBorder(),
@@ -101,6 +164,7 @@ class LoginMockupScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
+                        controller: _passwordController,
                         decoration: const InputDecoration(
                           labelText: 'Mot de passe',
                           border: OutlineInputBorder(),
@@ -110,7 +174,9 @@ class LoginMockupScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: ref.watch(authProvider).isLoading
+                          ? null
+                          : () => _submitForm(context),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
@@ -155,7 +221,7 @@ class LoginMockupScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _login(context, 'brlacroix@epfc.eu', password: 'Password1,'),
                           icon: const Icon(Icons.person),
                           label: const Text('Client (Bruno)'),
                           style: OutlinedButton.styleFrom(
@@ -166,7 +232,7 @@ class LoginMockupScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _login(context, 'mamichel@epfc.eu', password: 'Password1,'),
                           icon: const Icon(Icons.person),
                           label: const Text('Client (Marc)'),
                           style: OutlinedButton.styleFrom(
@@ -181,7 +247,7 @@ class LoginMockupScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _login(context, 'bepenelle@epfc.eu', password: 'Password1,'),
                           icon: const Icon(Icons.manage_accounts),
                           label: const Text('Manager (Benoît)'),
                           style: OutlinedButton.styleFrom(
@@ -192,7 +258,7 @@ class LoginMockupScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _login(context, 'gedielman@epfc.eu', password: 'Password1,'),
                           icon: const Icon(Icons.manage_accounts),
                           label: const Text('Manager (Geoffrey)'),
                           style: OutlinedButton.styleFrom(
@@ -206,7 +272,7 @@ class LoginMockupScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed: () {},
+                      onPressed: () => _resetDatabase(context),
                       icon: const Icon(Icons.refresh),
                       label: const Text('Réinitialiser la base de données'),
                       style: OutlinedButton.styleFrom(
