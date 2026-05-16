@@ -46,7 +46,7 @@ create or replace function check_table_restaurant_match() returns trigger as
             -- Si on arrive ici, on laisse l'insertion continuer
             return new;
         end;
-        $$ language plpgsql;
+        $$ language plpgsql security definer;
 
 create or replace trigger br_03_trigger
        before insert

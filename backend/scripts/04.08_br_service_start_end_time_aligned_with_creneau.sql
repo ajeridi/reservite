@@ -49,8 +49,7 @@ returns trigger as
         end if;
         return null;
     end;
-    $$language plpgsql;
-
+    $$language plpgsql security definer;
 create or replace trigger trigger_start_end_time_aligned_slot_duration
     after insert or update of start_time, end_time
     on services
