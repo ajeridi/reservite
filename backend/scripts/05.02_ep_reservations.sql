@@ -8,6 +8,8 @@ Operations possible pour une reservation
     - confirm (manager)
     - cancel (manager, client)
     - complete (manager)
+
+    - liste des creneau de reservation possibles, pour un client. (donc pour une date donnee, les horaire de reservation possibles)
 */
 
 -- METHODES UTILITAIRES
@@ -229,6 +231,8 @@ create or replace function cancel_reservation(reservation_id int) returns json a
     declare restaurant_id int := (select restaurant from reservations where id = reservation_id);
     declare user_id  int := auth.id();
     begin
+        -- verification connexion du user
+        perform auth.check_logged();
         if (role = 'client'::role_type AND is_client_reservation(user_id, reservation_id) OR role = 'manager'::role_type AND check_manager_works_in_restaurant(user_id, restaurant_id)) then
             update reservations set status = 'cancelled' where id = reservation_id;
             return get_reservation(reservation_id);
@@ -251,6 +255,8 @@ create or replace function complete_reservation(reservation_id int) returns json
     $$
     declare restaurant_id int := (select restaurant from reservations where id = reservation_id);
     begin
+        -- verification connexion du user
+        perform auth.check_logged();
         if (auth.role() = 'manager' AND check_manager_works_in_restaurant(auth.id(), restaurant_id)) then
             update reservations set status = 'completed' where id = reservation_id;
             return get_reservation(reservation_id);
@@ -261,3 +267,35 @@ create or replace function complete_reservation(reservation_id int) returns json
 grant execute on function complete_reservation(int) to manager;
 
 -- =====================================================================================================================
+/*
+    ENDPOINT qui va retourner les creneaux disponible le jour d'une reservation
+*/
+create or replace function get_available_slots(restaurant_id int, date_of_reservation date) returns json as
+    $$
+    declare service RECORD;
+    declare hours time[];
+    declare first_slot time;
+    declare slot int := (select slot_duration from restaurants where id = restaurant_id);
+    begin
+        -- check si utilisateur est connecte
+        perform auth.check_logged();
+        if (auth.role() = 'client') then
+            -- recuperation des services pour le jour de la reservatino
+            FOR service IN
+                select s.start_time, s.end_time
+                from services s
+                where s.restaurant = restaurant_id and s.day_of_week = extract(isodow from date_of_reservation)
+            LOOP
+                -- pour chacun des services calculer les heures de reservations
+                first_slot = service.start_time;
+                WHILE first_slot < service.end_time LOOP
+                    hours := array_append(hours, first_slot);
+                    first_slot := first_slot + slot * INTERVAL '1 minutes'; -- ajouter slot_duration
+                END LOOP;
+            END LOOP;
+            return to_json(hours);
+        end if;
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function get_available_slots(int, date) to client;
