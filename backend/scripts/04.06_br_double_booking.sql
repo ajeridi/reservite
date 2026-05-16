@@ -46,7 +46,7 @@ create or replace function br_06_double_booking_fct() returns trigger as
 
         return null; -- trigger AFTER peut renvoyer null
         end;
-        $$ language plpgsql;
+        $$ language plpgsql security definer;
 
 
 create or replace trigger br_06_reservations
