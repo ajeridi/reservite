@@ -99,7 +99,8 @@ returns json as
                                                           'rating',r.rating,
                                                           'price_range',r.price_range,
                                                           'slot_duration',r.slot_duration,
-                                                          'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1)))
+                                                          'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1),
+                                                          'reservations_pending',(select get_pending_reservation_count(r.id))))
                         from restaurants r
                         join public.restaurant_managers rm on r.id = rm.restaurant
                         where rm.manager = auth.id()
