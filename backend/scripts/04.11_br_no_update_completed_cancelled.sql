@@ -22,7 +22,7 @@ create or replace function br_11_no_update_completed_cancelled_fct() returns tri
             -- on laisse l'update s'exécuter en donnant la nouvelle ligne NEW
             return NEW;
         end;
-        $$ language plpgsql;
+        $$ language plpgsql security definer;
 
 
 create or replace trigger br_11_reservations

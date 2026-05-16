@@ -28,7 +28,7 @@ create or replace function br_14_no_past_reservation_fct() returns trigger as
 
             return NEW;
         end;
-        $$ language plpgsql;
+        $$ language plpgsql security definer;
 
 
 create or replace trigger br_14_reservations

@@ -322,3 +322,11 @@ create or replace function get_available_slots(restaurant_id int, date_of_reserv
     $$ language plpgsql security definer;
 
 grant execute on function get_available_slots(int, date) to client;
+
+
+-- =====================================================================================================================
+
+/*
+        ENDPOINT QUI RETOURNE SI OUI
+
+*/

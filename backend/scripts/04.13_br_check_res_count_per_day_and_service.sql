@@ -40,7 +40,7 @@ returns trigger as
         end if;
         return null;
     end;
-    $$ language plpgsql;
+    $$ language plpgsql security definer;
 
 
 create or replace trigger trigger_reservation_count_per_user_day_and_service

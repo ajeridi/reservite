@@ -42,7 +42,7 @@ create or replace function reservation_time_inside_service_fct() returns trigger
         end if;
         return null;
     end;
-    $$ language plpgsql;
+    $$ language plpgsql security definer;
 
 
 create or replace trigger trigger_reservations_time_inside_service
