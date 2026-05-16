@@ -1,0 +1,12 @@
+### connection d'un client
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "xapigeolet@reservite.com",
+  "password" : "Password1,"
+}
+
+### recuperation des creneaux disponibles
+GET http://localhost:3000/rpc/get_available_slots?restaurant_id=2&date_of_reservation=2024-12-06
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTAzNTg5MH0.-Kt28RZO7XC7SjOwWmgznLLGaNAevJbGApMMXrqmTl4

@@ -1,0 +1,30 @@
+### connection d'un manager
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "boverhaegen@reservite.com",
+  "password" : "Password1,"
+}
+
+### connection d'un client
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "xapigeolet@reservite.com",
+  "password" : "Password1,"
+}
+
+### reservation d'un client
+GET http://localhost:3000/rpc/get_reservations
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTAxNjIzNn0.atY6DIc3XHtov5wTCgSsR2cQWhUqFK8luXXpFueyy9g
+
+### reservations d'un manager dans un restaurant (ok)
+GET http://localhost:3000/rpc/get_reservations?restaurant_id=4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzkwMTkxNjJ9.oMWo-oUzTdKczT_VPGrf1Jp0Uyft2-96aCbX_KMU3is
+
+### reservations d'un manager dans un restaurant (KO)
+GET http://localhost:3000/rpc/get_reservations?restaurant_id=6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzkwMTkxNjJ9.oMWo-oUzTdKczT_VPGrf1Jp0Uyft2-96aCbX_KMU3is
+
