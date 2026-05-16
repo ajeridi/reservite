@@ -23,9 +23,9 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTAyNDQwNH0.JskNHbQGrFm5dijySlyIeICatqK5Gh8GgoIgm1YUJ78
 
 {
-  "restaurant_id" : 3,
-  "datetime_" : "2024-12-04 18:00:00",
-  "number_of_guests_" : 4,
+  "restaurant_id" : 2,
+  "datetime_" : "2024-12-06 18:30:00",
+  "number_of_guests_" : 2,
   "special_requests_" : "xxxxxxxxxxxxxxxxxxxx"
 }
 
