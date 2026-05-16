@@ -8,48 +8,26 @@ Operations possible pour une reservation
     - confirm (manager)
     - cancel (manager, client)
     - complete (manager)
-
 */
 
--- types sur mesures
-create type client_details as
-(
-    id integer,
-    name varchar,
-    email varchar,
-    phone varchar
-);
+-- METHODES UTILITAIRES
 
-create type restaurant_details as
-(
-    id integer,
-    name varchar,
-    address varchar,
-    city varchar,
-    phone varchar
-);
+/*
+Verifie si un manager travaille dans un restaurant
+*/
 
-create type table_details as
-(
-    id integer,
-    table_number integer,
-    capacity integer
-);
-
-create type reservation_type as
-(
-    id integer,
-    client client_details,
-    restaurant restaurant_details,
-    datetime timestamp,
-    number_of_guests integer,
-    status status_type,
-    special_requests text,
-    tables table_details[]
-);
+create or replace function check_manager_works_in_restaurant(manager_id int, restaurant_id int) returns void as
+    $$
+    begin
+        if not exists(select manager from restaurant_managers rm where restaurant = restaurant_id and manager = manager_id ) then
+            raise exception 'Manager is not working at that restaurant';
+        end if;
+    end;
+    $$ language plpgsql security definer;
 
 
 
+-- =====================================================================================================================
 /*
 FONCTION QUI RETOURNE UNE RESERVATION avec les details du client, du restaurant et la/les tables assignees
 */
@@ -99,8 +77,62 @@ select row (rsv.id,
     )::reservation_type from reservations rsv where rsv.id = 14;
 */
 
+-- =====================================================================================================================
 
+/*
+ENDPOINT QUI VA RETOURNER UNE LISTE DE RESERVATIONS
+    on retourne une liste d'objets reservations donc json_agg(json_build_object)
+*/
 
+create or replace function get_reservations(restaurant_id int default NULL) returns json as
+    $$
+    declare user_id int := auth.id();
+    declare user_role role_type := auth.role();
+    begin
+        -- verification si le user est logged
+        perform auth.check_logged();
+        -- un client a besoin uniquement du nom du restaurant, de la ville du restaurant, de la date et du nombre de convives, le statut
+        if (user_role = 'client'::role_type) then
+            return (select json_agg(
+                           json_build_object(
+                                'id', rsv.id,
+                                'client', rsv.client,
+                                'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'city', rst.city) from restaurants rst where rst.id = rsv.restaurant),
+                                'datetime', rsv.datetime,
+                                'number_of_guests', rsv.number_of_guests,
+                                'status', rsv.status
+                           )
+                           ORDER BY rsv.datetime DESC, rsv.id DESC
+                   )
+                    from reservations rsv
+                    where rsv.client = user_id);
+
+        end if;
+        if (user_role = 'manager'::role_type) then
+            -- on verifie si le manager travaille dans ce restaurant
+            perform check_manager_works_in_restaurant(user_id, restaurant_id);
+            return (select json_agg(
+                                   json_build_object(
+                                           'id', rsv.id,
+                                           'client', (select json_build_object('full_name', u.full_name) from users u where u.id = rsv.client),
+                                           'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'city', rst.city) from restaurants rst where rst.id = rsv.restaurant),
+                                           'datetime', rsv.datetime,
+                                           'number_of_guests', rsv.number_of_guests,
+                                           'status', rsv.status
+                                   )
+                                   ORDER BY rsv.datetime DESC, rsv.id DESC -- faut mettre le order by ici, et pas en fin de query apres le where sinon ca ne marchera pas
+                           )
+                    from reservations rsv
+                    where rsv.restaurant = restaurant_id);
+        end if;
+
+    end;
+    $$ language plpgsql security definer;
+
+-- droit d'execution pour les clients et managers
+grant execute on function get_reservations(int) to authenticated;
+
+-- =====================================================================================================================
 
 /*
 Confirmation d'une reservation et assignation des tables pour cette reservation
@@ -128,7 +160,7 @@ create or replace function confirm_reservation(reservation_id int, tables_id int
             raise exception 'At least one of the tables is not in the restaurant of the reservation';
         end if;
         -- assigner les tables
-        insert into reservation_tables (reservation, "table") select reservation_id, t from unnest(tables_id) as t;
+        insert into reservation_tables (reservation, "table") select reservation_id, t from unnest(tables_id) as t; -- unnest parcours la liste de table et pour chaque element insere la ligne reservation_id, tables_id[i]
         -- update le statut vers confirmed
         update reservations set status = 'confirmed' where reservations.id = reservation_id;
         -- retourner la reservation confirmee
@@ -138,6 +170,6 @@ create or replace function confirm_reservation(reservation_id int, tables_id int
 
 grant execute on function confirm_reservation(int, int[]) to manager;
 
-
+-- =====================================================================================================================
 
 
