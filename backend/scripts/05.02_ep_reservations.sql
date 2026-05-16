@@ -269,6 +269,9 @@ grant execute on function complete_reservation(int) to manager;
 -- =====================================================================================================================
 /*
     ENDPOINT qui va retourner les creneaux disponible le jour d'une reservation
+        la disponibilites des creneaux depends de deux choses : 1 - si le restaurant est ouvert
+                                                                2 - si le client a deja une reservation ce jour la dans un service
+
 */
 create or replace function get_available_slots(restaurant_id int, date_of_reservation date) returns json as
     $$
@@ -276,6 +279,7 @@ create or replace function get_available_slots(restaurant_id int, date_of_reserv
     declare hours time[];
     declare first_slot time;
     declare slot int := (select slot_duration from restaurants where id = restaurant_id);
+    declare reservation_dow int := extract(isodow from date_of_reservation);
     begin
         -- check si utilisateur est connecte
         perform auth.check_logged();
@@ -284,7 +288,16 @@ create or replace function get_available_slots(restaurant_id int, date_of_reserv
             FOR service IN
                 select s.start_time, s.end_time
                 from services s
-                where s.restaurant = restaurant_id and s.day_of_week = extract(isodow from date_of_reservation)
+                where s.restaurant = restaurant_id and s.day_of_week = reservation_dow
+                and s.id not in -- liste des services contenant une reservation du client pour le meme jour
+                    (select s2.id
+                     from reservations rsv
+                        join restaurants rst on rst.id = rsv.restaurant
+                        join services s2 on s2.restaurant = rst.id
+                    where rsv.datetime::date = date_of_reservation -- meme jour que la date de reservation
+                        and rsv.client = auth.id() -- reservation effectuee par le client
+                        and s2.day_of_week = reservation_dow -- services du meme jour que la reservation
+                        and rsv.datetime::time BETWEEN s2.start_time AND  s2.end_time) -- qui contiennent une reservation
             LOOP
                 -- pour chacun des services calculer les heures de reservations
                 first_slot = service.start_time;
@@ -293,6 +306,16 @@ create or replace function get_available_slots(restaurant_id int, date_of_reserv
                     first_slot := first_slot + slot * INTERVAL '1 minutes'; -- ajouter slot_duration
                 END LOOP;
             END LOOP;
+            -- si les heures sont vides, c'est que aucun service n'a ete trouve
+            if (hours IS NULL) then
+                -- si c'est parce que le restaurant est ferme
+                if ( not exists(select s.id from services s where s.day_of_week = reservation_dow and s.restaurant = restaurant_id)) then
+                    return json_build_object('message','Le restaurant est ferme ce jour la.');
+                -- sinon c'est parce que la personne a une reservation dans chaque service du jour
+                else
+                    return json_build_object('message','Vous avez deja une reservation pour chaque service de ce jour la.');
+                end if;
+            end if;
             return to_json(hours);
         end if;
     end;
