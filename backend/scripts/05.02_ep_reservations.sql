@@ -133,6 +133,44 @@ create or replace function get_reservations(restaurant_id int default NULL) retu
 grant execute on function get_reservations(int) to authenticated;
 
 -- =====================================================================================================================
+/*
+    INSERT UPDATE RESERVATION
+        SEUL UN CLIENT PEUT CREER OU MODIFIER SA RESERVATION
+    retourne la reservation ajoutee ou modifiee
+*/
+
+create or replace function save_reservation(restaurant_id int, datetime_ timestamp, number_of_guests_ int, special_requests_ text DEFAULT NULL, reservation_id int DEFAULT NULL)
+returns json as
+    $$
+    declare updated_reservation_id int := reservation_id;
+    begin
+        -- verification si utilisateur connecte
+        perform auth.check_logged();
+        if (auth.role() <> 'client') then
+            raise exception 'Cannot add/edit a reservation if you are not a client';
+        end if;
+        -- si reservation_id est null alors on cree une nouvelle reservation
+        if (reservation_id is NULL) then
+            INSERT INTO reservations(client, restaurant, datetime, number_of_guests, special_requests)
+            VALUES (auth.id(), restaurant_id, datetime_, number_of_guests_, special_requests_) returning id into updated_reservation_id;
+        -- sinon on update reservation
+        else
+            UPDATE reservations set datetime = datetime_, number_of_guests = number_of_guests_, special_requests = special_requests_
+            WHERE client = auth.id() AND restaurant = restaurant_id;
+        end if;
+        return get_reservation(updated_reservation_id);
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function save_reservation(int, timestamp, int, text, int) to client;
+
+
+
+
+
+
+
+-- =====================================================================================================================
 
 /*
 Confirmation d'une reservation et assignation des tables pour cette reservation
