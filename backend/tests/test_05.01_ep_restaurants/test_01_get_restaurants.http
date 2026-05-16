@@ -1,0 +1,11 @@
+### affichage restaurants en fonction de params de recherche par ville
+GET http://localhost:3000/rpc/get_restaurants?research=namur
+
+### recherche sur description
+GET http://localhost:3000/rpc/get_restaurants?research=gastro
+
+### recherche sur nom
+GET http://localhost:3000/rpc/get_restaurants?research=trattoria
+
+### recherche NULL
+GET http://localhost:3000/rpc/get_restaurants
