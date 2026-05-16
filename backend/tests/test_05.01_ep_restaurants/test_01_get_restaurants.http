@@ -10,6 +10,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50I
 GET http://localhost:3000/rpc/get_restaurants?research=trattoria
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTA1ODU0Nn0.0AmU8GCCuZ2ShcUTTOX1YLqPvpnkkYl4c2DWrv6bj4Y
 
-### recherche NULL
+### recherche NULL , role - manager
 GET http://localhost:3000/rpc/get_restaurants
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTA1ODU0Nn0.0AmU8GCCuZ2ShcUTTOX1YLqPvpnkkYl4c2DWrv6bj4Y
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzkwNTk4MDh9.ueQbNyYemmXzC12MICdMRvt0TF2uyvzwthqZbpDJ_Vo
+
+### pour avoir le token du user
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "boverhaegen@epfc.eu",
+  "password" : "Password1,"
+}
+
