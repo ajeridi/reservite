@@ -241,3 +241,23 @@ create or replace function cancel_reservation(reservation_id int) returns json a
 grant execute on function cancel_reservation(int) to authenticated;
 
 -- =====================================================================================================================
+/*
+    Complete reservation
+        uniquement le manager peut terminer une reservation
+        il faut qu'il soit manager dans le restaurant
+*/
+
+create or replace function complete_reservation(reservation_id int) returns json as
+    $$
+    declare restaurant_id int := (select restaurant from reservations where id = reservation_id);
+    begin
+        if (auth.role() = 'manager' AND check_manager_works_in_restaurant(auth.id(), restaurant_id)) then
+            update reservations set status = 'completed' where id = reservation_id;
+            return get_reservation(reservation_id);
+        end if;
+    end;
+    $$ language plpgsql security definer ;
+
+grant execute on function complete_reservation(int) to manager;
+
+-- =====================================================================================================================

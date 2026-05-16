@@ -25,7 +25,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50I
 {
   "restaurant_id" : 3,
   "datetime_" : "2024-12-04 18:00:00",
-  "number_of_guests_" : 8,
+  "number_of_guests_" : 4,
   "special_requests_" : "xxxxxxxxxxxxxxxxxxxx"
 }
 
@@ -37,7 +37,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlc
 {
 "restaurant_id" : 3,
 "datetime_" : "2024-12-04 18:00:00",
-"number_of_guests_" : 8,
+"number_of_guests_" : 4,
 "special_requests_" : "xxxxxxxxxxxxxxxxxxxx"
 }
 
