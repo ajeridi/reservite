@@ -27,7 +27,7 @@ $$
 
 $$ language plpgsql security definer ;
 
-grant execute on function get_restaurant(int) to anon;
+grant execute on function get_restaurant(int) to authenticated;
 
 
 
@@ -73,7 +73,8 @@ create or replace function get_restaurants(research text default NULL)
 returns json as
     $$
         begin
-            return (select json_agg(json_build_object('id',r.id,
+            if auth.role() = 'client' then
+                return (select json_agg(json_build_object('id',r.id,
                                                       'name',r.name,
                                                       'address',r.address,
                                                       'city',r.city,
@@ -86,8 +87,39 @@ returns json as
                     from restaurants r where lower(name) like  CONCAT('%',get_restaurants.research,'%')
                                                                                                     or lower(city) like CONCAT('%',get_restaurants.research,'%')
                                                                                                     or lower(description) like CONCAT('%',get_restaurants.research,'%'));
+            end if;
+
+            if auth.role() = 'manager' then
+                return (select json_agg(json_build_object('id',r.id,
+                                                          'name',r.name,
+                                                          'address',r.address,
+                                                          'city',r.city,
+                                                          'phone',r.phone,
+                                                          'description',r.description,
+                                                          'rating',r.rating,
+                                                          'price_range',r.price_range,
+                                                          'slot_duration',r.slot_duration,
+                                                          'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1)))
+                        from restaurants r
+                        join public.restaurant_managers rm on r.id = rm.restaurant
+                        where rm.manager = auth.id()
+                );
+            end if;
         end;
 
     $$language plpgsql security definer ;
 
-grant execute on function get_restaurants(text) to anon;
+grant execute on function get_restaurants(text) to authenticated;
+
+select json_agg(json_build_object('id',r.id,
+                        'name',r.name,
+                        'address',r.address,
+                        'city',r.city,
+                        'phone',r.phone,
+                        'description',r.description,
+                        'rating',r.rating,
+                        'price_range',r.price_range,
+                        'slot_duration',r.slot_duration,
+                        'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1))) from restaurants r
+                                                        join public.restaurant_managers rm on r.id = rm.restaurant
+                                                        where rm.manager = auth.id();
