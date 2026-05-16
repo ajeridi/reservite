@@ -1,0 +1,2 @@
+###
+GET http://localhost:3000/rpc/get_restaurant?id=2
