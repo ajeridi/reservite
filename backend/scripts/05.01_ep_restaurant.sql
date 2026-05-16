@@ -73,15 +73,17 @@ create or replace function get_restaurants(research text default NULL)
 returns json as
     $$
         begin
-            return (select json_agg(json_build_object('id',id,
-                                                      'name',name,
-                                                      'address',address,
-                                                      'city',city,
-                                                      'phone',phone,
-                                                      'description',description,
-                                                      'rating',rating,
-                                                      'price_range',price_range,
-                                                      'slot_duration',slot_duration)) from restaurants where lower(name) like  CONCAT('%',get_restaurants.research,'%')
+            return (select json_agg(json_build_object('id',r.id,
+                                                      'name',r.name,
+                                                      'address',r.address,
+                                                      'city',r.city,
+                                                      'phone',r.phone,
+                                                      'description',r.description,
+                                                      'rating',r.rating,
+                                                      'price_range',r.price_range,
+                                                      'slot_duration',r.slot_duration,
+                                                        'last_reservation_date',(select datetime from reservations where auth.id() = client and reservations.restaurant = r.id ORDER BY datetime DESC Limit 1)))
+                    from restaurants r where lower(name) like  CONCAT('%',get_restaurants.research,'%')
                                                                                                     or lower(city) like CONCAT('%',get_restaurants.research,'%')
                                                                                                     or lower(description) like CONCAT('%',get_restaurants.research,'%'));
         end;
