@@ -16,12 +16,24 @@ Operations possible pour une reservation
 Verifie si un manager travaille dans un restaurant
 */
 
-create or replace function check_manager_works_in_restaurant(manager_id int, restaurant_id int) returns void as
+create or replace function check_manager_works_in_restaurant(manager_id int, restaurant_id int) returns boolean as
     $$
     begin
         if not exists(select manager from restaurant_managers rm where restaurant = restaurant_id and manager = manager_id ) then
             raise exception 'Manager is not working at that restaurant';
         end if;
+        return true;
+    end;
+    $$ language plpgsql security definer;
+
+
+/*
+    Verifie si la reservation est celle d'un client
+*/
+create or replace function is_client_reservation(client_id int, reservation_id int) returns boolean as
+    $$
+    begin
+        return exists(select rsv.id from reservations rsv where rsv.client = client_id AND reservation_id = rsv.id);
     end;
     $$ language plpgsql security definer;
 
@@ -164,12 +176,6 @@ returns json as
 
 grant execute on function save_reservation(int, timestamp, int, text, int) to client;
 
-
-
-
-
-
-
 -- =====================================================================================================================
 
 /*
@@ -210,4 +216,28 @@ grant execute on function confirm_reservation(int, int[]) to manager;
 
 -- =====================================================================================================================
 
+/*
+    CANCEL_RESERVATION
+    changement du status de la reservation vers cancelled
+        - client peut annuler sa reservation
+        - manager peut annuler une reservation dans son restaurant
+*/
 
+create or replace function cancel_reservation(reservation_id int) returns json as
+    $$
+    declare role role_type := auth.role();
+    declare restaurant_id int := (select restaurant from reservations where id = reservation_id);
+    declare user_id  int := auth.id();
+    begin
+        if (role = 'client'::role_type AND is_client_reservation(user_id, reservation_id) OR role = 'manager'::role_type AND check_manager_works_in_restaurant(user_id, restaurant_id)) then
+            update reservations set status = 'cancelled' where id = reservation_id;
+            return get_reservation(reservation_id);
+        else
+            raise exception 'User does not have the rights to call this method';
+        end if;
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function cancel_reservation(int) to authenticated;
+
+-- =====================================================================================================================
