@@ -32,7 +32,7 @@ create or replace function reservation_associated_with_client_fct() returns trig
             end if;
             return new;
        end;
-       $$ language plpgsql;
+       $$ language plpgsql security definer;
 
 create or replace trigger reservation_associated_with_client
     before insert
