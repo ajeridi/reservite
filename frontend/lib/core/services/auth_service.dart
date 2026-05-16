@@ -54,7 +54,7 @@ class AuthService {
       body: json.encode({}),
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != 204) {
       throw Exception('Reset database failed: ${response.body}');
     }
   }
