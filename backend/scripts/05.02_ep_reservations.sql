@@ -327,6 +327,22 @@ grant execute on function get_available_slots(int, date) to client;
 -- =====================================================================================================================
 
 /*
-        ENDPOINT QUI RETOURNE SI OUI
-
+        ENDPOINT QUI RETOURNE SI LE RESTAURANT A ASSEZ DE PLACES POUR ACCEUILLIR LES CONVIVES
 */
+
+
+
+
+
+/*
+Retourne le nombre de reservations en attentes
+*/
+create or replace function get_pending_reservation_count(restaurant_id int) returns integer as
+    $$
+    begin
+        select count(*) from reservations r where r.status = 'pending' and r.restaurant = restaurant_id;
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function get_pending_reservation_count(int) to manager;
+
