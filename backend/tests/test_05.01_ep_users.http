@@ -33,3 +33,9 @@ Content-Type: application/json
   "email": "nouveau.client@test.be",
   "password": "MauvaisPassword00!"
 }
+
+###
+
+// test du Reset Database (il n'attends aucun paramètre)
+
+POST http://localhost:3000/rpc/reset_database

@@ -5,7 +5,7 @@ import 'assign_tables_mockup.dart';
 import 'edit_service_mockup.dart';
 import 'edit_table_mockup.dart';
 import 'home_client_mockup.dart';
-import 'login_mockup.dart';
+import 'login_page.dart';
 import 'my_restaurants_mockup.dart';
 import 'reservation_details_manager_mockup.dart';
 import 'reservation_details_mockup.dart';
@@ -15,7 +15,7 @@ import 'restaurant_management_reservations_mockup.dart';
 import 'restaurant_management_services_mockup.dart';
 import 'restaurant_management_tables_mockup.dart';
 import 'search_restaurants_mockup.dart';
-import 'signup_mockup.dart';
+import 'signup_page.dart';
 
 /// Écran carousel qui affiche tous les mockups du projet.
 class MockupCarouselScreen extends StatefulWidget {
