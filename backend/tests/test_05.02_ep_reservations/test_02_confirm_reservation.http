@@ -10,7 +10,7 @@ Content-Type: application/json
 ### confirmation de reservation en utilisant le token du login
 POST http://localhost:3000/rpc/confirm_reservation
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3Nzg4MDA3MjN9.CyL5slfHTE-pnkSAbLSrdhhhAQBbUFsxpt7OB7uDWjA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzkwMjU5MTF9.VdAp_NyDFp3A8W_D1dsdbeHb5uDay12YwBEXxS3rJB8
 
 {
   "reservation_id" : 23,
