@@ -39,3 +39,30 @@ Content-Type: application/json
 // test du Reset Database (il n'attends aucun paramètre)
 
 POST http://localhost:3000/rpc/reset_database
+
+###
+
+// test du available email (true)
+
+POST http://localhost:3000/rpc/is_email_available
+Content-Type: application/json
+
+{ "email": "test@bidon.com" }
+
+###
+
+// meme test (doit renvoyer faux)
+
+POST http://localhost:3000/rpc/is_email_available
+Content-Type: application/json
+
+{ "email": "bepenelle@epfc.eu" }
+
+###
+
+// test available name (renvoie faux)
+
+POST http://localhost:3000/rpc/is_full_name_available
+Content-Type: application/json
+
+{ "full_name": "Bruno" }
