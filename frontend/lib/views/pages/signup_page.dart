@@ -1,23 +1,111 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/auth_provider.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+    ProviderScope(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        home: const SignupMockupScreen(),
       ),
-      home: const SignupMockupScreen(),
     ),
   );
 }
 
-class SignupMockupScreen extends StatelessWidget {
+class SignupMockupScreen extends ConsumerStatefulWidget {
   const SignupMockupScreen({super.key});
+
+  @override
+  ConsumerState<SignupMockupScreen> createState() => _SignupMockupScreenState();
+}
+
+class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _phoneController = TextEditingController();
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm(BuildContext context) {
+    final fullName = _fullNameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+    final phone = _phoneController.text.trim();
+
+    if (fullName.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez remplir tous les champs obligatoires')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Les mots de passe ne correspondent pas')),
+      );
+      return;
+    }
+
+    _signup(
+      context,
+      email: email,
+      password: password,
+      fullName: fullName,
+      phone: phone.isEmpty ? null : phone,
+    );
+  }
+
+  void _signup(
+      BuildContext context, {
+        required String email,
+        required String password,
+        required String fullName,
+        String? phone,
+      }) async {
+    await ref.read(authProvider.notifier).signup(
+      email: email,
+      password: password,
+      fullName: fullName,
+      phone: phone,
+    );
+    final authState = ref.read(authProvider);
+
+    if (!context.mounted) return;
+
+    authState.when(
+      data: (token) {
+        if (token != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Compte créé et connecté !')),
+          );
+          Navigator.pop(context); // retour à la page de login
+        }
+      },
+      error: (error, _) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur: $error')),
+      ),
+      loading: () {},
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +116,7 @@ class SignupMockupScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Inscription'),
         automaticallyImplyLeading: false,
@@ -86,6 +174,7 @@ class SignupMockupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
+                  controller: _fullNameController,
                   decoration: const InputDecoration(
                     labelText: 'Nom complet',
                     border: OutlineInputBorder(),
@@ -94,6 +183,7 @@ class SignupMockupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _emailController,
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     border: OutlineInputBorder(),
@@ -103,6 +193,7 @@ class SignupMockupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _passwordController,
                   decoration: const InputDecoration(
                     labelText: 'Mot de passe',
                     border: OutlineInputBorder(),
@@ -112,6 +203,7 @@ class SignupMockupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _confirmPasswordController,
                   decoration: const InputDecoration(
                     labelText: 'Confirmer le mot de passe',
                     border: OutlineInputBorder(),
@@ -121,6 +213,7 @@ class SignupMockupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _phoneController,
                   decoration: const InputDecoration(
                     labelText: 'Téléphone (optionnel)',
                     border: OutlineInputBorder(),
@@ -130,7 +223,9 @@ class SignupMockupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: ref.watch(authProvider).isLoading
+                    ? null
+                    : () => _submitForm(context),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
@@ -138,7 +233,7 @@ class SignupMockupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => Navigator.pop(context),
                   child: const Text('Déjà un compte ? Se connecter'),
                 ),
               ],
