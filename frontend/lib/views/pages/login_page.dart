@@ -184,7 +184,7 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
                       ),
                       const SizedBox(height: 6),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () => Navigator.pushNamed(context, '/signup'),
                         child: const Text(
                           'Pas encore de compte ? S\'inscrire',
                         ),
