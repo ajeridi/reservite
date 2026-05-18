@@ -26,7 +26,7 @@ class ApiClient {
       headers: {
         ...?headers,
         'Content-Type': 'application/json; charset=UTF-8',
-        if (!anonymous) 'Authorization': 'Bearer ${Params.getValue('token')}',
+        if (!anonymous) 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzkyMzAzMTB9.7tSbCxFOmD8O7WSQ-8uoz4sKHqy4y4PWyzcDQL61A8Q',
       },
     );
   }
@@ -44,7 +44,7 @@ class ApiClient {
       headers: {
         ...?headers,
         'Content-Type': 'application/json; charset=UTF-8',
-        if (!anonymous) 'Authorization': 'Bearer ${Params.getValue('token')}',
+        if (!anonymous) 'Authorization': 'Bearer ${Params.getValue('token')} ',
       },
       body: body,
     );
