@@ -26,7 +26,8 @@ class ApiClient {
       headers: {
         ...?headers,
         'Content-Type': 'application/json; charset=UTF-8',
-        if (!anonymous) 'Authorization': 'Bearer ${Params.getValue('token')}',
+        // token manuel (a changer quand login sera la)
+        if (!anonymous) 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTIyNTY5N30.Wx5NOHWxu7rsmkq4xbh_xvvHuCPuDdrfcg2PmQC9KuQ',
       },
     );
   }
