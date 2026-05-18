@@ -46,7 +46,8 @@ class Reservation {
   }
 
   // methode qui va rechercher les reservations d'un client (Future, car on va chercher dans la DB)
-  static Future<List<Reservation>> getReservations() async{
+  static Future<List<Reservation>?> getReservations() async{
+    return null;
   }
 
 }
