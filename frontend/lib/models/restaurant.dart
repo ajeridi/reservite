@@ -19,8 +19,7 @@ class Restaurant {
     return Restaurant(
       id: json['id'],
       name: json['name'],
-      address: json['address'],
-      phone: json['phone'],
+      city: json['city'],
     );
   }
 }
