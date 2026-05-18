@@ -1,0 +1,118 @@
+import 'dart:collection';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
+import 'package:prbd_2526_a07/views/widgets/restaurantsWidget.dart';
+
+import '../../models/restaurant.dart';
+import '../widgets/data_error_widget.dart';
+
+void main() async {
+  await initializeDateFormatting('fr_FR', null);
+  runApp(ProviderScope(child: MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      useMaterial3: true,
+    ),
+    home: const MyRestaurantsPage(),
+  ))
+  );
+}
+
+class MyRestaurantsPage extends ConsumerWidget {
+  const MyRestaurantsPage({super.key});
+
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+
+    final asyncState = ref.watch(restaurantProvider);
+    final notifier = ref.read(restaurantProvider.notifier);
+
+    return asyncState.when(
+      data: (state) => data(state, notifier,theme, simulatedTime),
+      error: (err, _) =>
+          DataErrorWidget(
+            error: err,
+            stackTrace: StackTrace.current,
+            notifier: notifier,
+          ), loading: () =>
+        data(
+          asyncState.value ?? SplayTreeSet(),
+          notifier,
+          theme,
+          simulatedTime,
+        ),
+    );
+  }
+    Widget data(
+        SplayTreeSet<Restaurant> restaurants,
+        RestaurantsNotifier notifier,
+        dynamic theme, DateTime simulatedTime,
+    )
+    {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Mes restaurants'),
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Rafraîchir les données',
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'Déconnexion (Benoît P.)',
+              onPressed: () {},
+            ),
+          ],
+          elevation: 2,
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          surfaceTintColor: Colors.transparent,
+          flexibleSpace: Align(
+            alignment: Alignment.topCenter,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 2.0),
+                child: Tooltip(
+                  message:
+                  'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                  child: Text(
+                    DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
+                        .format(simulatedTime),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              for(var restaurant in restaurants)
+                RestaurantCard( restaurant : restaurant),
+
+
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+
+
