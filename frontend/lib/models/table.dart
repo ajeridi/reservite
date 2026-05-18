@@ -20,4 +20,14 @@ class Table {
       capacity: json['capacity']
     );
   }
+
+  // prends une collection Json table et retourne un SET de tables
+  static Set<Table> tablesFromJson(List<Map<String, dynamic>> json) {
+    Set<Table> tables = {}; // infos, https://dart.dev/language/collections#sets
+    for (Map<String, dynamic> tableJson in json) {
+      Table table = Table.fromJson(tableJson);
+      tables.add(table);
+    }
+    return tables;
+  }
 }
