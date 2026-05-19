@@ -14,7 +14,7 @@ import 'restaurant_details_mockup.dart';
 import 'restaurant_management_reservations_mockup.dart';
 import 'restaurant_management_services_mockup.dart';
 import 'restaurant_management_tables_mockup.dart';
-import 'search_restaurants_mockup.dart';
+import '../pages/search_restaurants_page.dart';
 import 'signup_mockup.dart';
 
 /// Écran carousel qui affiche tous les mockups du projet.

@@ -18,6 +18,7 @@ class RestaurantsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Restaurant>
     try {
       return SplayTreeSet<Restaurant>.from(await Restaurant.getRestaurants());
     }catch(e) {
+      print(e);
       throw "Something went really wrong!\nPlease try again later.";
     }
   }

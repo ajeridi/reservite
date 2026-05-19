@@ -1,2 +1,3 @@
 ###
 GET http://localhost:3000/rpc/get_restaurant?id=2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTMxODYwNH0.shLzIg75HOwp0cvFvIn2f7Wc-FXksDJ4R9lvV2c7d0Q

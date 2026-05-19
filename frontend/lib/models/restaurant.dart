@@ -2,32 +2,33 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
+import 'package:prbd_2526_a07/core/tools/params.dart';
 
 class Restaurant implements Comparable<Restaurant>{
   final int id;
   final String name;
   final String address;
-  final String city;
-  final String phone;
-  final String description;
-  final double rating;
-  final int price_range;
-  final int slot_duration;
-  final DateTime date;
-  final int reservPending;
+  final String? city;
+  final String? phone;
+  final String? description;
+  final double? rating;
+  final int? priceRange;
+  final int? slotDuration;
+  final DateTime? date;
+  final int? reservPending;
 
   // constructeur
   const Restaurant({
-    this.id = 0,
-    this.name = '',
+    required this.id,
+    required this.name,
     this.address = '',
     this.city = '',
     this.phone = '',
     this.description = '',
     this.rating = 0,
-    this.price_range = 0,
-    this.slot_duration = 0,
-    required this.date,
+    this.priceRange = 0,
+    this.slotDuration = 0,
+    required this.date ,
     this.reservPending = 0,
   });
 
@@ -38,8 +39,10 @@ class Restaurant implements Comparable<Restaurant>{
 
   String getPriceRange (){
     String result='';
-    for(int i=0;i<price_range;i++)
-      result +='€';
+    if(priceRange != null) {
+      for (int i = 0; i < priceRange!; i++)
+        result += '€';
+    }
     return  result;
   }
 
@@ -56,10 +59,10 @@ class Restaurant implements Comparable<Restaurant>{
       city: json['city'],
       description: json['description'],
       rating: json['rating'],
-      price_range: json['price_range'],
-      slot_duration: json['slot_duration'],
-      date: DateTime.parse(json['last_reservation_date']),
-      reservPending: json['reservations_pending'],
+      priceRange: json['price_range'],
+      slotDuration: json['slot_duration'],
+      date: json['last_reservation_date'] != null ? DateTime.parse(json['last_reservation_date']) : null,
+      reservPending: json['reservations_pending'] as int?,
     );
   }
 
@@ -73,6 +76,7 @@ class Restaurant implements Comparable<Restaurant>{
   }
 
   static Future<Restaurant> getRestaurant() async{
+    //Params.setValue('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTIyNTY5N30.Wx5NOHWxu7rsmkq4xbh_xvvHuCPuDdrfcg2PmQC9KuQ');
     final response = await ApiClient.get('get_restaurant');
     if(response.statusCode == 200) {
       return Restaurant.fromJson(json.decode(response.body));
@@ -82,6 +86,7 @@ class Restaurant implements Comparable<Restaurant>{
   }
 
   static Future<List<Restaurant>> getRestaurants() async{
+    //Params.setValue('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTIyNTY5N30.Wx5NOHWxu7rsmkq4xbh_xvvHuCPuDdrfcg2PmQC9KuQ');
     final response = await ApiClient.get('get_restaurants');
     if(response.statusCode == 200){
       final List<dynamic> body = json.decode(response.body);
