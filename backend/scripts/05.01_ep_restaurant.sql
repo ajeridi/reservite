@@ -112,15 +112,15 @@ returns json as
 
 grant execute on function get_restaurants(text) to authenticated;
 
-select json_agg(json_build_object('id',r.id,
-                        'name',r.name,
-                        'address',r.address,
-                        'city',r.city,
-                        'phone',r.phone,
-                        'description',r.description,
-                        'rating',r.rating,
-                        'price_range',r.price_range,
-                        'slot_duration',r.slot_duration,
-                        'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1))) from restaurants r
-                                                        join public.restaurant_managers rm on r.id = rm.restaurant
-                                                        where rm.manager = auth.id();
+-- select json_agg(json_build_object('id',r.id,
+--                         'name',r.name,
+--                         'address',r.address,
+--                         'city',r.city,
+--                         'phone',r.phone,
+--                         'description',r.description,
+--                         'rating',r.rating,
+--                         'price_range',r.price_range,
+--                         'slot_duration',r.slot_duration,
+--                         'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1))) from restaurants r
+--                                                         join public.restaurant_managers rm on r.id = rm.restaurant
+--                                                         where rm.manager = auth.id();
