@@ -41,7 +41,7 @@ class Reservation {
     return Reservation(
         id: json['id'],
         client: json['client'],
-        restaurant: Restaurant.fromJson(json['restaurant']),
+        restaurant: Restaurant.makeRestaurantOfReservation(json['restaurant']),
         datetime: DateTime.parse(json['datetime']),
         numberOfGuests: json['number_of_guests'],
         status: toStatus(json['status']),
