@@ -15,6 +15,16 @@ class ReservationCard extends StatelessWidget {
     required this.reservation,
   });
 
+  Icon getStatusIcon(Status status){
+    return switch(status){
+      Status.pending  => Icon(Icons.pending, color: Colors.orange, size: 40),
+      Status.confirmed => Icon(Icons.event_available, color: Colors.blue, size: 40),
+      Status.completed => Icon(Icons.check_circle, color: Colors.green, size: 40),
+      Status.cancelled => Icon(Icons.cancel, color: Colors.red, size: 40),
+      _ => throw Exception('incorrect status'),
+    };
+  }
+
 
 
   @override
@@ -22,7 +32,7 @@ class ReservationCard extends StatelessWidget {
       return Card(
         margin: const EdgeInsets.only(bottom: 8),
         child: ListTile(
-          leading: const Icon(Icons.restaurant, size: 40),
+          leading: getStatusIcon(reservation.status),
           title: Text(
               reservation.restaurant.name,
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),
