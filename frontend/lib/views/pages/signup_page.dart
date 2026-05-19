@@ -3,22 +3,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
-
-void main() async {
-  await initializeDateFormatting('fr_FR', null);
-  runApp(
-    ProviderScope(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
-        home: const SignupMockupScreen(),
-      ),
-    ),
-  );
-}
+import 'package:prbd_2526_a07/core/tools/validating_text_editing_controller.dart';
+import 'package:prbd_2526_a07/models/user.dart';
 
 class SignupMockupScreen extends ConsumerStatefulWidget {
   const SignupMockupScreen({super.key});
@@ -28,11 +14,39 @@ class SignupMockupScreen extends ConsumerStatefulWidget {
 }
 
 class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
-  final _fullNameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  late ValidatingTextEditingController _fullNameController;
+  late ValidatingTextEditingController _emailController;
+  late ValidatingTextEditingController _passwordController;
+  late ValidatingTextEditingController _confirmPasswordController;
   final _phoneController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _fullNameController = ValidatingTextEditingController(
+      validator: User.validateFullName,
+      asyncValidator: User.validateFullNameAvailable,
+    );
+    _fullNameController.onAfterValidated = () => setState(() {});
+
+    _emailController = ValidatingTextEditingController(
+      validator: User.validateEmail,
+      asyncValidator: User.validateEmailAvailable,
+    );
+    _emailController.onAfterValidated = () => setState(() {});
+
+    _passwordController = ValidatingTextEditingController(
+      validator: User.validatePassword,
+    );
+    _passwordController.onAfterValidated = () => setState(() {});
+
+    _confirmPasswordController = ValidatingTextEditingController(
+      validator: (value) =>
+          User.validateConfirmPassword(value, _passwordController.text),
+    );
+    _confirmPasswordController.onAfterValidated = () => setState(() {});
+  }
 
   @override
   void dispose() {
@@ -44,33 +58,25 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
     super.dispose();
   }
 
-  void _submitForm(BuildContext context) {
-    final fullName = _fullNameController.text.trim();
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-    final confirmPassword = _confirmPasswordController.text;
-    final phone = _phoneController.text.trim();
+  Future<void> _submitForm(BuildContext context) async {
+    await _fullNameController.validateAndWait();
+    await _emailController.validateAndWait();
+    await _passwordController.validateAndWait();
+    await _confirmPasswordController.validateAndWait();
 
-    if (fullName.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir tous les champs obligatoires')),
-      );
-      return;
-    }
+    setState(() {});
 
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Les mots de passe ne correspondent pas')),
-      );
+    if (_fullNameController.errorText != null || _emailController.errorText != null ||
+        _passwordController.errorText != null || _confirmPasswordController.errorText != null) {
       return;
     }
 
     _signup(
       context,
-      email: email,
-      password: password,
-      fullName: fullName,
-      phone: phone.isEmpty ? null : phone,
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      fullName: _fullNameController.text.trim(),
+      phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
     );
   }
 
@@ -175,7 +181,8 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: _fullNameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    errorText: _fullNameController.errorText,
                     labelText: 'Nom complet',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.person),
@@ -184,7 +191,8 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    errorText: _emailController.errorText,
                     labelText: 'Email',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.email),
@@ -194,7 +202,8 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    errorText: _passwordController.errorText,
                     labelText: 'Mot de passe',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
@@ -204,7 +213,8 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _confirmPasswordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    errorText: _confirmPasswordController.errorText,
                     labelText: 'Confirmer le mot de passe',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock_outline),

@@ -59,4 +59,36 @@ class AuthService {
     }
   }
 
+  static Future<bool> isEmailAvailable(String email) async {
+    final url = Uri.parse('$_baseUrl/is_email_available');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Check email failed: ${response.body}');
+    }
+
+    return json.decode(response.body) as bool;
+  }
+
+  static Future<bool> isFullNameAvailable(String fullName) async {
+    final url = Uri.parse('$_baseUrl/is_full_name_available');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'full_name': fullName}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Check full name failed: ${response.body}');
+    }
+
+    return json.decode(response.body) as bool;
+  }
+
 }
