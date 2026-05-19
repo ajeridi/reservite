@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/core/tools/my_provider_observer.dart';
 
 import '../../models/reservation.dart';
 import '../../providers/reservations_provider.dart';
@@ -11,8 +12,10 @@ import '../widgets/reservation_widget.dart';
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
-      ProviderScope(child:
-        MaterialApp(
+      ProviderScope(
+        observers: [MyProviderObserver()],
+        retry: (int _, Object _ ) => null,
+        child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
