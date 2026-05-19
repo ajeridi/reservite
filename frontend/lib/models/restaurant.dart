@@ -63,6 +63,15 @@ class Restaurant implements Comparable<Restaurant>{
     );
   }
 
+  // construit un objet Restaurant avec le json venant de reservations
+  static Restaurant makeRestaurantOfReservation(Map<String, dynamic>json){
+    return Restaurant(
+        id : json['id'],
+        name: json['name'],
+        city: json['city'],
+        date: DateTime.now());
+  }
+
   static Future<Restaurant> getRestaurant() async{
     final response = await ApiClient.get('get_restaurant');
     if(response.statusCode == 200) {
