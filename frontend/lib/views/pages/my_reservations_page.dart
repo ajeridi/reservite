@@ -1,40 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
+import '../../models/reservation.dart';
+import '../../providers/reservations_provider.dart';
+import '../widgets/data_error_widget.dart';
 import '../widgets/reservation_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const MyReservationsPage(),
-    ),
+      ProviderScope(child:
+        MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+            useMaterial3: true,
+          ),
+          home: const MyReservationsPage(),
+        ),
+    )
   );
 }
 
-class MyReservationsPage extends StatelessWidget {
+class MyReservationsPage extends ConsumerWidget {
   const MyReservationsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
+
+    final reservationsState = ref.watch(reservationsProvider);
+    final reservationNotifier = ref.read(reservationsProvider.notifier);
+
+    return reservationsState.when(
+        data: (state) => data(state, reservationNotifier, theme, simulatedTime),
+        error: (err, _) =>
+            DataErrorWidget(
+              error: err,
+              stackTrace: StackTrace.current,
+              notifier: reservationNotifier,
+            ),
+        loading: () => loading(),
+    );
+  }
+
+  Widget data(List<Reservation> reservations,
+      ReservationsNotifier notifier, ThemeData theme, DateTime simulatedTime) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes restaurants'),
+        title: const Text('Mes reservations'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+            onPressed: () {
+              notifier.refresh();
+            },
           ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -53,7 +79,7 @@ class MyReservationsPage extends StatelessWidget {
               padding: const EdgeInsets.only(top: 2.0),
               child: Tooltip(
                 message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
                   DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
                       .format(simulatedTime),
@@ -72,104 +98,17 @@ class MyReservationsPage extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
-            ReservationCard(),
-            Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: const Icon(Icons.restaurant, size: 40),
-                title: const Text('La Trattoria'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        const Text('Bruxelles'),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text(
-                          '4.2',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '€€',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.access_time, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Dernière réservation: jeu. 05/12/2024',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Row(
-                      children: [
-                        Icon(Icons.pending, size: 14, color: Colors.orange),
-                        SizedBox(width: 4),
-                        Text(
-                          '1 demande en attente',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
-              ),
-            ),
-            Card(
-              margin: EdgeInsets.zero,
-              child: ListTile(
-                leading: const Icon(Icons.restaurant, size: 40),
-                title: const Text('Sushi House'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        const Text('Bruxelles'),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text(
-                          '4.7',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '€€€',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
-              ),
-            ),
+            for (var reservation in reservations)
+              ReservationCard(reservation: reservation,),
           ],
         ),
       ),
     );
   }
+}
+
+Widget loading() {
+  return Center(child: CircularProgressIndicator(color: Colors.black));
 }
 
 
