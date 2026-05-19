@@ -42,6 +42,7 @@ class RestaurantCard extends StatelessWidget {
               children: [
                 const Icon(Icons.access_time, size: 14, color: Colors.grey),
                 const SizedBox(width: 4),
+                if(restaurant.date != null)
                 Text(
                   'Dernière réservation: ${restaurant.getLastDate()}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
