@@ -19,7 +19,7 @@ class Reservation {
   final int id;
   final int client;
   final Restaurant restaurant;
-  final String datetime;
+  final DateTime datetime;
   final int numberOfGuests;
   final Status status;
   final String? specialRequests;
@@ -42,7 +42,7 @@ class Reservation {
         id: json['id'],
         client: json['client'],
         restaurant: Restaurant.fromJson(json['restaurant']),
-        datetime: json['datetime'],
+        datetime: DateTime.parse(json['datetime']),
         numberOfGuests: json['number_of_guests'],
         status: toStatus(json['status']),
     );
