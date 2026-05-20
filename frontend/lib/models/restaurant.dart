@@ -33,7 +33,9 @@ class Restaurant implements Comparable<Restaurant>{
   });
 
   String getLastDate (){
-    String day = DateFormat('EE dd/MM/yyyy').format(this.date);
+    DateTime? date = this.date;
+    if (date == null) return '';
+    String day = DateFormat('EE dd/MM/yyyy').format(date);
     return day;
   }
 
@@ -48,8 +50,16 @@ class Restaurant implements Comparable<Restaurant>{
 
   @override
   int compareTo(Restaurant other) {
-    return this.date==other.date? this.name.compareTo(other.name) : this.date.compareTo(other.date);
-  } // constructeur Json
+    DateTime? date = this.date;
+    DateTime? otherDate = other.date;
+    if (date==null && otherDate == null) return 0;
+    if (date == null) return -1;
+    if (otherDate == null) return 1;
+    return this.date==other.date? this.name.compareTo(other.name) : date.compareTo(otherDate);
+  }
+
+
+  // constructeur Json
   factory Restaurant.fromJson(Map<String, dynamic> json){
     return Restaurant(
       id: json['id'],
@@ -72,7 +82,7 @@ class Restaurant implements Comparable<Restaurant>{
         id : json['id'],
         name: json['name'],
         city: json['city'],
-        date: DateTime.now());
+        date: null);
   }
 
   static Future<Restaurant> getRestaurant() async{

@@ -346,3 +346,6 @@ create or replace function get_pending_reservation_count(restaurant_id int) retu
 
 grant execute on function get_pending_reservation_count(int) to manager;
 
+
+
+
