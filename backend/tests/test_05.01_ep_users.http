@@ -1,0 +1,68 @@
+// test signup
+
+POST http://localhost:3000/rpc/signup
+Content-Type: application/json
+
+{
+  "email": "nouveau.client@test.be",
+  "password": "MonMotDePasse123!",
+  "full_name": "Jean Dupont",
+  "phone": "0470123456"
+}
+
+###
+
+// test login (succès attendu avec le compte que je viens de crée)
+
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email": "nouveau.client@test.be",
+  "password": "MonMotDePasse123!"
+}
+
+###
+
+// test login (échec attendu avec un mauvais mot de passe)
+
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email": "nouveau.client@test.be",
+  "password": "MauvaisPassword00!"
+}
+
+###
+
+// test du Reset Database (il n'attends aucun paramètre)
+
+POST http://localhost:3000/rpc/reset_database
+
+###
+
+// test du available email (true)
+
+POST http://localhost:3000/rpc/is_email_available
+Content-Type: application/json
+
+{ "email": "test@bidon.com" }
+
+###
+
+// meme test (doit renvoyer faux)
+
+POST http://localhost:3000/rpc/is_email_available
+Content-Type: application/json
+
+{ "email": "bepenelle@reservite.com" }
+
+###
+
+// test available name (renvoie faux)
+
+POST http://localhost:3000/rpc/is_full_name_available
+Content-Type: application/json
+
+{ "full_name": "Bruno" }
