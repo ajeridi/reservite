@@ -37,17 +37,27 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
 
   void _login(BuildContext context, String email, {String? password}) async {
     await ref.read(authProvider.notifier).login(email, password ?? '');
-    final authState = ref.read(authProvider);
+    final authState = ref.watch(authProvider);
+    final authNotifier = ref.read(authProvider.notifier);
 
     if (!context.mounted) return;
 
     authState.when(
-      data: (token) {
+      data: (token) async {
         if (token != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Connecté !')),
           );
-          // Plus tard : Navigator.pushReplacementNamed(context, '/home');
+
+          if (await authNotifier.isClient()) {
+            Navigator.pushReplacementNamed(context, '/home_client_page');
+            debugPrint("C'est un client");
+          }
+
+          if (await authNotifier.isManager()) {
+            Navigator.pushReplacementNamed(context, '/my_restaurants_page');
+            debugPrint("C'est un Manager");
+          }
         }
       },
       error: (error, _) => ScaffoldMessenger.of(context).showSnackBar(

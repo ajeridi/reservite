@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:prbd_2526_a07/core/services/api_client.dart';
+import 'package:prbd_2526_a07/core/tools/params.dart';
 
 class AuthService {
   static const String _baseUrl = 'http://localhost:3000/rpc';
@@ -18,6 +20,8 @@ class AuthService {
     }
 
     final data = json.decode(response.body); // extrait la clé token
+
+    Params.setValue('token', data['token']);
     return data['token'];
   }
 
@@ -86,6 +90,26 @@ class AuthService {
 
     if (response.statusCode != 200) {
       throw Exception('Check full name failed: ${response.body}');
+    }
+
+    return json.decode(response.body) as bool;
+  }
+
+  static Future<bool> isClient() async {
+    final response = await ApiClient.get("isclient");
+
+    if (response.statusCode != 200) {
+      throw Exception('Cet utilisateur n''est pas un client: ${response.body}');
+    }
+
+    return json.decode(response.body) as bool;
+  }
+
+  static Future<bool> isManager() async {
+    final response = await ApiClient.get("ismanager");
+
+    if (response.statusCode != 200) {
+      throw Exception('Cet utilisateur n''est pas un manager: ${response.body}');
     }
 
     return json.decode(response.body) as bool;

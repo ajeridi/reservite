@@ -24,6 +24,30 @@ Content-Type: application/json
 
 ###
 
+// test isClient (doit retourner vrai)
+
+GET http://localhost:3000/rpc/isclient
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoibm91dmVhdS5jbGllbnRAdGVzdC5iZSIsIm5hbWUiOiJKZWFuIER1cG9udCIsInVzZXJfaWQiOjksImV4cCI6MTc3OTM1ODk2NX0.n4NEvEm5giIuGGpmR0DVF06vZOXtICSnPAIFx9TQTHs
+
+###
+
+// test login Manager
+
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email": "bepenelle@epfc.eu",
+  "password": "Password1,"
+}
+
+###
+
+// test isManager (doit retourner vrai)
+
+GET http://localhost:3000/rpc/ismanager
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJlcGVuZWxsZUBlcGZjLmV1IiwibmFtZSI6IkJlbm_DrnQiLCJ1c2VyX2lkIjoyLCJleHAiOjE3NzkzNTk0NjR9.JeGQ3IjW7J2JdEO0DVLOTbYztCrGz52mNdb2_7VM_Jw
+
 // test login (échec attendu avec un mauvais mot de passe)
 
 POST http://localhost:3000/rpc/login
@@ -66,3 +90,6 @@ POST http://localhost:3000/rpc/is_full_name_available
 Content-Type: application/json
 
 { "full_name": "Bruno" }
+
+
+
