@@ -40,3 +40,26 @@ end
 $$ language plpgsql security definer;
 
 grant execute on function is_full_name_available(text) to anon;
+
+
+-- Endpoint : isClient (vérifie si c'est un client ou pas)
+
+create or replace function isClient() returns boolean as
+$$
+begin
+    return (select auth.role()) = 'client';
+end
+$$ language plpgsql security definer;
+
+grant execute on function isClient() to anon;
+
+-- Endpoint : isManager (vérifie si c'est un manager ou pas)
+
+create or replace function isManager() returns boolean as
+$$
+begin
+    return (select auth.role()) = 'manager';
+end
+$$ language plpgsql security definer;
+
+grant execute on function isManager() to anon;
