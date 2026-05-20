@@ -22,7 +22,7 @@ class RestaurantCard extends StatelessWidget {
               children: [
                 const Icon(Icons.location_on, size: 14, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text(restaurant.city),
+                Text(restaurant.city ?? ''),
                 const SizedBox(width: 12),
                 const Icon(Icons.star, size: 14, color: Colors.amber),
                 const SizedBox(width: 2),

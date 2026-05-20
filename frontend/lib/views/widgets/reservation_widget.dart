@@ -60,7 +60,7 @@ class ReservationCard extends StatelessWidget {
                           const Icon(Icons.location_on, size: 14),
                           const SizedBox(width: 4),
                           Text(
-                            reservation.restaurant.city,
+                            reservation.restaurant.city ?? '',
                             style: TextStyle(fontSize: 12, color: Colors
                                 .grey[600]),
                           ),

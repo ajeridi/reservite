@@ -27,7 +27,7 @@ class ApiClient {
         ...?headers,
         'Content-Type': 'application/json; charset=UTF-8',
         // token manuel (a changer quand login sera la)
-        if (!anonymous) 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTMxODE1Mn0.RNNYJSaLHWiaSC5tqFgb78J_ocM-Zm5OV51ermqiD7k',
+        if (!anonymous) 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzkzNTk2OTV9.tjv3-ANsBAyoM2Rw9rREXWHBvmsR7uIOgHwrOeeIE9g',
       },
     );
   }
