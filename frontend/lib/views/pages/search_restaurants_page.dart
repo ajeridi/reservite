@@ -122,6 +122,7 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
             Expanded(
               child: Column(
                 children: [
+                  if(restaurants.length > 5)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -137,7 +138,7 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
                           color: Colors.orange.shade800,
                         ),
                         const SizedBox(width: 8),
-                        if(restaurants.length > 5)
+
                           Expanded(
                             child: Text(
                               'Trop de résultats trouvés. Veuillez affiner votre recherche pour voir plus de restaurants.',
