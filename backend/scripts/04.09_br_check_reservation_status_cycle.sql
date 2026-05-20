@@ -35,7 +35,7 @@ returns trigger as
         end if;
         raise exception 'Reservation status cycle not respected';
     end;
-    $$language plpgsql;
+    $$language plpgsql security definer ;
 
 
 create or replace trigger check_reservation_status_cycle
