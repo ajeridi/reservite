@@ -50,6 +50,7 @@ class RestaurantCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
+            if(restaurant.reservPending != null)
             Row(
               children: [
                 Icon(Icons.pending, size: 14, color: Colors.orange),
