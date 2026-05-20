@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:prbd_2526_a07/views/mockups/home_client_mockup.dart';
+import 'package:prbd_2526_a07/views/pages/home_client_page.dart';
 import 'package:prbd_2526_a07/views/pages/login_page.dart';
+import 'package:prbd_2526_a07/views/pages/my_restaurants_page.dart';
 import 'package:prbd_2526_a07/views/pages/signup_page.dart';
+
+import 'core/tools/params.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +20,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Params.init();
     return MaterialApp(
       title: 'ReserVite',
       debugShowCheckedModeBanner: false,
@@ -26,6 +32,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginMockupScreen(),
         '/signup': (context) => const SignupMockupScreen(),
+        '/home_client_page': (context) => HomeClientPage(),
+        '/my_restaurants_page': (context) => MyRestaurantsPage()
       },
     );
   }
