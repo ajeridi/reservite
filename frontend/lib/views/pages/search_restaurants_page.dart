@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/filtered_restaurants_provider.dart';
 
 import '../../core/tools/my_provider_observer.dart';
 import '../../models/restaurant.dart';
@@ -37,11 +38,16 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
+    String search = '';
+
     final asyncState = ref.watch(restaurantProvider);
     final notifier = ref.read(restaurantProvider.notifier);
 
+    final filterRestaurantState = ref.watch(filteredRestaurantsProvider);
+    final filterRestoNotifier = ref.read(filteredRestaurantsProvider.notifier);
+
     return asyncState.when(
-      data: (state) => data(state, notifier,theme, simulatedTime),
+      data: (state) => data(state, notifier,theme, simulatedTime, filterRestaurantState,filterRestoNotifier,search),
       error: (err, _) =>
           DataErrorWidget(
             error: err,
@@ -53,6 +59,9 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
           notifier,
           theme,
           simulatedTime,
+          filterRestaurantState,
+          filterRestoNotifier,
+          search
         ),
     );
   }
@@ -60,7 +69,8 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
   Widget data(
       SplayTreeSet<Restaurant> restaurants,
       RestaurantsNotifier notifier,
-      dynamic theme, DateTime simulatedTime,
+      dynamic theme, DateTime simulatedTime, SplayTreeSet<Restaurant> filterRestaurantState,
+      FilteredRestaurantsNotifier filterRestoNotifier,String search
       ){
 
     return Scaffold(
@@ -75,7 +85,9 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+            onPressed: () {
+              print(search);
+              filterRestoNotifier.refresh(search);},
           ),
         ],
         elevation: 2,
@@ -116,13 +128,16 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
                 ),
-                onChanged: (_) {},
+                onChanged: (s) {
+                  search = s;
+                  filterRestoNotifier.updateFilter(restaurants, s);
+                  },
               ),
             ),
             Expanded(
               child: Column(
                 children: [
-                  if(restaurants.length > 5)
+                  if(filterRestaurantState.length > 5)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -156,7 +171,7 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
                     child: ListView(
                       padding: const EdgeInsets.all(16.0),
                       children: [
-                        for(var restaurant in restaurants)
+                        for(var restaurant in filterRestaurantState)
                           RestaurantCard( restaurant : restaurant),
 
                 ],
