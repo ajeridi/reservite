@@ -29,6 +29,7 @@ void main() async {
     ),
   ));
 }
+String search = '';
 
 class SearchRestaurantsMockupScreen extends ConsumerWidget {
   const SearchRestaurantsMockupScreen({super.key});
@@ -38,7 +39,7 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
-    String search = '';
+
 
     final asyncState = ref.watch(restaurantProvider);
     final notifier = ref.read(restaurantProvider.notifier);
@@ -47,7 +48,7 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
     final filterRestoNotifier = ref.read(filteredRestaurantsProvider.notifier);
 
     return asyncState.when(
-      data: (state) => data(state, notifier,theme, simulatedTime, filterRestaurantState,filterRestoNotifier,search),
+      data: (state) => data(state, notifier,theme, simulatedTime, filterRestaurantState,filterRestoNotifier),
       error: (err, _) =>
           DataErrorWidget(
             error: err,
@@ -61,7 +62,7 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
           simulatedTime,
           filterRestaurantState,
           filterRestoNotifier,
-          search
+
         ),
     );
   }
@@ -70,7 +71,7 @@ class SearchRestaurantsMockupScreen extends ConsumerWidget {
       SplayTreeSet<Restaurant> restaurants,
       RestaurantsNotifier notifier,
       dynamic theme, DateTime simulatedTime, SplayTreeSet<Restaurant> filterRestaurantState,
-      FilteredRestaurantsNotifier filterRestoNotifier,String search
+      FilteredRestaurantsNotifier filterRestoNotifier,
       ){
 
     return Scaffold(
