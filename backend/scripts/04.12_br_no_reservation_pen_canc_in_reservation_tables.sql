@@ -32,7 +32,7 @@ returns trigger as
         end if;
         return null;
     end;
-    $$ language plpgsql;
+    $$ language plpgsql security definer;
 
 create or replace trigger trigger_check_reservation_table_after_cancellation
     after update of status

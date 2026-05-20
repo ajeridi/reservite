@@ -1,0 +1,64 @@
+### connection d'un manager
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "boverhaegen@reservite.com",
+  "password" : "Password1,"
+}
+
+
+### connection d'un manager Penelle
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "bepenelle@reservite.com",
+  "password" : "Password1,"
+}
+
+### connection d'un client
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "xapigeolet@reservite.com",
+  "password" : "Password1,"
+}
+
+
+### annulation d'une reservation par le client
+POST http://localhost:3000/rpc/cancel_reservation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTAyNDQwNH0.JskNHbQGrFm5dijySlyIeICatqK5Gh8GgoIgm1YUJ78
+
+{
+  "reservation_id" : 23
+}
+
+### annulation d'une reservation par un manager qui n'est pas du restaurant (KO)
+POST http://localhost:3000/rpc/cancel_reservation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzkwMTkxNjJ9.oMWo-oUzTdKczT_VPGrf1Jp0Uyft2-96aCbX_KMU3is
+
+{
+  "reservation_id" : 23
+}
+
+### annulation d'une reservation par un manager qui est du restaurant (OK)
+POST http://localhost:3000/rpc/cancel_reservation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJlcGVuZWxsZUBlcGZjLmV1IiwibmFtZSI6IkJlbm_DrnQiLCJ1c2VyX2lkIjoyLCJleHAiOjE3NzkwMjY2NDZ9.tjAl0ej1dOHplDehx2YK4nFTJLlrImXIapM5HIEyCmM
+
+{
+  "reservation_id" : 23
+}
+
+### annulation d'une reservation qui n'est pas la sienne (client)
+POST http://localhost:3000/rpc/cancel_reservation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTAyNDQwNH0.JskNHbQGrFm5dijySlyIeICatqK5Gh8GgoIgm1YUJ78
+
+{
+  "reservation_id" : 22
+}

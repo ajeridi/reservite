@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import '../pages/my_restaurants_page.dart';
 import 'assign_tables_mockup.dart';
 import 'edit_service_mockup.dart';
 import 'edit_table_mockup.dart';
 import 'home_client_mockup.dart';
-import 'login_page.dart';
 import 'my_restaurants_mockup.dart';
 import 'reservation_details_manager_mockup.dart';
 import 'reservation_details_mockup.dart';
@@ -15,7 +15,6 @@ import 'restaurant_management_reservations_mockup.dart';
 import 'restaurant_management_services_mockup.dart';
 import 'restaurant_management_tables_mockup.dart';
 import 'search_restaurants_mockup.dart';
-import 'signup_page.dart';
 
 /// Écran carousel qui affiche tous les mockups du projet.
 class MockupCarouselScreen extends StatefulWidget {
@@ -30,14 +29,12 @@ class _MockupCarouselScreenState extends State<MockupCarouselScreen> {
   int _currentPage = 0;
 
   static final List<({String label, Widget screen})> _mockups = [
-    (label: 'Connexion', screen: const LoginMockupScreen()),
-    (label: 'Inscription', screen: const SignupMockupScreen()),
     (label: 'Accueil client', screen: const HomeClientMockupScreen()),
     (label: 'Recherche restaurants', screen: const SearchRestaurantsMockupScreen()),
     (label: 'Détails restaurant', screen: const RestaurantDetailsMockupScreen()),
     (label: 'Formulaire réservation', screen: const ReservationFormMockupScreen()),
     (label: 'Détails réservation', screen: const ReservationDetailsMockupScreen()),
-    (label: 'Mes restaurants', screen: const MyRestaurantsMockupScreen()),
+    (label: 'Mes restaurants', screen: const MyRestaurantsPage()),
     (label: 'Gestion restaurant - Réservations', screen: const RestaurantManagementReservationsMockupScreen()),
     (label: 'Gestion restaurant - Services', screen: const RestaurantManagementServicesMockupScreen()),
     (label: 'Gestion restaurant - Tables', screen: const RestaurantManagementTablesMockupScreen()),
