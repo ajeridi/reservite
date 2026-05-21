@@ -52,4 +52,17 @@ class AuthNotifier extends AsyncNotifier<String?> {
   }
 
   bool get isLoggedIn => state.value != null;
+
+
+  Future<bool> isClient() async {
+    final result = await AuthService.isClient();
+
+    return result;
+  }
+
+  Future<bool> isManager() async {
+    final result = await AuthService.isManager();
+
+    return result;
+  }
 }
