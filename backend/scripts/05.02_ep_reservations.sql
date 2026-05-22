@@ -128,7 +128,7 @@ create or replace function get_reservations(restaurant_id int default NULL) retu
             return (select json_agg(
                                    json_build_object(
                                            'id', rsv.id,
-                                           'client', (select json_build_object('full_name', u.full_name) from users u where u.id = rsv.client),
+                                           'client', (select u.full_name from users u where u.id = rsv.client),
                                            'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'city', rst.city) from restaurants rst where rst.id = rsv.restaurant),
                                            'datetime', rsv.datetime,
                                            'number_of_guests', rsv.number_of_guests,
@@ -345,4 +345,3 @@ create or replace function get_pending_reservation_count(restaurant_id int) retu
     $$ language plpgsql security definer;
 
 grant execute on function get_pending_reservation_count(int) to manager;
-

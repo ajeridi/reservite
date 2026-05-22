@@ -20,7 +20,7 @@ Content-Type: application/json
 ### creation d'une nouvelle reservation par un client
 POST http://localhost:3000/rpc/save_reservation
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTM2NDY4Mn0.IZNc2hJRtRxSEdWyCUPnzh_31xw8C3AzKshZUgomMSQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoiYnJsYWNyb2l4QGVwZmMuZXUiLCJuYW1lIjoiQnJ1bm8iLCJ1c2VyX2lkIjo2LCJleHAiOjE3Nzk1NDMzMTZ9.jkzlLyOXQ2D3uVtbeF0s2YjMxSDV81kVMcBIoe6g6Uw
 
 {
   "restaurant_id" : 3,
