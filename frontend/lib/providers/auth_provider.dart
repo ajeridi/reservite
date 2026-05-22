@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/core/services/auth_service.dart';
+import 'package:prbd_2526_a07/core/tools/params.dart';
 
 // l'état qu'il gère est de type String? (le token JWT ou null si pas connecté)
 final authProvider = AsyncNotifierProvider<AuthNotifier, String?>(
@@ -43,7 +44,9 @@ class AuthNotifier extends AsyncNotifier<String?> {
   }
 
   void logout() {
+    Params.clearValue('token');
     state = const AsyncData(null);
+    print('logged out');
   }
 
   Future<void> resetDatabase() async {
