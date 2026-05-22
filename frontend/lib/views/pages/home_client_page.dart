@@ -34,8 +34,7 @@ void main() async {
 }
 
 class HomeClientPage extends ConsumerWidget {
-   HomeClientPage({super.key, this.selectedStatus = 'pending'});
-   String selectedStatus;
+   HomeClientPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -148,11 +147,11 @@ class HomeClientPage extends ConsumerWidget {
                     tooltip: 'Annulées',
                   ),
                 ],
-                selected: {selectedStatus},
+                selected: {filteredReservationsNotifier.filterStatus},
                 onSelectionChanged: (Set<String> newSelection) {
+                  filteredReservationsNotifier.filterStatus = newSelection.first; // on enregistre le filtre de selection
                     // appeler la fonction filtrage du notifier des reservations filtrees pour update le state
-                    filteredReservationsNotifier.updateFilter(reservations, newSelection.first);
-                    selectedStatus = newSelection.first;
+                    filteredReservationsNotifier.updateFilter(reservations);
                 },
               ),
             ),
