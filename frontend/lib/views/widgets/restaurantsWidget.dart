@@ -66,7 +66,9 @@ class RestaurantCard extends StatelessWidget {
           ],
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {},
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/manager_reservations_page');
+        },
       ),
     );
   }
