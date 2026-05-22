@@ -58,6 +58,8 @@ class Reservation {
     if (selectedRestaurant != null) enpoint += '?restaurant_id=$selectedRestaurant';
     final response = await ApiClient.get(enpoint);
     if (response.statusCode == 200){
+      // un user qui n'a pas de reservations, a un response.body == 'null'
+      if (response.body == 'null') return <Reservation>[]; // on retourne liste vide si null
       final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
       return body.map((dynamic reservation) => Reservation.fromJson(reservation)).toList(); // mappage de chaque element de la liste d'objets Json en objet Reservation
     }
