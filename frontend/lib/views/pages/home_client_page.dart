@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/filtered_reservations_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_widget.dart';
 
@@ -40,18 +41,19 @@ class HomeClientPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-
+    // etat de connexion
+    final authState = ref.watch(authProvider);
+    final authNotifier = ref.read(authProvider.notifier);
     // etat de la liste contenant toutes les reservations
     final reservationsState = ref.watch(reservationsProvider);
     final reservationNotifier = ref.read(reservationsProvider.notifier);
-
     // etat de la liste contenant les reservations filtrees
     final filteredReservationsState = ref.watch(filteredReservationsProvider);
     final filteredReservationsNotifier = ref.read(filteredReservationsProvider.notifier);
 
 
     return reservationsState.when(
-      data: (state) => data(state, reservationNotifier, theme,filteredReservationsState, filteredReservationsNotifier),
+      data: (state) => data(context, state, reservationNotifier, theme,filteredReservationsState, filteredReservationsNotifier, authNotifier),
       error: (err, _) =>
           DataErrorWidget(
             error: err,
@@ -63,9 +65,13 @@ class HomeClientPage extends ConsumerWidget {
   }
 
 
-  Widget data(List<Reservation> reservations,
-      ReservationsNotifier notifier, ThemeData theme,List<Reservation> filteredReservationsState, FilteredReservationsNotifier filteredReservationsNotifier) {
-
+  Widget data(BuildContext context,
+      List<Reservation> reservations,
+      ReservationsNotifier notifier,
+      ThemeData theme,
+      List<Reservation> filteredReservationsState,
+      FilteredReservationsNotifier filteredReservationsNotifier,
+      AuthNotifier authNotifier) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mes réservations'),
@@ -85,7 +91,10 @@ class HomeClientPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Déconnexion',
-            onPressed: () {},
+            onPressed: () {
+              authNotifier.logout();
+              Navigator.pushReplacementNamed(context, '/login');
+            },
           ),
         ],
         elevation: 2,
