@@ -16,6 +16,9 @@ final filteredReservationsProvider =
     );
 
 class FilteredReservationsNotifier extends Notifier<List<Reservation>> {
+
+  String filterStatus = 'pending';
+
   @override
   List<Reservation> build() {
     final reservations = ref.watch(reservationsProvider);
@@ -23,24 +26,24 @@ class FilteredReservationsNotifier extends Notifier<List<Reservation>> {
     // on retourne uniquement quand reservations a de la data
     return reservations.when(
         data: (data) {
-          return getFilteredReservations(data, "pending");
+          return getFilteredReservations(data);
         },
         error: (err, _) => [],
         loading: () => []
     );
   }
 
-  List<Reservation> getFilteredReservations(List<Reservation> reservations, String status) {
+  List<Reservation> getFilteredReservations(List<Reservation> reservations) {
     List<Reservation> filteredReservations = [];
     for (var reservation in reservations){
-      if (status == 'all' || reservation.status == Reservation.toStatus(status)){
+      if (filterStatus == 'all' || reservation.status == Reservation.toStatus(filterStatus)){
         filteredReservations.add(reservation);
       }
     }
     return filteredReservations;
   }
 
-  void updateFilter(List<Reservation> reservations, String status){
-    state = getFilteredReservations(reservations, status);
+  void updateFilter(List<Reservation> reservations){
+    state = getFilteredReservations(reservations);
   }
 }

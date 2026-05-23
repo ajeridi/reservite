@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
 
 import '../../models/reservation.dart';
@@ -48,7 +49,7 @@ class ReservationCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        reservation.restaurant.name,
+                        (reservation.client_name == ''? reservation.restaurant.name : reservation.client_name), // nous savons que le client_name ne sera jamais null donc on se permet de mettre de !
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -60,7 +61,7 @@ class ReservationCard extends StatelessWidget {
                           const Icon(Icons.location_on, size: 14),
                           const SizedBox(width: 4),
                           Text(
-                            reservation.restaurant.city,
+                            (reservation.client_name == '' ? reservation.restaurant.city : reservation.restaurant.name),
                             style: TextStyle(fontSize: 12, color: Colors
                                 .grey[600]),
                           ),
