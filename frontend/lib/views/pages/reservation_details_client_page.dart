@@ -28,7 +28,8 @@ class ReservationDetailsClientPage extends ConsumerWidget {
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     // on a besoin d'aller chercher la reservation selectionnee
-    final currentReservationState = ref.watch(currentReservationProvider);
+    final currentReservationState = ref.watch(currentReservationProvider).value; // utilisation  de value pour extraire la Reservation de <AsyncValue<Reservation>>
+    final currentReservationNotifier = ref.read(currentReservationProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,7 +45,9 @@ class ReservationDetailsClientPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+            onPressed: () {
+              currentReservationNotifier.refresh();
+            },
           ),
         ],
         elevation: 2,
@@ -89,9 +92,9 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                         children: [
                           const Icon(Icons.restaurant),
                           const SizedBox(width: 8),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'La Trattoria',
+                              '${currentReservationState?.restaurant.name}',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -111,7 +114,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              'Avenue Louise 45, Bruxelles',
+                              '${currentReservationState?.restaurant.address}, ${currentReservationState?.restaurant.city}',
                               style: TextStyle(color: Colors.grey[600]),
                             ),
                           ),
@@ -123,7 +126,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                           const Icon(Icons.phone, size: 16, color: Colors.grey),
                           const SizedBox(width: 4),
                           Text(
-                            '+32 2 234 56 78',
+                            '${currentReservationState?.restaurant.phone}',
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                         ],
@@ -136,7 +139,8 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                           const Icon(Icons.calendar_today, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'Date: jeu. 05/12/2024',
+                            'Date: ${DateFormat('EE dd/MM/yyyy', 'fr_FR')
+                                .format(currentReservationState!.datetime)}',
                           ),
                         ],
                       ),
@@ -145,7 +149,8 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                         children: [
                           const Icon(Icons.access_time, size: 20),
                           const SizedBox(width: 8),
-                          const Text('Heure: 20:00'),
+                          Text('Heure: ${DateFormat('HH:mm', 'fr_FR')
+                              .format(currentReservationState.datetime)}'),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -153,7 +158,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                         children: [
                           const Icon(Icons.people, size: 20),
                           const SizedBox(width: 8),
-                          const Text('Nombre de convives: 4'),
+                          Text('Nombre de convives: ${currentReservationState.numberOfGuests}'),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -184,7 +189,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Anniversaire de mariage',
+                        currentReservationState.specialRequests ?? '',
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                     ],
