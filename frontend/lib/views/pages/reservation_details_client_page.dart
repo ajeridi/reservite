@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+
+import '../../providers/current_reservation_provider.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -16,13 +19,16 @@ void main() async {
   );
 }
 
-class ReservationDetailsClientPage extends StatelessWidget {
+class ReservationDetailsClientPage extends ConsumerWidget {
   const ReservationDetailsClientPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+
+    // on a besoin d'aller chercher la reservation selectionnee
+    final currentReservationState = ref.watch(currentReservationProvider);
 
     return Scaffold(
       appBar: AppBar(
