@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/reservation.dart';
 
 import '../../providers/current_reservation_provider.dart';
 
@@ -168,16 +169,17 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                           const SizedBox(width: 8),
                           const Text('Statut: '),
                           Chip(
-                            label: const Text(
-                              'En attente',
+                            label: Text(
+                              '${currentReservationState.statusToString()}',
                               style: TextStyle(fontSize: 12, color: Colors.white),
                             ),
-                            backgroundColor: const Color(0xFFFF9800),
+                            backgroundColor: statusColor(currentReservationState.status),
                             padding: EdgeInsets.zero,
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
+                      if (currentReservationState.specialRequests != null)  ... [ // faut rajouter les '...' pour inclure plusieurs widgets dans un if
                       const Divider(),
                       const SizedBox(height: 8),
                       const Text(
@@ -191,12 +193,13 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                       Text(
                         currentReservationState.specialRequests ?? '',
                         style: TextStyle(color: Colors.grey[700]),
-                      ),
+                      ),]
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 24),
+              if (currentReservationState.canEdit())
               Row(
                 children: [
                   Expanded(
@@ -204,6 +207,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                       onPressed: () {},
                       icon: const Icon(Icons.edit),
                       label: const Text('Modifier'),
+
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -221,5 +225,15 @@ class ReservationDetailsClientPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  // methode qui retourne la couleur du status
+  Color? statusColor(Status status) {
+    return switch(status){
+      Status.pending => Colors.orange,
+      Status.confirmed => Colors.green,
+      Status.completed => Colors.blue,
+      Status.cancelled => Colors.red
+    };
   }
 }

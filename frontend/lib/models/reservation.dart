@@ -49,6 +49,7 @@ class Reservation {
         datetime: DateTime.parse(json['datetime']),
         numberOfGuests: json['number_of_guests'],
         status: toStatus(json['status']),
+        specialRequests: json['special_requests'],
     );
   }
 
@@ -78,6 +79,20 @@ class Reservation {
       _ => throw Exception('incorrect status'),
     };
   }
+
+  String statusToString(){
+    return switch(this.status){
+      Status.pending => 'En attente',
+      Status.confirmed => 'Confirmee',
+      Status.completed => 'Terminee',
+      Status.cancelled => 'Annulee',
+    };
+  }
+
+  bool canEdit() {
+    return this.status != Status.completed && this.status != Status.cancelled;
+  }
+
 
 
   @override
