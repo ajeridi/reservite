@@ -111,10 +111,11 @@ create or replace function get_reservations(restaurant_id int default NULL) retu
                            json_build_object(
                                 'id', rsv.id,
                                 'client', rsv.client,
-                                'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'city', rst.city) from restaurants rst where rst.id = rsv.restaurant),
+                                'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'address', rst.address, 'city', rst.city, 'phone', rst.phone) from restaurants rst where rst.id = rsv.restaurant),
                                 'datetime', rsv.datetime,
                                 'number_of_guests', rsv.number_of_guests,
-                                'status', rsv.status
+                                'status', rsv.status,
+                                'special_requests', rsv.special_requests
                            )
                            ORDER BY rsv.datetime DESC, rsv.id DESC
                    )
@@ -129,10 +130,11 @@ create or replace function get_reservations(restaurant_id int default NULL) retu
                                    json_build_object(
                                            'id', rsv.id,
                                            'client', (select u.full_name from users u where u.id = rsv.client),
-                                           'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'city', rst.city) from restaurants rst where rst.id = rsv.restaurant),
+                                           'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'address', rst.address , 'city', rst.city, 'phone', rst.phone) from restaurants rst where rst.id = rsv.restaurant),
                                            'datetime', rsv.datetime,
                                            'number_of_guests', rsv.number_of_guests,
-                                           'status', rsv.status
+                                           'status', rsv.status,
+                                           'special_requests', rsv.special_requests
                                    )
                                    ORDER BY rsv.datetime DESC, rsv.id DESC -- faut mettre le order by ici, et pas en fin de query apres le where sinon ca ne marchera pas
                            )

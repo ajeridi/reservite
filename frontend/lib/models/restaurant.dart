@@ -68,7 +68,9 @@ class Restaurant implements Comparable<Restaurant>{
     return Restaurant(
         id : json['id'],
         name: json['name'],
+        address: json['address'],
         city: json['city'],
+        phone: json['phone'],
         date: DateTime.now());
   }
 
