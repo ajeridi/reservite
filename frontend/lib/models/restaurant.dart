@@ -69,6 +69,7 @@ class Restaurant implements Comparable<Restaurant>{
         id : json['id'],
         name: json['name'],
         city: json['city'],
+        phone: json['phone'],
         date: DateTime.now());
   }
 
