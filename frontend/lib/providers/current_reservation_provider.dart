@@ -24,7 +24,7 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
   @override
   build() {
     final reservationsState = ref.watch(reservationsProvider).value; // si la liste se rafraichit, la reservation est rafraichie aussi (.value pour decapsuler le <AsyncValue<List<Reservations>>
-    final selectedReservationIdState = ref.watch(selectedReservationIdProvider); // comme on a pas besoin de rebuild quand on change de
+    final selectedReservationIdState = ref.watch(selectedReservationIdProvider); // la reservation selectionne change si on change d'id de selection
     state = AsyncData(null);
     state = AsyncLoading();
     // on va chercher dans la liste des reservation, la reservation selectionee par son id
