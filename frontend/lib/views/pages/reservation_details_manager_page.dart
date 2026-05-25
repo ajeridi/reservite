@@ -28,9 +28,8 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     // observation de la liste des reservations car currentReservation vient de la
-    final reservationsState = ref.watch(reservationsProvider);
-    final reservationsNotifier = ref.watch(reservationsProvider.notifier);
     final currentReservation = ref.watch(currentReservationProvider);
+    final currentReservationNotifier = ref.read(currentReservationProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,7 +47,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
             onPressed: () {
-              reservationsNotifier.refresh();
+              currentReservationNotifier.refresh();
             },
           ),
         ],
