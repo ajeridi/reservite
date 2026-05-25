@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/views/widgets/reservation_details_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -28,7 +29,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     // observation de la liste des reservations car currentReservation vient de la
-    final currentReservation = ref.watch(currentReservationProvider);
+    final currentReservation = ref.watch(currentReservationProvider).value;
     final currentReservationNotifier = ref.read(currentReservationProvider.notifier);
 
     return Scaffold(
@@ -97,19 +98,19 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Row(
+                       Row(
                         children: [
                           Icon(Icons.person, size: 20),
                           SizedBox(width: 8),
-                          Text('Nom: Xavier'),
+                          Text('Nom: ${currentReservation?.client!.name}'),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Row(
+                       Row(
                         children: [
                           Icon(Icons.email, size: 20),
                           SizedBox(width: 8),
-                          Text('Email: xapigeolet@reservite.com'),
+                          Text('Email: ${currentReservation?.client.email}'),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -118,7 +119,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                           const Icon(Icons.phone, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'Téléphone: Non renseigné',
+                            'Téléphone: ${currentReservation?.client.phone == '' ? 'Non renseigné' : currentReservation?.client.phone}',
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                         ],
@@ -128,101 +129,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Détails de la réservation',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Row(
-                        children: [
-                          Icon(Icons.restaurant, size: 20),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Le Gourmet',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      const Divider(),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          const Icon(Icons.calendar_today, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Date: jeu. 21/11/2024',
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(Icons.access_time, size: 20),
-                          const SizedBox(width: 8),
-                          const Text('Heure: 19:30'),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(Icons.people, size: 20),
-                          const SizedBox(width: 8),
-                          const Text('Nombre de convives: 8'),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(Icons.info, size: 20),
-                          const SizedBox(width: 8),
-                          const Text('Statut: '),
-                          Chip(
-                            label: const Text(
-                              'Confirmée',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                              ),
-                            ),
-                            backgroundColor: const Color(0xFF4CAF50),
-                            padding: EdgeInsets.zero,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      const Divider(),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Demandes spéciales',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Célébration',
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              ReservationDetailsWidget(currentReservationState: currentReservation),
               const SizedBox(height: 16),
               const Text(
                 'Tables assignées',
