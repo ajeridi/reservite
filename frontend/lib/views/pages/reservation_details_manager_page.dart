@@ -6,6 +6,8 @@ import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_details_widget.dart';
 
+import '../../models/reservation.dart';
+
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
@@ -20,6 +22,24 @@ void main() async {
   );
 }
 
+String updateStatusMessage(Status status) {
+  return switch (status) {
+    Status.pending => "Confirmer et assigner les tables",
+    Status.confirmed => "Marquer comme terminée",
+    Status.completed => "",
+    Status.cancelled => "",
+  };
+}
+
+IconData updateStatusIcon(Status status) {
+  return switch (status) {
+    Status.pending => Icons.table_restaurant,
+    Status.confirmed => Icons.check_circle,
+    Status.completed => Icons.cancel,
+    Status.cancelled => Icons.cancel,
+  };
+}
+
 class ReservationDetailsManagerPage extends ConsumerWidget {
   const ReservationDetailsManagerPage({super.key});
 
@@ -30,7 +50,9 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
 
     // observation de la liste des reservations car currentReservation vient de la
     final currentReservation = ref.watch(currentReservationProvider).value;
-    final currentReservationNotifier = ref.read(currentReservationProvider.notifier);
+    final currentReservationNotifier = ref.read(
+      currentReservationProvider.notifier,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -38,7 +60,10 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             // redirection vers la page des reservations pour le manager
-            Navigator.pushReplacementNamed(context, '/manager_reservations_page');
+            Navigator.pushReplacementNamed(
+              context,
+              '/manager_reservations_page',
+            );
           },
         ),
         title: const Text('Détails de la réservation'),
@@ -65,8 +90,10 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 message:
                     'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
+                  DateFormat(
+                    'EEEE dd/MM/yyyy HH:mm',
+                    'fr_FR',
+                  ).format(simulatedTime),
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
@@ -98,7 +125,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                       Row(
+                      Row(
                         children: [
                           Icon(Icons.person, size: 20),
                           SizedBox(width: 8),
@@ -106,7 +133,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                       Row(
+                      Row(
                         children: [
                           Icon(Icons.email, size: 20),
                           SizedBox(width: 8),
@@ -129,65 +156,59 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              ReservationDetailsWidget(currentReservationState: currentReservation),
+              ReservationDetailsWidget(
+                currentReservationState: currentReservation,
+              ),
               const SizedBox(height: 16),
               const Text(
                 'Tables assignées',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.table_restaurant, size: 20),
-                            const SizedBox(width: 8),
-                            const Text('Table 2'),
-                            const SizedBox(width: 16),
-                            Text(
-                              '(4 places)',
-                              style: TextStyle(color: Colors.grey[600]),
+              if (currentReservation?.tables.length == 0)
+                Text('Aucune table assignee ${currentReservation!.status == Status.cancelled ? '' : '(en attente de confirmation)'}')
+              else
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var table in currentReservation!.tables)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.table_restaurant, size: 20),
+                                const SizedBox(width: 8),
+                                Text('Table ${table.tableNumber}'),
+                                const SizedBox(width: 16),
+                                Text(
+                                  '(${table.capacity} places)',
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.table_restaurant, size: 20),
-                          const SizedBox(width: 8),
-                          const Text('Table 3'),
-                          const SizedBox(width: 16),
-                          Text(
-                            '(6 places)',
-                            style: TextStyle(color: Colors.grey[600]),
                           ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.check_circle),
-                label: const Text('Marquer comme terminée'),
-              ),
-              const SizedBox(height: 8),
-              OutlinedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.cancel),
-                label: const Text('Annuler'),
-              ),
+              if (currentReservation!.status != Status.completed &&
+                  currentReservation!.status != Status.cancelled) ...[
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(updateStatusIcon(currentReservation!.status)),
+                  label: Text(updateStatusMessage(currentReservation!.status)),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.cancel),
+                  label: const Text('Annuler'),
+                ),
+              ],
             ],
           ),
         ),

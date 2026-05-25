@@ -37,7 +37,7 @@ class ReservationDetailsWidget extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (userRole == 'manager') ... {
+            if (userRole == 'manager') ... [
             const Text(
               'Détails de la réservation',
               style: TextStyle(
@@ -45,8 +45,8 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8)
-            },
+            const SizedBox(height: 8),
+            ],
             Row(
               children: [
                 const Icon(Icons.restaurant),
