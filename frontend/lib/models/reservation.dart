@@ -18,8 +18,7 @@ enum Status {
 
 class Reservation {
   final int id;
-  final int client_id; // pour la liste des reservations pour un client
-  final String client_name; // pour la liste des reservations pour un manager
+  final Client client;
   final Restaurant restaurant;
   final DateTime datetime;
   final int numberOfGuests;
@@ -30,8 +29,7 @@ class Reservation {
 // constructeur
   const Reservation({
     required this.id,
-    this.client_id = 0,
-    this.client_name = '',
+    required this.client,
     required this.restaurant,
     required this.datetime,
     this.numberOfGuests = 0,
@@ -43,8 +41,7 @@ class Reservation {
   factory Reservation.fromJson(Map<String, dynamic> json){
     return Reservation(
         id: json['id'],
-        client_id: json['client'] is int ? json['client'] : 0,
-        client_name: json['client'] is int ? '' : json['client'],
+        client: Client.fromJson(json['client']),
         restaurant: Restaurant.makeRestaurantOfReservation(json['restaurant']),
         datetime: DateTime.parse(json['datetime']),
         numberOfGuests: json['number_of_guests'],
@@ -97,6 +94,6 @@ class Reservation {
 
   @override
   String toString() {
-    return'$id $client_id $client_name  $restaurant $datetime $numberOfGuests $status';
+    return'$id $client $restaurant $datetime $numberOfGuests $status';
   }
 }
