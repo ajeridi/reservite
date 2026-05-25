@@ -115,4 +115,15 @@ class AuthService {
     return json.decode(response.body) as bool;
   }
 
+
+  static Future<String> getRole() async {
+    final response = await ApiClient.get("get_role");
+
+    if (response.statusCode != 200)
+      throw Exception("Role fetch failed");
+
+    final body = jsonDecode(response.body);
+    return body["role"];
+  }
+
 }

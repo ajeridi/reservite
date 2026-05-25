@@ -63,3 +63,12 @@ end
 $$ language plpgsql security definer;
 
 grant execute on function isManager() to anon;
+
+
+create or replace function get_role() returns json as
+    $$
+    begin
+        return json_build_object('role', auth.role());
+    end;
+    $$ language plpgsql security definer;
+grant execute on function get_role() to anon;
