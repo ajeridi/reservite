@@ -58,7 +58,7 @@ class ReservationCard extends ConsumerWidget {
             child: Row(
               children: [
                 Tooltip(
-                  message: 'En attente',
+                  message: '${reservation.statusToString()}',
                   child: getStatusIcon(reservation.status),
                 ),
                 const SizedBox(width: 16),

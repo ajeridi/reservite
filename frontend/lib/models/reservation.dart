@@ -1,7 +1,6 @@
 
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/table.dart';
@@ -24,7 +23,7 @@ class Reservation {
   final int numberOfGuests;
   final Status status;
   final String? specialRequests;
-  //final List<Table> tables;
+  final List<Table> tables;
 
 // constructeur
   const Reservation({
@@ -35,6 +34,7 @@ class Reservation {
     this.numberOfGuests = 0,
     this.status = Status.pending,
     this.specialRequests = null,
+    required this.tables,
 });
 
   //constructeur from Json
@@ -47,6 +47,7 @@ class Reservation {
         numberOfGuests: json['number_of_guests'],
         status: toStatus(json['status']),
         specialRequests: json['special_requests'],
+        tables: Table.tablesFromJson(json['tables']),
     );
   }
 
@@ -94,6 +95,6 @@ class Reservation {
 
   @override
   String toString() {
-    return'$id $client $restaurant $datetime $numberOfGuests $status';
+    return'$id $client $restaurant $datetime $numberOfGuests $status $tables';
   }
 }
