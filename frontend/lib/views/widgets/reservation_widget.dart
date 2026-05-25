@@ -6,6 +6,7 @@ import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 import 'package:prbd_2526_a07/views/pages/reservation_details_client_page.dart';
 
 import '../../models/reservation.dart';
@@ -13,6 +14,8 @@ import '../../models/reservation.dart';
 class ReservationCard extends ConsumerWidget {
 
   final Reservation reservation;
+
+
 
   const ReservationCard({
     super.key,
@@ -35,22 +38,27 @@ class ReservationCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // on a besoin du notifier qui va stocker l'id de la reservation selectionee
     final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
+    // on doit voir le notifier de l'utilisateur connecte, pour connaitre son role et rediriger vers la bonne page de details
+    final userRole = ref.watch(userRoleProvider).value;
     return
       Card(
         margin: const EdgeInsets.only(bottom: 16),
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             // on definit l'id de la reservation selectionee
             selectedReservationIdNotifier.set(reservation.id);
-            // navigation vers la page de details de la reservation
-            Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
+            // navigation vers la page de details de la reservation (differente en fonction du role)
+            if (userRole == 'client')
+              Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
+            if (userRole == 'manager')
+              Navigator.pushReplacementNamed(context, '/reservation_details_manager_page');
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
                 Tooltip(
-                  message: 'En attente',
+                  message: '${reservation.statusToString()}',
                   child: getStatusIcon(reservation.status),
                 ),
                 const SizedBox(width: 16),
@@ -59,7 +67,7 @@ class ReservationCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        (reservation.client_name == ''? reservation.restaurant.name : reservation.client_name), // nous savons que le client_name ne sera jamais null donc on se permet de mettre de !
+                        (reservation.client.name == ''? reservation.restaurant.name : reservation.client.name), // nous savons que le client_name ne sera jamais null donc on se permet de mettre de !
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -71,7 +79,7 @@ class ReservationCard extends ConsumerWidget {
                           const Icon(Icons.location_on, size: 14),
                           const SizedBox(width: 4),
                           Text(
-                            (reservation.client_name == '' ? reservation.restaurant.city : reservation.restaurant.name),
+                            (reservation.client.name == '' ? reservation.restaurant.city : reservation.restaurant.name),
                             style: TextStyle(fontSize: 12, color: Colors
                                 .grey[600]),
                           ),

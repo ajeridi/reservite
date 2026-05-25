@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/core/services/auth_service.dart';
 import 'package:prbd_2526_a07/core/tools/params.dart';
@@ -67,5 +69,9 @@ class AuthNotifier extends AsyncNotifier<String?> {
     final result = await AuthService.isManager();
 
     return result;
+  }
+
+  Future<String> getRole() async {
+    return await AuthService.getRole();
   }
 }
