@@ -9,7 +9,7 @@ class Client {
     this.id = 0,
     this.name = '',
     this.email = '',
-    this.phone = ''
+    this.phone = '',
   });
 
 
@@ -17,9 +17,9 @@ class Client {
   factory Client.fromJson(Map<String, dynamic> json){
     return Client(
       id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      phone: json['phone']
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
     );
   }
 }
