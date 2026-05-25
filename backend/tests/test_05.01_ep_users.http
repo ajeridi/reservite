@@ -91,5 +91,10 @@ Content-Type: application/json
 
 { "full_name": "Bruno" }
 
+###
+// test du get_role
+GET http://localhost:3000/rpc/get_role
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoibm91dmVhdS5jbGllbnRAdGVzdC5iZSIsIm5hbWUiOiJKZWFuIER1cG9udCIsInVzZXJfaWQiOjksImV4cCI6MTc3OTc5Nzc3NH0.U4jncoA8DfC1vH2UwPnKwaCMLrAS8J5_patUvttsnDE
+
 
 
