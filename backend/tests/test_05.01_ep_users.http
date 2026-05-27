@@ -1,0 +1,100 @@
+// test signup
+
+POST http://localhost:3000/rpc/signup
+Content-Type: application/json
+
+{
+  "email": "nouveau.client@test.be",
+  "password": "MonMotDePasse123!",
+  "full_name": "Jean Dupont",
+  "phone": "0470123456"
+}
+
+###
+
+// test login (succès attendu avec le compte que je viens de crée)
+
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email": "nouveau.client@test.be",
+  "password": "MonMotDePasse123!"
+}
+
+###
+
+// test isClient (doit retourner vrai)
+
+GET http://localhost:3000/rpc/isclient
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoibm91dmVhdS5jbGllbnRAdGVzdC5iZSIsIm5hbWUiOiJKZWFuIER1cG9udCIsInVzZXJfaWQiOjksImV4cCI6MTc3OTM1ODk2NX0.n4NEvEm5giIuGGpmR0DVF06vZOXtICSnPAIFx9TQTHs
+
+###
+
+// test login Manager
+
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email": "bepenelle@epfc.eu",
+  "password": "Password1,"
+}
+
+###
+
+// test isManager (doit retourner vrai)
+
+GET http://localhost:3000/rpc/ismanager
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJlcGVuZWxsZUBlcGZjLmV1IiwibmFtZSI6IkJlbm_DrnQiLCJ1c2VyX2lkIjoyLCJleHAiOjE3NzkzNTk0NjR9.JeGQ3IjW7J2JdEO0DVLOTbYztCrGz52mNdb2_7VM_Jw
+
+// test login (échec attendu avec un mauvais mot de passe)
+
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email": "nouveau.client@test.be",
+  "password": "MauvaisPassword00!"
+}
+
+###
+
+// test du Reset Database (il n'attends aucun paramètre)
+
+POST http://localhost:3000/rpc/reset_database
+
+###
+
+// test du available email (true)
+
+POST http://localhost:3000/rpc/is_email_available
+Content-Type: application/json
+
+{ "email": "test@bidon.com" }
+
+###
+
+// meme test (doit renvoyer faux)
+
+POST http://localhost:3000/rpc/is_email_available
+Content-Type: application/json
+
+{ "email": "bepenelle@epfc.eu" }
+
+###
+
+// test available name (renvoie faux)
+
+POST http://localhost:3000/rpc/is_full_name_available
+Content-Type: application/json
+
+{ "full_name": "Bruno" }
+
+###
+// test du get_role
+GET http://localhost:3000/rpc/get_role
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoibm91dmVhdS5jbGllbnRAdGVzdC5iZSIsIm5hbWUiOiJKZWFuIER1cG9udCIsInVzZXJfaWQiOjksImV4cCI6MTc3OTc5Nzc3NH0.U4jncoA8DfC1vH2UwPnKwaCMLrAS8J5_patUvttsnDE
+
+
+

@@ -81,8 +81,10 @@ class Restaurant implements Comparable<Restaurant>{
     return Restaurant(
         id : json['id'],
         name: json['name'],
+        address: json['address'],
         city: json['city'],
-        date: null);
+        date: null,
+        phone: json['phone']);
   }
 
   static Future<Restaurant> getRestaurant() async{

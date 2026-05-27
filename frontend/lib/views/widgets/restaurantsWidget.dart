@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
+import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
-class RestaurantCard extends StatelessWidget {
+class RestaurantCard extends ConsumerWidget {
   final Restaurant restaurant;
   const RestaurantCard( {
     super.key,
@@ -9,7 +11,11 @@ class RestaurantCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    // recherche du notifier de la reservation selectionnee pour pouvoir la mettre a jour quand on clique sur une carte de restaurant
+    final selectedRestaurantNotifier = ref.read(selectedRestaurantProvider.notifier);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -68,7 +74,10 @@ class RestaurantCard extends StatelessWidget {
           ],
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {},
+        onTap: () {
+          selectedRestaurantNotifier.setValue(restaurant.id);
+          Navigator.pushReplacementNamed(context, '/manager_reservations_page');
+        },
       ),
     );
   }
