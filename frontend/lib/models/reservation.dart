@@ -17,13 +17,13 @@ enum Status {
 
 class Reservation {
   final int id;
-  final int client;
+  final Client client;
   final Restaurant restaurant;
   final DateTime datetime;
   final int numberOfGuests;
   final Status status;
   final String? specialRequests;
-  //final List<Table> tables;
+  final List<Table> tables;
 
 // constructeur
   const Reservation({
@@ -34,24 +34,31 @@ class Reservation {
     this.numberOfGuests = 0,
     this.status = Status.pending,
     this.specialRequests = null,
+    required this.tables,
 });
 
   //constructeur from Json
   factory Reservation.fromJson(Map<String, dynamic> json){
     return Reservation(
         id: json['id'],
-        client: json['client'],
+        client: Client.fromJson(json['client']),
         restaurant: Restaurant.makeRestaurantOfReservation(json['restaurant']),
         datetime: DateTime.parse(json['datetime']),
         numberOfGuests: json['number_of_guests'],
         status: toStatus(json['status']),
+        specialRequests: json['special_requests'],
+        tables: Table.tablesFromJson(json['tables']),
     );
   }
 
   // methode qui va rechercher les reservations d'un client (Future, car on va chercher dans la DB)
-  static Future<List<Reservation>> getReservations() async{
-    final response = await ApiClient.get("get_reservations");
+  static Future<List<Reservation>> getReservations({int? selectedRestaurant = null}) async{
+    String enpoint = 'get_reservations';
+    if (selectedRestaurant != null) enpoint += '?restaurant_id=$selectedRestaurant';
+    final response = await ApiClient.get(enpoint);
     if (response.statusCode == 200){
+      // un user qui n'a pas de reservations, a un response.body == 'null'
+      if (response.body == 'null') return <Reservation>[]; // on retourne liste vide si null
       final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
       return body.map((dynamic reservation) => Reservation.fromJson(reservation)).toList(); // mappage de chaque element de la liste d'objets Json en objet Reservation
     }
@@ -71,9 +78,23 @@ class Reservation {
     };
   }
 
+  String statusToString(){
+    return switch(this.status){
+      Status.pending => 'En attente',
+      Status.confirmed => 'Confirmee',
+      Status.completed => 'Terminee',
+      Status.cancelled => 'Annulee',
+    };
+  }
+
+  bool canEdit() {
+    return this.status != Status.completed && this.status != Status.cancelled;
+  }
+
+
 
   @override
   String toString() {
-    return'$id $client $restaurant $datetime $numberOfGuests $status';
+    return'$id $client $restaurant $datetime $numberOfGuests $status $tables';
   }
 }

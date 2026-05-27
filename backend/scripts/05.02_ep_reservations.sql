@@ -110,11 +110,12 @@ create or replace function get_reservations(restaurant_id int default NULL) retu
             return (select json_agg(
                            json_build_object(
                                 'id', rsv.id,
-                                'client', rsv.client,
-                                'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'city', rst.city) from restaurants rst where rst.id = rsv.restaurant),
+                                'client', (select(json_build_object('id', rsv.client))),
+                                'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'address', rst.address, 'city', rst.city, 'phone', rst.phone) from restaurants rst where rst.id = rsv.restaurant),
                                 'datetime', rsv.datetime,
                                 'number_of_guests', rsv.number_of_guests,
-                                'status', rsv.status
+                                'status', rsv.status,
+                                'special_requests', rsv.special_requests
                            )
                            ORDER BY rsv.datetime DESC, rsv.id DESC
                    )
@@ -128,11 +129,13 @@ create or replace function get_reservations(restaurant_id int default NULL) retu
             return (select json_agg(
                                    json_build_object(
                                            'id', rsv.id,
-                                           'client', (select json_build_object('full_name', u.full_name) from users u where u.id = rsv.client),
-                                           'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'city', rst.city) from restaurants rst where rst.id = rsv.restaurant),
+                                           'client', (select json_build_object('id', u.id, 'name', u.full_name, 'email', u.email, 'phone', u.phone) from users u where u.id = rsv.client),
+                                           'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'address', rst.address , 'city', rst.city, 'phone', rst.phone) from restaurants rst where rst.id = rsv.restaurant),
                                            'datetime', rsv.datetime,
                                            'number_of_guests', rsv.number_of_guests,
-                                           'status', rsv.status
+                                           'status', rsv.status,
+                                           'special_requests', rsv.special_requests,
+                                           'tables', (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number, 'capacity', t.capacity)) from reservation_tables rt join tables t on rt."table" = t.id where rt.reservation = rsv.id)
                                    )
                                    ORDER BY rsv.datetime DESC, rsv.id DESC -- faut mettre le order by ici, et pas en fin de query apres le where sinon ca ne marchera pas
                            )
@@ -345,7 +348,4 @@ create or replace function get_pending_reservation_count(restaurant_id int) retu
     $$ language plpgsql security definer;
 
 grant execute on function get_pending_reservation_count(int) to manager;
-
-
-
 

@@ -15,15 +15,17 @@ class Table {
   // constructeur from Json
   factory Table.fromJson(Map<String, dynamic> json){
     return Table(
-      id: json['id'],
-      tableNumber: json['table_number'],
-      capacity: json['capacity']
+      id: json['id'] ?? 0,
+      tableNumber: json['table_number'] ?? 0,
+      capacity: json['capacity'] ?? 0,
     );
   }
 
   // prends une collection Json table et retourne un SET de tables
-  static List<Table> tablesFromJson(List<dynamic> json) {
+  static List<Table> tablesFromJson(List<dynamic>? json) {
     List<Table> tables = []; // infos, https://dart.dev/language/collections#sets
+    if (json == null)
+      return tables;
     for (Map<String, dynamic> tableJson in json) {
       Table table = Table.fromJson(tableJson);
       tables.add(table);
