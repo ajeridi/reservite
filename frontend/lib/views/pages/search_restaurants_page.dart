@@ -48,7 +48,7 @@ class SearchRestaurantsScreen extends ConsumerWidget {
     final filterRestoNotifier = ref.read(filteredRestaurantsProvider.notifier);
 
     return asyncState.when(
-      data: (state) => data(state, notifier,theme, simulatedTime, filterRestaurantState,filterRestoNotifier),
+      data: (state) => data(state, notifier,theme, simulatedTime, filterRestaurantState,filterRestoNotifier , context),
       error: (err, _) =>
           DataErrorWidget(
             error: err,
@@ -62,6 +62,7 @@ class SearchRestaurantsScreen extends ConsumerWidget {
           simulatedTime,
           filterRestaurantState,
           filterRestoNotifier,
+          context,
 
         ),
     );
@@ -72,13 +73,16 @@ class SearchRestaurantsScreen extends ConsumerWidget {
       RestaurantsNotifier notifier,
       dynamic theme, DateTime simulatedTime, SplayTreeSet<Restaurant> filterRestaurantState,
       FilteredRestaurantsNotifier filterRestoNotifier,
+      BuildContext context,
       ){
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home_client_page');
+          },
         ),
         title: const Text('Rechercher un restaurant'),
         automaticallyImplyLeading: false,

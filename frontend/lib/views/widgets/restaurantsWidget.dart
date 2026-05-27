@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
 class RestaurantCard extends ConsumerWidget {
   final Restaurant restaurant;
@@ -15,6 +16,8 @@ class RestaurantCard extends ConsumerWidget {
 
     // recherche du notifier de la reservation selectionnee pour pouvoir la mettre a jour quand on clique sur une carte de restaurant
     final selectedRestaurantNotifier = ref.read(selectedRestaurantProvider.notifier);
+
+    final userRole = ref.read(userRoleProvider);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -76,7 +79,7 @@ class RestaurantCard extends ConsumerWidget {
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
           selectedRestaurantNotifier.setValue(restaurant.id);
-          Navigator.pushReplacementNamed(context, '/manager_reservations_page');
+          Navigator.pushReplacementNamed(context,( userRole.value == 'manager' ? '/manager_reservations_page' : '/restaurant_details_page'));
         },
       ),
     );
