@@ -25,14 +25,14 @@ void main() async {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const SearchRestaurantsMockupScreen(),
+      home: const SearchRestaurantsScreen(),
     ),
   ));
 }
 String search = '';
 
-class SearchRestaurantsMockupScreen extends ConsumerWidget {
-  const SearchRestaurantsMockupScreen({super.key});
+class SearchRestaurantsScreen extends ConsumerWidget {
+  const SearchRestaurantsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

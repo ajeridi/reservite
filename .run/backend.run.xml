@@ -20,8 +20,8 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/04.14_br_no_past_reservation.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/05.00_ep_custom_types.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/05.01_ep_restaurant.sql" />
-    <script-file value="$PROJECT_DIR$/backend/scripts/05.02_ep_reservations.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/05.01_ep_users.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/05.02_ep_reservations.sql" />
     <script-mode>FILE</script-mode>
     <data-source id="6d275bb5-c69c-4f95-bc29-f6a29631655b" namespace="database/&quot;prbd-2526-a07&quot;" />
     <method v="2" />
