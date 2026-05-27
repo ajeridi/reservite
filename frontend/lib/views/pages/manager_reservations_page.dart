@@ -177,11 +177,6 @@ class ManagerReservationsPage extends ConsumerWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        icon: const Icon(Icons.add),
-        label: const Text('Nouvelle réservation'),
-      ),
     );
   }
 }
