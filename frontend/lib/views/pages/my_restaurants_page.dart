@@ -7,20 +7,24 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/restaurantsWidget.dart';
 
+import '../../core/tools/my_provider_observer.dart';
 import '../../models/restaurant.dart';
 import '../widgets/data_error_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
-  runApp(ProviderScope(child: MaterialApp(
+  runApp
+    (ProviderScope(
+      observers: [MyProviderObserver()],
+  retry: (int _, Object _) => null,child: MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       useMaterial3: true,
     ),
     home: const MyRestaurantsPage(),
-  ))
-  );
+  )
+  ));
 }
 
 class MyRestaurantsPage extends ConsumerWidget {
