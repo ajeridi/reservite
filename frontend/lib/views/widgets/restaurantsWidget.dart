@@ -28,7 +28,7 @@ class RestaurantCard extends ConsumerWidget {
               children: [
                 const Icon(Icons.location_on, size: 14, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text(restaurant.city),
+                Text(restaurant.city ?? ''),
                 const SizedBox(width: 12),
                 const Icon(Icons.star, size: 14, color: Colors.amber),
                 const SizedBox(width: 2),
@@ -48,6 +48,7 @@ class RestaurantCard extends ConsumerWidget {
               children: [
                 const Icon(Icons.access_time, size: 14, color: Colors.grey),
                 const SizedBox(width: 4),
+                if(restaurant.date != null)
                 Text(
                   'Dernière réservation: ${restaurant.getLastDate()}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
@@ -55,6 +56,7 @@ class RestaurantCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 4),
+            if(restaurant.reservPending != null)
             Row(
               children: [
                 Icon(Icons.pending, size: 14, color: Colors.orange),

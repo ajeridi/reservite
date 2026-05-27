@@ -349,16 +349,3 @@ create or replace function get_pending_reservation_count(restaurant_id int) retu
 
 grant execute on function get_pending_reservation_count(int) to manager;
 
-(select json_agg(
-                json_build_object(
-                        'id', rsv.id,
-                        'client', rsv.client,
-                        'restaurant', (select json_build_object('id', rsv.id, 'name', rst.name, 'city', rst.city) from restaurants rst where rst.id = rsv.restaurant),
-                        'datetime', rsv.datetime,
-                        'number_of_guests', rsv.number_of_guests,
-                        'status', rsv.status
-                )
-                ORDER BY rsv.datetime DESC, rsv.id DESC
-        )
- from reservations rsv
- where rsv.client = 9);

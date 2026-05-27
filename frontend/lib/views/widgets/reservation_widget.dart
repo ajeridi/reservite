@@ -79,7 +79,7 @@ class ReservationCard extends ConsumerWidget {
                           const Icon(Icons.location_on, size: 14),
                           const SizedBox(width: 4),
                           Text(
-                            (reservation.client.name == '' ? reservation.restaurant.city : reservation.restaurant.name),
+                            (reservation.client.name == '' ? reservation.restaurant.city! : reservation.restaurant.name),
                             style: TextStyle(fontSize: 12, color: Colors
                                 .grey[600]),
                           ),
