@@ -46,7 +46,9 @@ class RestaurantDetailsPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/restaurant_details_page');
+            },
           ),
         ],
         elevation: 2,

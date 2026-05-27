@@ -1,8 +1,14 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/services.dart';
+import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../../providers/current_restaurant_provider.dart';
+import 'data_error_widget.dart';
 
 class RestaurantDetailsWidget extends ConsumerWidget {
   const RestaurantDetailsWidget({
@@ -11,8 +17,12 @@ class RestaurantDetailsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     final resto = ref.watch(currentRestaurantProvider(ref.read(selectedRestaurantProvider)));
-    return Column(
+
+    return resto.when(
+      data: 
+      (restaurant) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -81,7 +91,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '12:00 - 14:00, 19:00 - 22:00',
+                            getServiceOfDay(1, resto.value!.services),
                             style: const TextStyle(
                                 fontFamily: 'monospace'),
                           ),
@@ -104,7 +114,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '12:00 - 14:00, 19:00 - 22:00',
+                            getServiceOfDay(2, resto.value!.services),
                             style: const TextStyle(
                                 fontFamily: 'monospace'),
                           ),
@@ -127,7 +137,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '12:00 - 14:00, 19:00 - 22:00',
+                            getServiceOfDay(3, resto.value!.services),
                             style: const TextStyle(
                                 fontFamily: 'monospace'),
                           ),
@@ -150,7 +160,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '12:00 - 14:00, 19:00 - 22:00',
+                            getServiceOfDay(4, resto.value!.services),
                             style: const TextStyle(
                                 fontFamily: 'monospace'),
                           ),
@@ -180,7 +190,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '12:00 - 14:00, 19:00 - 23:00',
+                            getServiceOfDay(5, resto.value!.services),
                             style: const TextStyle(
                                 fontFamily: 'monospace'),
                           ),
@@ -203,7 +213,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '19:00 - 23:00',
+                            getServiceOfDay(6, resto.value!.services),
                             style: const TextStyle(
                                 fontFamily: 'monospace'),
                           ),
@@ -226,7 +236,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '12:00 - 14:00',
+                            getServiceOfDay(7, resto.value!.services),
                             style: const TextStyle(
                                 fontFamily: 'monospace'),
                           ),
@@ -252,6 +262,27 @@ class RestaurantDetailsWidget extends ConsumerWidget {
           ),
         ),
       ],
+    ),loading:() => Center(child: CircularProgressIndicator()),
+      error: (err, _) =>
+          DataErrorWidget(
+            error: err,
+            stackTrace: StackTrace.current,
+            notifier: ref.read(restaurantProvider.notifier),
+          )
     );
+    
   }
+}
+
+String getServiceOfDay (int dayOfWeek, SplayTreeSet<Services>? services){
+  String times ='';
+  if(services != null) {
+    for (var service in services) {
+      if (service.dayOfWeek == dayOfWeek) {
+        times += '${DateFormat('HH:mm', 'fr_FR').format(service.startTime)}' + ' - ' + '${DateFormat('HH:mm', 'fr_FR').format(service.endTime)}'+
+                "\n";
+      }
+    }
+  }
+  return times;
 }
