@@ -10,7 +10,7 @@ import 'my_restaurants_mockup.dart';
 import 'reservation_details_manager_mockup.dart';
 import 'reservation_details_mockup.dart';
 import 'reservation_form_mockup.dart';
-import 'restaurant_details_mockup.dart';
+import '../pages/restaurant_details_page.dart';
 import 'restaurant_management_reservations_mockup.dart';
 import 'restaurant_management_services_mockup.dart';
 import 'restaurant_management_tables_mockup.dart';
@@ -31,7 +31,7 @@ class _MockupCarouselScreenState extends State<MockupCarouselScreen> {
   static final List<({String label, Widget screen})> _mockups = [
     (label: 'Accueil client', screen: const HomeClientMockupScreen()),
     (label: 'Recherche restaurants', screen: const SearchRestaurantsScreen()),
-    (label: 'Détails restaurant', screen: const RestaurantDetailsMockupScreen()),
+    (label: 'Détails restaurant', screen: const RestaurantDetailsPage()),
     (label: 'Formulaire réservation', screen: const ReservationFormMockupScreen()),
     (label: 'Détails réservation', screen: const ReservationDetailsMockupScreen()),
     (label: 'Mes restaurants', screen: const MyRestaurantsPage()),
