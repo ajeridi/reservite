@@ -59,8 +59,8 @@ class RestaurantCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 4),
-            if(restaurant.reservPending != null)
-            Row(
+            if(restaurant.reservPending != 0)
+              Row(
               children: [
                 Icon(Icons.pending, size: 14, color: Colors.orange),
                 SizedBox(width: 4),
