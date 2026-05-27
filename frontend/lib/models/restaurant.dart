@@ -1,8 +1,10 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
-import 'package:prbd_2526_a07/core/tools/params.dart';
+import 'package:prbd_2526_a07/models/services.dart';
+
 
 class Restaurant implements Comparable<Restaurant>{
   final int id;
@@ -16,6 +18,7 @@ class Restaurant implements Comparable<Restaurant>{
   final int? slotDuration;
   final DateTime? date;
   final int? reservPending;
+  final SplayTreeSet<Services>? services;
 
   // constructeur
   const Restaurant({
@@ -30,6 +33,7 @@ class Restaurant implements Comparable<Restaurant>{
     this.slotDuration = 0,
     required this.date ,
     this.reservPending = 0,
+    this.services = null,
   });
 
   String getLastDate (){
@@ -73,6 +77,7 @@ class Restaurant implements Comparable<Restaurant>{
       slotDuration: json['slot_duration'],
       date: json['last_reservation_date'] != null ? DateTime.parse(json['last_reservation_date']) : null,
       reservPending: json['reservations_pending'] as int?,
+      services:  json['services'] == null ? null : Services.servicesFromJson (json ['services' ]),
     );
   }
 
