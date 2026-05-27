@@ -79,7 +79,9 @@ class HomeClientPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushReplacementNamed(context,'/search_restaurants_page' );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
