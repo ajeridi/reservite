@@ -41,6 +41,17 @@ class ReservationsNotifier extends AbstractAsyncNotifier<List<Reservation>>{
     await getAll();
   }
 
+    void updateList(Reservation reserv) {
+    state = AsyncLoading();
+    final reservations = state.value;
+    for(var reservation in reservations!){
+      if(reservation.id == reserv.id){
+        reservation.copyWith(status: reserv.status);
+      }
+    }
+    state = AsyncData(reservations);
+  }
+
   Future<void> getAll() async {
     state = AsyncLoading();
     try {
