@@ -10,7 +10,7 @@ class ApplicationTime {
   // methode qui va recuperer la date/heure courante de l'application
   static Future<DateTime> get() async {
     try {
-      final response = await ApiClient.get("get_simulated_time");
+      final response = await ApiClient.get("get_simulated_time", anonymous: true);
       if (response.statusCode != 200){
         throw Exception("Failed to fetch simulated time.");
       }
@@ -18,7 +18,7 @@ class ApplicationTime {
       return DateTime.parse(body['simulated_time']);
     } catch(e, st){
       debugPrint('$e\n$st');
-      throw Exception('Failed to get user');
+      throw Exception('Failed to get time');
     }
 
 

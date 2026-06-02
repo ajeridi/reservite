@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
 
 class LoginMockupScreen extends ConsumerStatefulWidget {
@@ -78,7 +79,7 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+    final simulatedTime = ref.watch(applicationTimeProvider).value;
 
     return Scaffold(
       appBar: AppBar(
@@ -105,7 +106,7 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
                     'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
                   DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
+                      .format(simulatedTime!),
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
