@@ -1,6 +1,8 @@
 
 import 'dart:convert';
 
+
+
 import 'package:prbd_2526_a07/core/services/api_client.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/table.dart';
@@ -76,6 +78,25 @@ class Reservation {
       "cancelled" => Status.cancelled,
       _ => throw Exception('incorrect status'),
     };
+  }
+
+  //recup reservation pour cancel
+
+  Future<Reservation> getCancel() async{
+    try {
+      final response = await ApiClient.post(
+        'cancel_reservation',
+      body: json.encode({'reservation_id': id}));
+      if (response.statusCode == 200) {
+        return Reservation.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to get reservation');
+      }
+    }catch(e,st){
+      print(e);
+      throw Exception('Failed to get user');
+    }
+
   }
 
   String statusToString(){

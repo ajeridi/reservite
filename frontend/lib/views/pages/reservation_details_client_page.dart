@@ -100,7 +100,9 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        currentReservationNotifier.cancel();
+                      },
                       icon: const Icon(Icons.cancel),
                       label: const Text('Annuler'),
                     ),
