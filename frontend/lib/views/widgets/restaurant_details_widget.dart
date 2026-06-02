@@ -20,6 +20,9 @@ class RestaurantDetailsWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final resto = ref.watch(currentRestaurantProvider(ref.read(selectedRestaurantProvider)));
+    // id de la reservation selectionnee (a set a 0 si on redirige vers la page de reservation)
+    final selectedReservationIdState = ref.watch(selectedReservationIdProvider); // on en a besoin pour build le notifier, et pouvoir set le state
+    final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
 
     return resto.when(
       data: 
@@ -255,6 +258,8 @@ class RestaurantDetailsWidget extends ConsumerWidget {
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () {
+              // comme c'est la creation d'une nouvelle reservation, il faut set le selected_reservation_id a 0
+              selectedReservationIdNotifier.set(0);
               // redirection vers la page de creation/edition d'une reservation
               Navigator.pushReplacementNamed(context, '/reservation_form_page');
             },

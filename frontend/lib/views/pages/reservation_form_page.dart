@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
@@ -16,11 +17,11 @@ void main() async {
   );
 }
 
-class ReservationFormPage extends StatelessWidget {
+class ReservationFormPage extends ConsumerWidget {
   const ReservationFormPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
@@ -28,7 +29,10 @@ class ReservationFormPage extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            // retour a search_restaurant
+            Navigator.pushReplacementNamed(context, '/search_restaurants_page');
+          },
         ),
         title: const Text('Nouvelle réservation'),
         automaticallyImplyLeading: false,
