@@ -7,6 +7,7 @@ import 'package:prbd_2526_a07/views/pages/manager_reservations_page.dart';
 import 'package:prbd_2526_a07/views/pages/my_restaurants_page.dart';
 import 'package:prbd_2526_a07/views/pages/reservation_details_client_page.dart';
 import 'package:prbd_2526_a07/views/pages/reservation_details_manager_page.dart';
+import 'package:prbd_2526_a07/views/pages/reservation_form_page.dart';
 import 'package:prbd_2526_a07/views/pages/restaurant_details_page.dart';
 import 'package:prbd_2526_a07/views/pages/search_restaurants_page.dart';
 import 'package:prbd_2526_a07/views/pages/signup_page.dart';
@@ -50,6 +51,7 @@ class MyApp extends StatelessWidget {
         '/reservation_details_manager_page' : (context) => ReservationDetailsManagerPage(),
         '/search_restaurants_page' : (context) => SearchRestaurantsScreen(),
         '/restaurant_details_page' : (context) => RestaurantDetailsPage(),
+        '/reservation_form_page' : (context) => ReservationFormPage(),
       },
     );
   }

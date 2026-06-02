@@ -67,7 +67,7 @@ $$
            'datetime', rsv.datetime,
            'number_of_guests', rsv.number_of_guests,
            'status', rsv.status,
-           'sepcial_requests', rsv.special_requests,
+           'special_requests', rsv.special_requests,
            'tables', (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number, 'capacity', t.capacity)) from reservation_tables rt join tables t on rt."table" = t.id where rt.reservation = reservation_id)
            )
     from reservations rsv
