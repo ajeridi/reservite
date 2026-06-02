@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
 
 final userRoleProvider = AsyncNotifierProvider<UserRoleNotifier, String?>(
-    () => UserRoleNotifier(),
+  () => UserRoleNotifier(),
 );
 
 class UserRoleNotifier extends AsyncNotifier<String?> {
@@ -22,7 +22,7 @@ class UserRoleNotifier extends AsyncNotifier<String?> {
     try {
       if (!authNotifier.isLoggedIn) return null;
       return await authNotifier.getRole();
-    }catch (e) {
+    } catch (e) {
       throw "Something went wrong!\nPlease try again later.";
     }
   }

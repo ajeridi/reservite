@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/restaurantsWidget.dart';
 
@@ -31,7 +32,6 @@ class MyRestaurantsPage extends ConsumerWidget {
   const MyRestaurantsPage({super.key});
 
 
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -40,8 +40,10 @@ class MyRestaurantsPage extends ConsumerWidget {
     final asyncState = ref.watch(restaurantProvider);
     final notifier = ref.read(restaurantProvider.notifier);
 
+    final authNotifier = ref.read(authProvider.notifier);
+
     return asyncState.when(
-      data: (state) => data(state, notifier,theme, simulatedTime,context),
+      data: (state) => data(state, notifier,theme, simulatedTime, authNotifier, context),
       error: (err, _) =>
           DataErrorWidget(
             error: err,
@@ -53,14 +55,17 @@ class MyRestaurantsPage extends ConsumerWidget {
           notifier,
           theme,
           simulatedTime,
-          context,
+          authNotifier,
+          context
         ),
     );
   }
     Widget data(
         SplayTreeSet<Restaurant> restaurants,
         RestaurantsNotifier notifier,
-        dynamic theme, DateTime simulatedTime, context,
+        dynamic theme, DateTime simulatedTime,
+        AuthNotifier authNotifier,
+        BuildContext context
     )
     {
       return Scaffold(
@@ -72,13 +77,14 @@ class MyRestaurantsPage extends ConsumerWidget {
               icon: const Icon(Icons.refresh),
               tooltip: 'Rafraîchir les données',
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/my_restaurants_page');
+                notifier.refresh();
               },
             ),
             IconButton(
               icon: const Icon(Icons.logout),
               tooltip: 'Déconnexion (Benoît P.)',
               onPressed: () {
+                authNotifier.logout();
                 Navigator.pushReplacementNamed(context, '/login');
               },
             ),

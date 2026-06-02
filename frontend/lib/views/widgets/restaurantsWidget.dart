@@ -17,7 +17,7 @@ class RestaurantCard extends ConsumerWidget {
     // recherche du notifier de la reservation selectionnee pour pouvoir la mettre a jour quand on clique sur une carte de restaurant
     final selectedRestaurantNotifier = ref.read(selectedRestaurantProvider.notifier);
 
-    final userRole = ref.read(userRoleProvider);
+    final userRole = ref.watch(userRoleProvider);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
