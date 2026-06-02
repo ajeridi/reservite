@@ -80,6 +80,27 @@ class Reservation {
     };
   }
 
+ Reservation copyWith( {
+   int? id,
+   Client? client,
+   Restaurant? restaurant,
+   DateTime? datetime,
+   int? numberOfGuests,
+   Status? status,
+    String? specialRequests,
+   List<Table>? tables}){
+    return Reservation(
+        id: id ?? this.id,
+        client: client ?? this.client,
+        restaurant: restaurant ?? this.restaurant,
+        datetime: datetime ?? this.datetime,
+        numberOfGuests: numberOfGuests ?? this.numberOfGuests,
+        status: status ?? this.status,
+        tables: tables ?? this.tables);
+ }
+
+
+
   //recup reservation pour cancel
 
   Future<Reservation> getCancel() async{

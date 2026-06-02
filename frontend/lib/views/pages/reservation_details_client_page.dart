@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 
 import '../../providers/current_reservation_provider.dart';
+import '../../providers/selected_reservation_id_provider.dart';
 import '../widgets/reservation_details_widget.dart';
 
 void main() async {
@@ -31,9 +32,11 @@ class ReservationDetailsClientPage extends ConsumerWidget {
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
+    final selectedReservation = ref.watch(selectedReservationIdProvider);
+
     // on a besoin d'aller chercher la reservation selectionnee
-    final currentReservationState = ref.watch(currentReservationProvider).value; // utilisation  de value pour extraire la Reservation de <AsyncValue<Reservation>>
-    final currentReservationNotifier = ref.read(currentReservationProvider.notifier);
+    final currentReservationState = ref.watch(currentReservationProvider(selectedReservation)).value; // utilisation  de value pour extraire la Reservation de <AsyncValue<Reservation>>
+    final currentReservationNotifier = ref.read(currentReservationProvider(selectedReservation).notifier);
 
     return Scaffold(
       appBar: AppBar(

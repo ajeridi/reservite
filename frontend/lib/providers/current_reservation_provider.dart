@@ -16,11 +16,14 @@ import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 
 import '../models/reservation.dart';
 
-final currentReservationProvider = AsyncNotifierProvider<CurrentReservationNotifier, Reservation?>( // autoDispose pour detruire le provider une fois qu'on ne l'utilise plus
-  () => CurrentReservationNotifier(),
-);
+
+
+final currentReservationProvider = AsyncNotifierProvider.autoDispose.family<CurrentReservationNotifier, Reservation?, int>
+  (CurrentReservationNotifier.new,);
 
 class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
+  CurrentReservationNotifier(this.id);
+  final int id;
   @override
   build() {
     final reservationsState = ref.watch(reservationsProvider).value; // si la liste se rafraichit, la reservation est rafraichie aussi (.value pour decapsuler le <AsyncValue<List<Reservations>>
@@ -29,8 +32,9 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
     state = AsyncLoading();
     // on va chercher dans la liste des reservation, la reservation selectionee par son id
     for (var reservation in reservationsState!) {
-      if (reservation.id == selectedReservationIdState)
+      if (reservation.id == selectedReservationIdState) {
         return reservation;
+      }
     }
     return null;
   }
@@ -43,6 +47,8 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
   Future<void> cancel()  async{
     final canceled = await state.value!.getCancel();
     state = AsyncData(canceled);
+
+    ref.read(reservationsProvider.notifier).updateList(state.value!);
 
   }
 
