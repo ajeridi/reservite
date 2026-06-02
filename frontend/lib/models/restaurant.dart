@@ -59,7 +59,7 @@ class Restaurant implements Comparable<Restaurant>{
     if (date==null && otherDate == null) return 0;
     if (date == null) return -1;
     if (otherDate == null) return 1;
-    return this.date==other.date? this.name.compareTo(other.name) : date.compareTo(otherDate);
+    return this.date==other.date? this.name.compareTo(other.name) : otherDate.compareTo(date);
   }
 
 

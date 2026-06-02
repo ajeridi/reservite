@@ -6,6 +6,8 @@ import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/core/tools/validating_text_editing_controller.dart';
 import 'package:prbd_2526_a07/models/user.dart';
 
+import '../../providers/application_time_provider.dart';
+
 class SignupMockupScreen extends ConsumerStatefulWidget {
   const SignupMockupScreen({super.key});
 
@@ -116,7 +118,7 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+    final simulatedTime = ref.watch(applicationTimeProvider).value;
 
     return Scaffold(
       appBar: AppBar(
@@ -147,7 +149,7 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
                     'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
                   DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
+                      .format(simulatedTime!),
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
