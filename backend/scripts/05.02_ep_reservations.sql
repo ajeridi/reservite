@@ -63,7 +63,7 @@ $$
     return (select json_build_object(
            'id', rsv.id,
            'client', (select json_build_object('id', u.id, 'name', u.full_name, 'email', u.email, 'phone', u.phone) from users u where u.id = rsv.client),
-           'restaurant', (select json_agg(json_build_object('id', rsv.restaurant, 'name', rst.name, 'address', rst.address, 'city', rst.city, 'phone', rst.phone)) from restaurants rst where rst.id = rsv.restaurant),
+           'restaurant', (select json_build_object('id', rsv.restaurant, 'name', rst.name, 'address', rst.address, 'city', rst.city, 'phone', rst.phone) from restaurants rst where rst.id = rsv.restaurant),
            'datetime', rsv.datetime,
            'number_of_guests', rsv.number_of_guests,
            'status', rsv.status,
