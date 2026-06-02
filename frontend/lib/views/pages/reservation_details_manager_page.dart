@@ -204,7 +204,34 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Expanded(
+                          child: AlertDialog(
+                            title: Text('Annuler la réservation'),
+                            content: Text('Êtes-vous sûr de vouloir annuler cette réservation?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Non'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  currentReservationNotifier.cancel();
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Oui'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                   icon: const Icon(Icons.cancel),
                   label: const Text('Annuler'),
                 ),
