@@ -17,5 +17,3 @@ create or replace function get_simulated_time() returns json as
     $$ language plpgsql security definer;
 
 grant execute on function get_simulated_time() to anon;
-
-delete from system_time;
