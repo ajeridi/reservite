@@ -209,7 +209,10 @@ class HomeClientPage extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          // redirection vers la page search_restaurant
+          Navigator.pushReplacementNamed(context, '/search_restaurants_page');
+        },
         icon: const Icon(Icons.add),
         label: const Text('Nouvelle réservation'),
       ),

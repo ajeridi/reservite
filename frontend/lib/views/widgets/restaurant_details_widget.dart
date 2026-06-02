@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/services.dart';
 import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../../providers/current_restaurant_provider.dart';
@@ -253,7 +254,10 @@ class RestaurantDetailsWidget extends ConsumerWidget {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              // redirection vers la page de creation/edition d'une reservation
+              Navigator.pushReplacementNamed(context, '/reservation_form_page');
+            },
             icon: const Icon(Icons.add),
             label: const Text('Réserver'),
             style: ElevatedButton.styleFrom(
