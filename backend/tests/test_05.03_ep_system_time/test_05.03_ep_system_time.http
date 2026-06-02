@@ -1,0 +1,4 @@
+### Recherche du temps simule
+GET http://localhost:3000/rpc/get_simulated_time
+
+###
