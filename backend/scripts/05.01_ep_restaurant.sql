@@ -104,6 +104,7 @@ returns json as
                         from restaurants r
                         join public.restaurant_managers rm on r.id = rm.restaurant
                         where rm.manager = auth.id()
+
                 );
             end if;
         end;
