@@ -31,6 +31,7 @@ class MyRestaurantsPage extends ConsumerWidget {
   const MyRestaurantsPage({super.key});
 
 
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -40,7 +41,7 @@ class MyRestaurantsPage extends ConsumerWidget {
     final notifier = ref.read(restaurantProvider.notifier);
 
     return asyncState.when(
-      data: (state) => data(state, notifier,theme, simulatedTime),
+      data: (state) => data(state, notifier,theme, simulatedTime,context),
       error: (err, _) =>
           DataErrorWidget(
             error: err,
@@ -52,13 +53,14 @@ class MyRestaurantsPage extends ConsumerWidget {
           notifier,
           theme,
           simulatedTime,
+          context,
         ),
     );
   }
     Widget data(
         SplayTreeSet<Restaurant> restaurants,
         RestaurantsNotifier notifier,
-        dynamic theme, DateTime simulatedTime,
+        dynamic theme, DateTime simulatedTime, context,
     )
     {
       return Scaffold(
@@ -69,12 +71,16 @@ class MyRestaurantsPage extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.refresh),
               tooltip: 'Rafraîchir les données',
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/my_restaurants_page');
+              },
             ),
             IconButton(
               icon: const Icon(Icons.logout),
               tooltip: 'Déconnexion (Benoît P.)',
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/login');
+              },
             ),
           ],
           elevation: 2,
