@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_details_widget.dart';
 
 import '../../models/reservation.dart';
@@ -49,9 +50,10 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     // observation de la liste des reservations car currentReservation vient de la
-    final currentReservation = ref.watch(currentReservationProvider).value;
+    final selectedReservationId = ref.watch(selectedReservationIdProvider);
+    final currentReservation = ref.watch(currentReservationProvider(selectedReservationId)).value;
     final currentReservationNotifier = ref.read(
-      currentReservationProvider.notifier,
+      currentReservationProvider(selectedReservationId).notifier,
     );
 
     return Scaffold(
