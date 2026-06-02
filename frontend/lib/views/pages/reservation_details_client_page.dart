@@ -1,8 +1,10 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a07/models/reservation.dart';
+
 
 import '../../providers/current_reservation_provider.dart';
 import '../widgets/reservation_details_widget.dart';
@@ -100,8 +102,34 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () {
-                        currentReservationNotifier.cancel();
+                      onPressed: () => {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Expanded(
+                              child: AlertDialog(
+                                title: Text('Annuler la réservation'),
+                                content: Text('Êtes-vous sûr de vouloir annuler cette réservation?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Non'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      currentReservationNotifier.cancel();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Oui'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        )
+                        //currentReservationNotifier.cancel();
                       },
                       icon: const Icon(Icons.cancel),
                       label: const Text('Annuler'),
@@ -115,4 +143,8 @@ class ReservationDetailsClientPage extends ConsumerWidget {
       ),
     );
   }
+
+
+
+
 }
