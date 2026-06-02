@@ -51,6 +51,20 @@ class Reservation {
     );
   }
 
+  static Future<Reservation?> getReservation(int id) async {
+    try {
+      final response = await ApiClient.get("get_reservation?reservation_id=$id");
+      if (response.statusCode == 200){
+        final body = json.decode(response.body);
+        return Reservation.fromJson(body);
+      }
+    } catch (e, st){
+      print('$e\n$st');
+      throw Exception('Failed to get reservation.');
+    }
+
+  }
+
   // methode qui va rechercher les reservations d'un client (Future, car on va chercher dans la DB)
   static Future<List<Reservation>> getReservations({int? selectedRestaurant = null}) async{
     String enpoint = 'get_reservations';

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/services.dart';
 import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../../providers/current_restaurant_provider.dart';
@@ -19,6 +20,9 @@ class RestaurantDetailsWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final resto = ref.watch(currentRestaurantProvider(ref.read(selectedRestaurantProvider)));
+    // id de la reservation selectionnee (a set a 0 si on redirige vers la page de reservation)
+    final selectedReservationIdState = ref.watch(selectedReservationIdProvider); // on en a besoin pour build le notifier, et pouvoir set le state
+    final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
 
     return resto.when(
       data: 
@@ -253,7 +257,12 @@ class RestaurantDetailsWidget extends ConsumerWidget {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              // comme c'est la creation d'une nouvelle reservation, il faut set le selected_reservation_id a 0
+              selectedReservationIdNotifier.set(0);
+              // redirection vers la page de creation/edition d'une reservation
+              Navigator.pushReplacementNamed(context, '/reservation_form_page');
+            },
             icon: const Icon(Icons.add),
             label: const Text('Réserver'),
             style: ElevatedButton.styleFrom(
