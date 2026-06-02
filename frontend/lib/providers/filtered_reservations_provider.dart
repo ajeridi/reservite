@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/reservation.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/user_role_provider.dart';
+
+import 'auth_provider.dart';
 
 /*
 * But de ce provider :
@@ -22,6 +25,13 @@ class FilteredReservationsNotifier extends Notifier<List<Reservation>> {
   @override
   List<Reservation> build() {
     final reservations = ref.watch(reservationsProvider);
+    final userRoleState = ref.watch(userRoleProvider);
+
+    if (userRoleState.value == "manager") {
+      filterStatus = 'all';
+    } else {
+      filterStatus = 'pending';
+    }
 
     // on retourne uniquement quand reservations a de la data
     return reservations.when(

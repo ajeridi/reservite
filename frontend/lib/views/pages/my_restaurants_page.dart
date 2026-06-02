@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/restaurantsWidget.dart';
 
@@ -39,8 +40,10 @@ class MyRestaurantsPage extends ConsumerWidget {
     final asyncState = ref.watch(restaurantProvider);
     final notifier = ref.read(restaurantProvider.notifier);
 
+    final authNotifier = ref.read(authProvider.notifier);
+
     return asyncState.when(
-      data: (state) => data(state, notifier,theme, simulatedTime),
+      data: (state) => data(state, notifier,theme, simulatedTime, authNotifier, context),
       error: (err, _) =>
           DataErrorWidget(
             error: err,
@@ -52,6 +55,8 @@ class MyRestaurantsPage extends ConsumerWidget {
           notifier,
           theme,
           simulatedTime,
+          authNotifier,
+          context
         ),
     );
   }
@@ -59,6 +64,8 @@ class MyRestaurantsPage extends ConsumerWidget {
         SplayTreeSet<Restaurant> restaurants,
         RestaurantsNotifier notifier,
         dynamic theme, DateTime simulatedTime,
+        AuthNotifier authNotifier,
+        BuildContext context
     )
     {
       return Scaffold(
@@ -69,12 +76,17 @@ class MyRestaurantsPage extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.refresh),
               tooltip: 'Rafraîchir les données',
-              onPressed: () {},
+              onPressed: () {
+                notifier.refresh();
+              },
             ),
             IconButton(
               icon: const Icon(Icons.logout),
               tooltip: 'Déconnexion (Benoît P.)',
-              onPressed: () {},
+              onPressed: () {
+                authNotifier.logout();
+                Navigator.pushReplacementNamed(context, '/login');
+              },
             ),
           ],
           elevation: 2,
