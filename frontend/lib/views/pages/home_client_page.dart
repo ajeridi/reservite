@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/filtered_reservations_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_widget.dart';
@@ -19,23 +21,23 @@ import '../widgets/data_error_widget.dart';
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
-      ProviderScope(
-        observers: [MyProviderObserver()],
-        retry: (int _, Object _ ) => null,
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-            useMaterial3: true,
-          ),
-      home: HomeClientPage(),
+    ProviderScope(
+      observers: [MyProviderObserver()],
+      retry: (int _, Object _) => null,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        home: HomeClientPage(),
       ),
-      )
+    ),
   );
 }
 
 class HomeClientPage extends ConsumerWidget {
-   HomeClientPage({super.key});
+  HomeClientPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,29 +51,42 @@ class HomeClientPage extends ConsumerWidget {
     final reservationNotifier = ref.read(reservationsProvider.notifier);
     // etat de la liste contenant les reservations filtrees
     final filteredReservationsState = ref.watch(filteredReservationsProvider);
-    final filteredReservationsNotifier = ref.read(filteredReservationsProvider.notifier);
-
+    final filteredReservationsNotifier = ref.read(
+      filteredReservationsProvider.notifier,
+    );
+    // temps simule
+    final simulatedTime = ref.watch(applicationTimeProvider);
 
     return reservationsState.when(
-      data: (state) => data(context, state, reservationNotifier, theme,filteredReservationsState, filteredReservationsNotifier, authNotifier),
-      error: (err, _) =>
-          DataErrorWidget(
-            error: err,
-            stackTrace: StackTrace.current,
-            notifier: reservationNotifier,
-          ),
+      data: (state) => data(
+        context,
+        state,
+        reservationNotifier,
+        theme,
+        filteredReservationsState,
+        filteredReservationsNotifier,
+        authNotifier,
+        simulatedTime,
+      ),
+      error: (err, _) => DataErrorWidget(
+        error: err,
+        stackTrace: StackTrace.current,
+        notifier: reservationNotifier,
+      ),
       loading: () => loading(),
     );
   }
 
-
-  Widget data(BuildContext context,
-      List<Reservation> reservations,
-      ReservationsNotifier notifier,
-      ThemeData theme,
-      List<Reservation> filteredReservationsState,
-      FilteredReservationsNotifier filteredReservationsNotifier,
-      AuthNotifier authNotifier) {
+  Widget data(
+    BuildContext context,
+    List<Reservation> reservations,
+    ReservationsNotifier notifier,
+    ThemeData theme,
+    List<Reservation> filteredReservationsState,
+    FilteredReservationsNotifier filteredReservationsNotifier,
+    AuthNotifier authNotifier,
+    AsyncValue<DateTime> simulatedTime,
+  ) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mes réservations'),
@@ -80,7 +95,10 @@ class HomeClientPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              Navigator.pushReplacementNamed(context,'/search_restaurants_page' );
+              Navigator.pushReplacementNamed(
+                context,
+                '/search_restaurants_page',
+              );
             },
           ),
           IconButton(
@@ -109,9 +127,11 @@ class HomeClientPage extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
               child: Tooltip(
-                message: 'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                message:
+                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
-                  'mercredi 04/12/2024 16:00',
+                  '${DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
+                                .format(simulatedTime.value!)}',
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
@@ -144,12 +164,20 @@ class HomeClientPage extends ConsumerWidget {
                   ),
                   ButtonSegment(
                     value: 'confirmed',
-                    icon: Icon(Icons.check_circle, size: 24, color: Colors.green),
+                    icon: Icon(
+                      Icons.check_circle,
+                      size: 24,
+                      color: Colors.green,
+                    ),
                     tooltip: 'Confirmées',
                   ),
                   ButtonSegment(
                     value: 'completed',
-                    icon: Icon(Icons.event_available, size: 24, color: Colors.blue),
+                    icon: Icon(
+                      Icons.event_available,
+                      size: 24,
+                      color: Colors.blue,
+                    ),
                     tooltip: 'Terminées',
                   ),
                   ButtonSegment(
@@ -160,9 +188,10 @@ class HomeClientPage extends ConsumerWidget {
                 ],
                 selected: {filteredReservationsNotifier.filterStatus},
                 onSelectionChanged: (Set<String> newSelection) {
-                  filteredReservationsNotifier.filterStatus = newSelection.first; // on enregistre le filtre de selection
-                    // appeler la fonction filtrage du notifier des reservations filtrees pour update le state
-                    filteredReservationsNotifier.updateFilter(reservations);
+                  filteredReservationsNotifier.filterStatus = newSelection
+                      .first; // on enregistre le filtre de selection
+                  // appeler la fonction filtrage du notifier des reservations filtrees pour update le state
+                  filteredReservationsNotifier.updateFilter(reservations);
                 },
               ),
             ),
@@ -172,7 +201,7 @@ class HomeClientPage extends ConsumerWidget {
                 padding: const EdgeInsets.all(16.0),
                 children: [
                   for (var reservation in filteredReservationsState)
-                      ReservationCard(reservation: reservation),
+                    ReservationCard(reservation: reservation),
                 ],
               ),
             ),
@@ -187,7 +216,6 @@ class HomeClientPage extends ConsumerWidget {
     );
   }
 }
-
 
 Widget loading() {
   return Center(child: CircularProgressIndicator(color: Colors.black));
