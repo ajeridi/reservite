@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
+import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
+import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -23,7 +27,11 @@ class ReservationFormPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+    final simulatedTime = ref.watch(applicationTimeProvider).value;
+
+    // on a besoin du restaurant dans lequel on effectue la reservation
+    final selectedRestaurantId = ref.read(selectedRestaurantProvider);
+    final currentRestaurantState = ref.watch(currentRestaurantProvider(selectedRestaurantId));
 
     return Scaffold(
       appBar: AppBar(
@@ -57,7 +65,7 @@ class ReservationFormPage extends ConsumerWidget {
                     'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
                   DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
+                      .format(simulatedTime!),
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
@@ -77,60 +85,15 @@ class ReservationFormPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'Le Gourmet',
+                Text(
+                  currentRestaurantState.value!.name,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {},
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.calendar_today),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Text('Date'),
-                                      Text(
-                                        'Mercredi 4/12/2024',
-                                        style: theme.textTheme.bodySmall,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Icon(Icons.chevron_right),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.remove),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {},
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                ),
+                date_time_picker(theme: theme),
                 const Divider(),
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -373,6 +336,65 @@ class ReservationFormPage extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class date_time_picker extends StatelessWidget {
+  const date_time_picker({
+    super.key,
+    required this.theme,
+  });
+
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {},
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Date'),
+                          Text(
+                            'Mercredi 4/12/2024',
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          icon: const Icon(Icons.remove),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {},
+        ),
+        const SizedBox(width: 16),
+      ],
     );
   }
 }
