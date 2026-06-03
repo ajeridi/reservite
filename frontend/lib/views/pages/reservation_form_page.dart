@@ -11,6 +11,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservati
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/date_time_picker_widget.dart';
+import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
 import '../../providers/reservation_providers/selected_slot_provider.dart';
 
@@ -136,21 +137,7 @@ class ReservationFormPage extends ConsumerWidget {
                   },
                 ),
                 const SizedBox(height: 24),
-                ListTile(
-                  leading: const Icon(Icons.people),
-                  title: const Text('Nombre de convives'),
-                  subtitle: const Text('2'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed: () {},
-                      ),
-                      IconButton(icon: const Icon(Icons.add), onPressed: () {}),
-                    ],
-                  ),
-                ),
+               const NumberOfGuestsWidget(),
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: Container(
