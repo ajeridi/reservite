@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/available_slots.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/available_slots_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/date_time_picker_widget.dart';
+import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -33,11 +37,18 @@ class ReservationFormPage extends ConsumerWidget {
 
     // on a besoin du restaurant dans lequel on effectue la reservation
     final selectedRestaurantId = ref.read(selectedRestaurantProvider);
-    final currentRestaurantState = ref.watch(currentRestaurantProvider(selectedRestaurantId));
+    final currentRestaurantState = ref.watch(
+      currentRestaurantProvider(selectedRestaurantId),
+    );
 
     // on va chercher la reservation courante (donc si elle est nouvelle elle aura un id de 0)
     final selectedReservationId = ref.watch(selectedReservationIdProvider);
-    final currentReservationState = ref.watch(currentReservationProvider(selectedReservationId));
+    final currentReservationState = ref.watch(
+      currentReservationProvider(selectedReservationId),
+    );
+
+    // on  va chercher les crenaux disponibles
+    final availableSlotsState = ref.watch(availableSlotsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -70,8 +81,10 @@ class ReservationFormPage extends ConsumerWidget {
                 message:
                     'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime!),
+                  DateFormat(
+                    'EEEE dd/MM/yyyy HH:mm',
+                    'fr_FR',
+                  ).format(simulatedTime!),
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
@@ -93,176 +106,29 @@ class ReservationFormPage extends ConsumerWidget {
               children: [
                 Text(
                   currentRestaurantState.value!.name,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
                 DatePickerReservation(),
                 const Divider(),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.warning, color: Colors.orange),
-                      const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          'Le restaurant est fermé ce jour-là.',
-                          style: TextStyle(
-                            color: Colors.orange,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 const SizedBox(height: 24),
                 const Text(
                   'Créneaux disponibles',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: [
-                    Container(
-                      width: 80,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: theme.colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '12:00',
-                          style: TextStyle(
-                            color: theme.colorScheme.onSurface,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 80,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: theme.colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '12:30',
-                          style: TextStyle(
-                            color: theme.colorScheme.onSurface,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 80,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: theme.colorScheme.primary,
-                          width: 1,
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '19:00',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 80,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: theme.colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '19:30',
-                          style: TextStyle(
-                            color: theme.colorScheme.onSurface,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 80,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: theme.colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '20:00',
-                          style: TextStyle(
-                            color: theme.colorScheme.onSurface,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                availableSlotsState.when(
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  error: (error, stack) => Text('Erreur: $error'),
+                  data: (availableSlots) {
+                    return Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: showSlots(availableSlots, theme),
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
                 ListTile(
@@ -276,10 +142,7 @@ class ReservationFormPage extends ConsumerWidget {
                         icon: const Icon(Icons.remove),
                         onPressed: () {},
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () {},
-                      ),
+                      IconButton(icon: const Icon(Icons.add), onPressed: () {}),
                     ],
                   ),
                 ),
@@ -341,6 +204,54 @@ class ReservationFormPage extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  List<Widget> showSlots(AvailableSlots availableSlots, ThemeData theme){
+    final slotsWidgets = <Widget>[];
+    if (availableSlots.slots != null) {
+      for (var slot in availableSlots.slots!) {
+        slotsWidgets.add(ReservationSlotWidget(theme: theme, slot: slot));
+      }
+    }
+    else if (availableSlots.error != null){
+      final error = availableSlots.error;
+      slotsWidgets.add(WarningWidget(error: error));
+    }
+    return slotsWidgets;
+  }
+
+}
+
+class WarningWidget extends StatelessWidget {
+  const WarningWidget({
+    super.key,
+    required this.error,
+  });
+
+  final String? error;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.orange.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.orange),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.warning, color: Colors.orange),
+          const SizedBox(width: 8),
+           Expanded(
+            child: Text(
+              error!,
+              style: TextStyle(color: Colors.orange, fontSize: 13),
+            ),
+          ),
+        ],
       ),
     );
   }

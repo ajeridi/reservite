@@ -323,7 +323,7 @@ create or replace function get_available_slots(restaurant_id int, date_of_reserv
                     return json_build_object('message','Vous avez deja une reservation pour chaque service de ce jour la.');
                 end if;
             end if;
-            return to_json(hours);
+            return  json_build_object('slots', hours);
         end if;
     end;
     $$ language plpgsql security definer;

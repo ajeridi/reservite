@@ -17,12 +17,12 @@ class SelectedReservationDateNotifier extends AsyncNotifier<DateTime> {
   @override
   FutureOr<DateTime> build() async {
     final applicationTime = ref.watch(applicationTimeProvider);
-    final currentReservation = ref.watch(
-      currentReservationProvider(ref.watch(selectedReservationIdProvider)),
+    final currentReservation = await ref.watch(
+      currentReservationProvider(ref.watch(selectedReservationIdProvider)).future
     );
     // si la reservation courante existe deja, on peut deja prendre son date time
-    if (currentReservation.value!.id != 0) {
-      return currentReservation.value!.datetime;
+    if (currentReservation != null && currentReservation.id != 0) {
+      return currentReservation.datetime;
     }
     // sinon on prends le date time de l'application
     try {
