@@ -226,7 +226,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  //currentReservationNotifier.cancel();
+                                  currentReservationNotifier.complete();
                                   Navigator.of(context).pop();
                                 },
                                 child: Text('Oui',

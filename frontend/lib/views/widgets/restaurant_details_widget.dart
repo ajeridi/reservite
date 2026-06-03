@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/services.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
@@ -23,6 +24,8 @@ class RestaurantDetailsWidget extends ConsumerWidget {
     // id de la reservation selectionnee (a set a 0 si on redirige vers la page de reservation)
     final selectedReservationIdState = ref.watch(selectedReservationIdProvider); // on en a besoin pour build le notifier, et pouvoir set le state
     final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
+
+    final simulatedTime = ref.watch(applicationTimeProvider).value;
 
     return resto.when(
       data: 
