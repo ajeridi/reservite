@@ -10,6 +10,7 @@ import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 import 'package:prbd_2526_a07/views/pages/reservation_details_client_page.dart';
 
 import '../../models/reservation.dart';
+import '../../providers/current_reservation_provider.dart';
 
 class ReservationCard extends ConsumerWidget {
 

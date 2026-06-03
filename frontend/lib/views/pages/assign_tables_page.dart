@@ -4,13 +4,11 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/table.dart';
 import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 
-import '../../models/reservation.dart';
-import '../../models/restaurant.dart';
+
 import '../../providers/application_time_provider.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/current_tables_provider.dart';
 import '../../providers/selected_tables_provider.dart';
 import '../../providers/tables_provider.dart';
 import '../widgets/assign_table_1_widget.dart';
