@@ -7,6 +7,7 @@ import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/available_slots_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/number_of_guests_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/special_request_provider.dart';
@@ -50,15 +51,22 @@ class ReservationFormPage extends ConsumerWidget {
     final currentReservationState = ref.watch(
       currentReservationProvider(selectedReservationId),
     );
+    final currentReservationNotifier = ref.read(currentReservationProvider(selectedReservationId).notifier);
+
+    final selectedReservationDateState = ref.watch(selectedReservationDateProvider);
 
     // on  va chercher les crenaux disponibles
     final availableSlotsState = ref.watch(availableSlotsProvider);
     final selectedSlot = ref.watch(selectedSlotProvider);
     final selectedSlotNotifier = ref.read(selectedSlotProvider.notifier);
     //on regarde l'etat de la validation de la capacite
+    final  numberOfGuestsState = ref.watch(numberOfGuestsProvider);
     final capacityCheckState = ref.watch(capacityCheckProvider);
     //notifier du special_request pour les validations
     final specialRequestsNotifier = ref.watch(specialRequestProvider.notifier);
+    final specialRequestsState = ref.watch(specialRequestProvider);
+
+
 
     return Scaffold(
       appBar: AppBar(
@@ -173,7 +181,15 @@ class ReservationFormPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final savedReseravation = await currentReservationNotifier.saveReservation(
+                        selectedDate: selectedReservationDateState.value!,
+                        selectedSlot: selectedSlot!,
+                        numberOfGuests: numberOfGuestsState,
+                        capacityCheck: capacityCheckState.value!,
+                        specialRequest: specialRequestsState);
+                    Navigator.pushReplacementNamed(context, '/home_client_page');
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),

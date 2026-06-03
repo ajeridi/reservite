@@ -195,7 +195,6 @@ class Reservation {
         date.day,
         int.parse(parts[0]),
         int.parse(parts[1]),
-        int.parse(parts[3]),
       );
       final datetimeString =
       DateFormat('yyyy-MM-dd HH:mm:ss').format(reservationDateTime);
@@ -204,9 +203,9 @@ class Reservation {
         'save_reservation',
         body: json.encode({
           'restaurant_id': restaurantId,
-          'datetime_': dateString,
-          'number_of_guests': numberOfGuests,
-          'special_requests': specialRequests,
+          'datetime_': datetimeString,
+          'number_of_guests_': numberOfGuests,
+          'special_requests_': specialRequests,
         }),
       );
 
