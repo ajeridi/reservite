@@ -55,7 +55,6 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
   Future<void> cancel()  async{
     final canceled = await state.value!.getCancel();
     state = AsyncData(canceled);
-
     ref.read(reservationsProvider.notifier).updateList(state.value!);
 
   }

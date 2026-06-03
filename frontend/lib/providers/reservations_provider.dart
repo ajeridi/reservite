@@ -41,14 +41,22 @@ class ReservationsNotifier extends AbstractAsyncNotifier<List<Reservation>>{
     await getAll();
   }
 
-    void updateList(Reservation reserv) {
+  void updateList(Reservation updatedReservation) {
     state = AsyncLoading();
-    final reservations = state.value;
+    final reservations = state.value; // liste actuelle dans l'etat
+    var newReservation; // va contenir la nouvelle copie de la reservation a modifier
+    // on va chercher la reservation a copier
     for(var reservation in reservations!){
-      if(reservation.id == reserv.id){
-        reservation.copyWith(status: reserv.status);
+      if(reservation.id == updatedReservation.id){
+        // copie de la reservation a modifier avec le nouveau statut
+        newReservation = reservation.copyWith(status: updatedReservation.status);
       }
     }
+    // suppression de la reservation obsolete
+    reservations.removeWhere((res) => res.id == updatedReservation.id);
+    // rajout de la nouvelle reservation mise a jour
+    reservations.add(newReservation);
+    // modification de la liste de l'etat
     state = AsyncData(reservations);
   }
 
