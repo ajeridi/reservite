@@ -67,7 +67,7 @@ $$
            'datetime', rsv.datetime,
            'number_of_guests', rsv.number_of_guests,
            'status', rsv.status,
-           'sepcial_requests', rsv.special_requests,
+           'special_requests', rsv.special_requests,
            'tables', (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number, 'capacity', t.capacity)) from reservation_tables rt join tables t on rt."table" = t.id where rt.reservation = reservation_id)
            )
     from reservations rsv
@@ -237,7 +237,11 @@ create or replace function cancel_reservation(reservation_id int) returns json a
         -- verification connexion du user
         perform auth.check_logged();
         if (role = 'client'::role_type AND is_client_reservation(user_id, reservation_id) OR role = 'manager'::role_type AND check_manager_works_in_restaurant(user_id, restaurant_id)) then
+           --on suprime la table du reservation_table avant supprimer la reservation
+            delete from reservation_tables where reservation = reservation_id;
+            --ensuite on supprime traquillement sans avoir des problemes avec les triggers (BR)
             update reservations set status = 'cancelled' where id = reservation_id;
+
             return get_reservation(reservation_id);
         else
             raise exception 'User does not have the rights to call this method';

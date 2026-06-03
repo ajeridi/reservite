@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_details_widget.dart';
 
 import '../../models/reservation.dart';
@@ -51,11 +52,19 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
 
     // observation de la liste des reservations car currentReservation vient de la
     final selectedReservationId = ref.watch(selectedReservationIdProvider);
-    final currentReservation = ref.watch(currentReservationProvider(selectedReservationId)).value;
+    final currentReservation = ref.watch(currentReservationProvider(selectedReservationId));
     final currentReservationNotifier = ref.read(
       currentReservationProvider(selectedReservationId).notifier,
     );
 
+    return currentReservation.when
+      (data: (reservation) => data(context, currentReservationNotifier, theme, simulatedTime, reservation),
+        error: (e, _) => DataErrorWidget(error: e, notifier: currentReservationNotifier),
+        loading: () => Center(child: CircularProgressIndicator(),)
+    );
+  }
+
+  Scaffold data(BuildContext context, CurrentReservationNotifier currentReservationNotifier, ThemeData theme, DateTime simulatedTime, Reservation? currentReservation) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -90,7 +99,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
               padding: const EdgeInsets.only(top: 2.0),
               child: Tooltip(
                 message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
                   DateFormat(
                     'EEEE dd/MM/yyyy HH:mm',
@@ -206,7 +215,34 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Expanded(
+                          child: AlertDialog(
+                            title: Text('Annuler la réservation'),
+                            content: Text('Êtes-vous sûr de vouloir annuler cette réservation?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Non'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  currentReservationNotifier.cancel();
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Oui'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                   icon: const Icon(Icons.cancel),
                   label: const Text('Annuler'),
                 ),
