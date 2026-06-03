@@ -49,7 +49,7 @@ class DatePickerReservation extends ConsumerWidget {
                         children: [
                           const Text('Date'),
                           Text(
-                            DateFormat('dd/MM/yyyy', 'fr_FR')
+                            DateFormat('EEEE dd/MM/yyyy', 'fr_FR')
                                 .format(selectedReservationDateState.value!),
                             style: theme.textTheme.bodySmall,
                           ),

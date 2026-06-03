@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -79,10 +81,10 @@ class ManagerReservationsPage extends ConsumerWidget {
 
   Widget data(
     BuildContext context,
-    List<Reservation> reservations,
+    SplayTreeSet<Reservation> reservations,
     ReservationsNotifier notifier,
     ThemeData theme,
-    List<Reservation> filteredReservationsState,
+    SplayTreeSet<Reservation> filteredReservationsState,
     FilteredReservationsNotifier filteredReservationsNotifier,
     AuthNotifier authNotifier, AsyncValue<Restaurant> restaurantState,
   ) {
