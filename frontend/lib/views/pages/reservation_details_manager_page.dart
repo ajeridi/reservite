@@ -93,7 +93,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
 
     // terminer si la date appTime est >= à la date de reservation
     final canTerminate = currentReservation?.status == Status.confirmed &&
-       !simulatedTime.isBefore(currentReservation!.datetime);
+       !simulatedTime.isAfter(currentReservation!.datetime);
 
 
     
