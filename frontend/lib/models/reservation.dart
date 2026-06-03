@@ -84,6 +84,25 @@ class Reservation {
     }
   }
 
+  static Future<Reservation?> confirmReservation({
+    required int reservationId,
+    required List<int> tablesId,
+  }) async {
+    final response = await ApiClient.post('confirm_reservation',
+      body: json.encode({
+        'reservation_id': reservationId,
+        'tables_id' : tablesId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      return Reservation.fromJson(body);
+    } else {
+      throw Exception('Failed to confirm reservation: ${response.body}');
+    }
+  }
+
   // prends un status en string et le convertit en enum Status
   static Status toStatus(String statusString) {
     return switch(statusString){

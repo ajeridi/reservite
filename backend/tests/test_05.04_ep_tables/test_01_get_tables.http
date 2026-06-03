@@ -1,0 +1,18 @@
+### connection d'un manager
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "boverhaegen@epfc.eu",
+  "password" : "Password1,"
+}
+
+
+### reservations d'un manager dans un restaurant (ok)
+GET http://localhost:3000/rpc/get_tables?restaurant_id=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODA1NDI5MjB9.xRzNdAjb8WrqPZ5gKOVMK_kpwVufCMGeBRAVU-gCEzU
+
+### reservations d'un manager dans un restaurant (KO)
+GET http://localhost:3000/rpc/get_tables?restaurant_id=6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODA1NDI5MjB9.xRzNdAjb8WrqPZ5gKOVMK_kpwVufCMGeBRAVU-gCEzU
+
