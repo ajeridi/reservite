@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/views/widgets/date_time_picker_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -32,6 +34,10 @@ class ReservationFormPage extends ConsumerWidget {
     // on a besoin du restaurant dans lequel on effectue la reservation
     final selectedRestaurantId = ref.read(selectedRestaurantProvider);
     final currentRestaurantState = ref.watch(currentRestaurantProvider(selectedRestaurantId));
+
+    // on va chercher la reservation courante (donc si elle est nouvelle elle aura un id de 0)
+    final selectedReservationId = ref.watch(selectedReservationIdProvider);
+    final currentReservationState = ref.watch(currentReservationProvider(selectedReservationId));
 
     return Scaffold(
       appBar: AppBar(
@@ -93,7 +99,7 @@ class ReservationFormPage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                date_time_picker(theme: theme),
+                DatePickerReservation(),
                 const Divider(),
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -340,61 +346,3 @@ class ReservationFormPage extends ConsumerWidget {
   }
 }
 
-class date_time_picker extends StatelessWidget {
-  const date_time_picker({
-    super.key,
-    required this.theme,
-  });
-
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {},
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_today),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text('Date'),
-                          Text(
-                            'Mercredi 4/12/2024',
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.chevron_right),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          icon: const Icon(Icons.remove),
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {},
-        ),
-        const SizedBox(width: 16),
-      ],
-    );
-  }
-}

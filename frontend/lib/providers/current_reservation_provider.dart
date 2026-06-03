@@ -12,11 +12,16 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/core/tools/abstract_async_notifier.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
+import 'package:prbd_2526_a07/providers/client_provider.dart';
+import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../models/reservation.dart';
+
 
 final currentReservationProvider = AsyncNotifierProvider.autoDispose
     .family<CurrentReservationNotifier, Reservation?, int>(
@@ -33,8 +38,12 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
   FutureOr<Reservation?> build() async {
     state = AsyncData(null);
     state = AsyncLoading();
+    final  currentRestaurantState = ref.watch(currentRestaurantProvider(ref.watch(selectedRestaurantProvider))).value;
+    final clientState = ref.watch(clientProvider);
+    final applicationTime = ref.watch(applicationTimeProvider);
     try {
-      return id != 0 ? await Reservation.getReservation(id) : null;
+      if (id != 0) return await Reservation.getReservation(id);
+      else return new Reservation(id: 0, client: clientState.value!, restaurant: currentRestaurantState, datetime: applicationTime.value!, tables: []);
     } catch (e, st) {
       throw Exception("Something went wrong.\nPlease retry later.");
     }
