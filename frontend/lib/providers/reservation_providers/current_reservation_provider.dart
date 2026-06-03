@@ -65,7 +65,7 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
       throw Exception("Failed to refresh the reservation");
     }
   }
-
+  // on appelle getCancel sûr la state, ensuite on update la page de reservations grâce a updateList
   Future<void> cancel()  async{
     final canceled = await state.value!.getCancel();
     state = AsyncData(canceled);
@@ -100,6 +100,13 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
 
     return savedReservation;
   }
+
+// on appelle getCompleted sûr la state, ensuite on update la page de reservations grâce a updateList
+Future<void> complete() async{
+    final completed = await state.value!.getCompleted();
+    state = AsyncData(completed);
+    ref.read(reservationsProvider.notifier).updateList(state.value!);
+}
 
 }
 

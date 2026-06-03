@@ -130,9 +130,28 @@ class Reservation {
       }
     }catch(e,st){
       print(e);
-      throw Exception('Failed to get user');
+      throw Exception('Failed to change reservation status to Canceled');
     }
 
+  }
+
+  // recup reservation pour complete reservation
+
+  Future<Reservation> getCompleted() async{
+    try{
+      final response = await ApiClient.post(
+        'complete_reservation',
+        body:json.encode({'reservation_id' : id})
+      );
+      if(response.statusCode == 200){
+        return Reservation.fromJson(json.decode(response.body));
+      }else{
+        throw Exception('Failed to get reservation');
+      }
+    }catch(e){
+      print(e);
+      throw Exception('Failed to change reservation status to Completed');
+    }
   }
 
   String statusToString(){
