@@ -209,7 +209,9 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
             if (currentReservation!.status != Status.completed &&
                 currentReservation!.status != Status.cancelled) ...[
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, '/assign_tables_page');
+                },
                 icon: Icon(updateStatusIcon(currentReservation!.status)),
                 label: Text(updateStatusMessage(currentReservation!.status)),
               ),

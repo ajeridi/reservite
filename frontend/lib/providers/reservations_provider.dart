@@ -16,7 +16,7 @@ class ReservationsNotifier extends AbstractAsyncNotifier<List<Reservation>>{
   FutureOr<List<Reservation>> build() async {
     // on doit regarder l'etat de connexion, car un manager n'a pas la meme liste q'un client
     ref.watch(authProvider);
-    final authNotifier = ref.watch(authProvider.notifier);
+    final authNotifier = ref.read(authProvider.notifier);
     // on doit aussi regarder l'etat de selection de restaurant, car un nouveau restaurant selectionne par le manager implique un nouveau fetch des reservations
     final selectedRestaurantState = ref.watch(selectedRestaurantProvider);
 
