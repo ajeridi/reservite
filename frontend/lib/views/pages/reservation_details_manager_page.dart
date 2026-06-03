@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
-import 'package:prbd_2526_a07/providers/reservations_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_details_widget.dart';
 
