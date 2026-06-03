@@ -83,4 +83,11 @@ class ReservationsNotifier extends AbstractAsyncNotifier<List<Reservation>>{
     }
   }
 
+  void addOrUpdateReservation(Reservation savedReservation) {
+    final reservations = state.value ?? <Reservation>[];
+    reservations.removeWhere((reservation) => reservation.id == savedReservation.id);
+    reservations.add(savedReservation);
+    state = AsyncData(reservations);
+  }
+
 }

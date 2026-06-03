@@ -6,9 +6,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/tools/pick_date_time.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
-import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
-import 'package:prbd_2526_a07/providers/reservations_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_details_widget.dart';
 
@@ -67,12 +67,12 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
 
     return currentReservation.when
       (data: (reservation) =>applicationTime.when(
-        data: (simulatedTime) => 
+        data: (simulatedTime) =>
           data(context,
               ref,
-              currentReservationNotifier, 
-              theme, 
-              simulatedTime, 
+              currentReservationNotifier,
+              theme,
+              simulatedTime,
               reservation),
         error: (e, _) => DataErrorWidget(error: e,
                                           notifier: currentReservationNotifier),
@@ -85,9 +85,9 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
   Scaffold data(
       BuildContext context,
       WidgetRef ref,
-      CurrentReservationNotifier currentReservationNotifier, 
-      ThemeData theme, 
-      DateTime simulatedTime, 
+      CurrentReservationNotifier currentReservationNotifier,
+      ThemeData theme,
+      DateTime simulatedTime,
       Reservation? currentReservation) {
     //pour tests
     //final simulatedTimeTest = DateTime(2024, 10, 4, 16, 0);
@@ -101,7 +101,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
     debugPrint('reservation dateTime: ${currentReservation!.datetime}');
     debugPrint('canTerminate: $canTerminate');
 
-    
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

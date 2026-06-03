@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/reservation.dart';
-import 'package:prbd_2526_a07/providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
-import 'auth_provider.dart';
+import '../auth_provider.dart';
 
 /*
 * But de ce provider :
