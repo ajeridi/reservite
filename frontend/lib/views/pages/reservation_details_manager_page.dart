@@ -52,7 +52,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    //final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+
 
     // observation de la liste des reservations car currentReservation vient de la
     final selectedReservationId = ref.watch(selectedReservationIdProvider);
@@ -86,9 +86,16 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
       ThemeData theme, 
       DateTime simulatedTime, 
       Reservation? currentReservation) {
+    //pour tests
+    //final simulatedTimeTest = DateTime(2024, 10, 4, 16, 0);
+   // final canTerminate = currentReservation?.status == Status.confirmed &&
+     //   !simulatedTimeTest.isBefore(currentReservation!.datetime);
+
     // terminer si la date appTime est >= à la date de reservation
-    final canTerminate = currentReservation?.status == Status.confirmed && 
-        !simulatedTime.isBefore(currentReservation!.datetime);
+    final canTerminate = currentReservation?.status == Status.confirmed &&
+       !simulatedTime.isBefore(currentReservation!.datetime);
+
+
     
     return Scaffold(
       appBar: AppBar(
@@ -269,7 +276,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 // message d'advertisement si la reservation ne peut pas être terminée a cause de l'appliTime
                 if(!canTerminate)
                   const Padding(padding: EdgeInsets.only(top: 4.0),
-                  child: Text('La réservation ne peut pas être terminée que durant son service ou après calui-ci',
+                  child: Text('La réservation ne peut pas être terminée que durant son service ou après celui-ci',
                   style: TextStyle(
                     color: Colors.red,
                     fontSize: 12,
