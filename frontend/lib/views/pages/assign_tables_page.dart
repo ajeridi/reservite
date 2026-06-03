@@ -16,7 +16,6 @@ import '../widgets/assign_table_2_widget.dart';
 import '../widgets/assign_table_3_widget.dart';
 import '../widgets/assign_table_4_widget.dart';
 import '../widgets/data_error_widget.dart';
-import 'home_client_page.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -197,4 +196,8 @@ class AssignTablesPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget loading() {
+  return Center(child: CircularProgressIndicator(color: Colors.black));
 }
