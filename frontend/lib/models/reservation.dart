@@ -148,6 +148,18 @@ class Reservation {
   }
 
 
+  static Future<DateTime> getFirstAvailableReservationDateTime() async {
+    try {
+      final response = await ApiClient.get("get_first_available_reservation_datetime");
+      if (response.statusCode == 200){
+        final body = json.decode(response.body);
+        return body['first_available_reservation_datetime'];
+      }
+      throw Exception('Failed to get first available reservation datetime\nResponse code : ${response.statusCode}');
+    } catch (e, st){
+      throw Exception("Failed to get first available reservation datetime.");
+    }
+  }
 
   @override
   String toString() {
