@@ -95,8 +95,8 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
      //   !simulatedTimeTest.isBefore(currentReservation!.datetime);
 
     // terminer si la date appTime est >= à la date de reservation
-    final canTerminate = currentReservation?.status == Status.confirmed &&
-       !simulatedTime.isBefore(currentReservation!.datetime);
+    final canTerminate = (currentReservation?.status == Status.confirmed &&
+       !simulatedTime.isBefore(currentReservation!.datetime)) || currentReservation?.status == Status.pending;
     debugPrint(' simulatedTime: $simulatedTime');
     debugPrint('reservation dateTime: ${currentReservation!.datetime}');
     debugPrint('canTerminate: $canTerminate');
@@ -258,7 +258,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 ),
               const SizedBox(height: 24),
               if (currentReservation!.status != Status.completed &&
-                  currentReservation!.status != Status.cancelled) ...[
+                  currentReservation!.status != Status.cancelled ) ...[
                 ElevatedButton.icon(
                   onPressed: canTerminate ? () {
                     showDialog(
@@ -288,7 +288,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                         );
                       },
                     );
-                  } : null, //null = btn disabled
+                  } :  null, //null = btn disabled
                   icon: Icon(updateStatusIcon(currentReservation!.status)),
                   label: Text(updateStatusMessage(currentReservation!.status)),
                 ),
