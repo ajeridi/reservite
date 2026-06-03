@@ -8,6 +8,7 @@ import 'package:prbd_2526_a07/providers/filtered_restaurants_provider.dart';
 
 import '../../core/tools/my_provider_observer.dart';
 import '../../models/restaurant.dart';
+import '../../providers/application_time_provider.dart';
 import '../../providers/restaurants_provider.dart';
 import '../widgets/data_error_widget.dart';
 import '../widgets/restaurantsWidget.dart';
@@ -37,7 +38,7 @@ class SearchRestaurantsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+    final applicationTime = ref.watch(applicationTimeProvider);
 
 
 
@@ -48,23 +49,13 @@ class SearchRestaurantsScreen extends ConsumerWidget {
     final filterRestoNotifier = ref.read(filteredRestaurantsProvider.notifier);
 
     return asyncState.when(
-      data: (state) => data(state, notifier,theme, simulatedTime, filterRestaurantState,filterRestoNotifier , context),
-      error: (err, _) =>
-          DataErrorWidget(
-            error: err,
-            stackTrace: StackTrace.current,
-            notifier: notifier,
-          ), loading: () =>
-        data(
-          asyncState.value ?? SplayTreeSet(),
-          notifier,
-          theme,
-          simulatedTime,
-          filterRestaurantState,
-          filterRestoNotifier,
-          context,
-
-        ),
+      data: (state) => applicationTime.when(                          // ✅
+        data: (simulatedTime) => data(state, notifier, theme, simulatedTime, filterRestaurantState, filterRestoNotifier, context),
+        error: (e, _) => DataErrorWidget(error: e, notifier: notifier),
+        loading: () => const Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, _) => DataErrorWidget(error: err, stackTrace: StackTrace.current, notifier: notifier),
+      loading: () => data(asyncState.value ?? SplayTreeSet(), notifier, theme, DateTime.now(), filterRestaurantState, filterRestoNotifier, context),
     );
   }
 

@@ -10,6 +10,7 @@ import 'package:prbd_2526_a07/views/widgets/restaurantsWidget.dart';
 
 import '../../core/tools/my_provider_observer.dart';
 import '../../models/restaurant.dart';
+import '../../providers/application_time_provider.dart';
 import '../widgets/data_error_widget.dart';
 
 void main() async {
@@ -35,7 +36,8 @@ class MyRestaurantsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+
+    final applicationTime = ref.watch(applicationTimeProvider);
 
     final asyncState = ref.watch(restaurantProvider);
     final notifier = ref.read(restaurantProvider.notifier);
@@ -43,21 +45,13 @@ class MyRestaurantsPage extends ConsumerWidget {
     final authNotifier = ref.read(authProvider.notifier);
 
     return asyncState.when(
-      data: (state) => data(state, notifier,theme, simulatedTime, authNotifier, context),
-      error: (err, _) =>
-          DataErrorWidget(
-            error: err,
-            stackTrace: StackTrace.current,
-            notifier: notifier,
-          ), loading: () =>
-        data(
-          asyncState.value ?? SplayTreeSet(),
-          notifier,
-          theme,
-          simulatedTime,
-          authNotifier,
-          context
-        ),
+      data: (state) => applicationTime.when(
+        data: (simulatedTime) => data(state, notifier, theme, simulatedTime, authNotifier, context),
+        error: (e, _) => DataErrorWidget(error: e, notifier: notifier),
+        loading: () => const Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, _) => DataErrorWidget(error: err, stackTrace: StackTrace.current, notifier: notifier),
+      loading: () => data(asyncState.value ?? SplayTreeSet(), notifier, theme, DateTime.now(), authNotifier, context),
     );
   }
     Widget data(
