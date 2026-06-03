@@ -1,12 +1,24 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/table.dart';
 import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 
+import '../../models/reservation.dart';
+import '../../models/restaurant.dart';
 import '../../providers/application_time_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/current_tables_provider.dart';
+import '../../providers/selected_tables_provider.dart';
+import '../../providers/tables_provider.dart';
 import '../widgets/assign_table_1_widget.dart';
+import '../widgets/assign_table_2_widget.dart';
+import '../widgets/assign_table_3_widget.dart';
+import '../widgets/assign_table_4_widget.dart';
+import '../widgets/data_error_widget.dart';
+import 'home_client_page.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -28,8 +40,47 @@ class AssignTablesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = ref.watch(applicationTimeProvider).value;
-    final reservation = ref.watch(currentReservationProvider(ref.watch(selectedReservationIdProvider)));
+    final simulatedTime = ref
+        .watch(applicationTimeProvider)
+        .value;
+    final reservation = ref.watch(
+        currentReservationProvider(ref.watch(selectedReservationIdProvider)));
+
+    final tablesState = ref.watch(tablesProvider);
+    final tableNotifier = ref.read(tablesProvider.notifier);
+    final authNotifier = ref.read(authProvider.notifier);
+
+    return tablesState.when(
+      data: (state) => data(
+              context,
+              ref,
+              state,
+              tableNotifier,
+              theme,
+              authNotifier,
+              simulatedTime,
+              reservation,
+          ),
+      error: (err, _) =>
+          DataErrorWidget(
+            error: err,
+            stackTrace: StackTrace.current,
+            notifier: tableNotifier,
+          ),
+      loading: () => loading(),
+    );
+  }
+
+  Widget data(
+      BuildContext context,
+      WidgetRef ref,
+      List<Table> tables,
+      TablesNotifier tableNotifier,
+      ThemeData theme,
+      AuthNotifier authNotifier,
+      DateTime? simulatedTime,
+      AsyncValue reservation,
+      ) {
 
     return Scaffold(
       appBar: AppBar(
@@ -46,7 +97,7 @@ class AssignTablesPage extends ConsumerWidget {
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
             onPressed: () {
-
+              tableNotifier.refresh();
             },
           ),
         ],
@@ -85,43 +136,7 @@ class AssignTablesPage extends ConsumerWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Card(
-                color: Colors.green.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: Colors.green[700],
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Capacité totale: 6 places',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '✓ Capacité suffisante pour 4 convives',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.green.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              child: assign_table_4_widget(reservation: reservation.value!, tables: tables,),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -140,67 +155,16 @@ class AssignTablesPage extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.all(16.0),
                 children: [
-                  Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: CheckboxListTile(
-                      value: true,
-                      onChanged: (_) {},
-                      title: const Text('Table 1'),
-                      subtitle: const Text(
-                        'Capacité: 2 personnes',
-                      ),
-                      secondary: const Icon(Icons.table_restaurant),
+                  for (final table in tables)
+                    FutureBuilder<bool?>(
+                      future: Table.is_occupee(idtable: table.id),
+                      builder: (context, snapshot) {
+                        if (snapshot.data == true) {
+                          return assign_table_3_widget(table: table);
+                        }
+                        return assign_table_2_widget(table: table);
+                      },
                     ),
-                  ),
-                  Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: CheckboxListTile(
-                      value: true,
-                      onChanged: (_) {},
-                      title: const Text('Table 2'),
-                      subtitle: const Text(
-                        'Capacité: 4 personnes',
-                      ),
-                      secondary: const Icon(Icons.table_restaurant),
-                    ),
-                  ),
-                  Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: CheckboxListTile(
-                      value: false,
-                      onChanged: (_) {},
-                      title: const Text('Table 3'),
-                      subtitle: const Text(
-                        'Capacité: 6 personnes',
-                      ),
-                      secondary: const Icon(Icons.table_restaurant),
-                    ),
-                  ),
-                  Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    color: Colors.grey.shade100,
-                    child: CheckboxListTile(
-                      value: false,
-                      onChanged: null,
-                      title: Text(
-                        'Table 4',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Occupée pour ce service',
-                        style: TextStyle(
-                          color: Colors.red.shade300,
-                        ),
-                      ),
-                      secondary: Icon(
-                        Icons.table_restaurant,
-                        color: Colors.grey.shade400,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -209,7 +173,20 @@ class AssignTablesPage extends ConsumerWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final reservationId = ref.read(selectedReservationIdProvider);
+                    final selected = ref.read(selectedTableProvider);
+                    await ref.read(currentReservationProvider(reservationId).notifier).confirmWithSelectedTables(selected);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Réservation confirmée avec les tables assignées'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+
+                    Navigator.pushReplacementNamed(context, '/manager_reservations_page');
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),

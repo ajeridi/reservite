@@ -3,18 +3,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final selectedTableProvider =
-  NotifierProvider<SelectedTableNotifier, int>(
+  NotifierProvider<SelectedTableNotifier, Set<int>>(
       () => SelectedTableNotifier(),
 );
 
-class SelectedTableNotifier extends Notifier<int>{
+class SelectedTableNotifier extends Notifier<Set<int>>{
   @override
-  int build() {
-    return 0;
+  Set<int> build() {
+    return {};
   }
 
-  void set(int newId){
-    state = newId;
+  void toggle(int tableId) {
+    if (state.contains(tableId)) {
+      state = {...state}..remove(tableId);
+    } else {
+      state = {...state, tableId};
+    }
+  }
+
+  void clear() {
+    state = {};
   }
 
 }
