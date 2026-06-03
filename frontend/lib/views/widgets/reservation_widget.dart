@@ -10,6 +10,7 @@ import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 import 'package:prbd_2526_a07/views/pages/reservation_details_client_page.dart';
 
 import '../../models/reservation.dart';
+import '../../providers/current_reservation_provider.dart';
 
 class ReservationCard extends ConsumerWidget {
 
@@ -47,6 +48,7 @@ class ReservationCard extends ConsumerWidget {
           onTap: () async {
             // on definit l'id de la reservation selectionee
             selectedReservationIdNotifier.set(reservation.id);
+            ref.invalidate(currentReservationProvider(reservation.id));
             // navigation vers la page de details de la reservation (differente en fonction du role)
             if (userRole == 'client')
               Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
