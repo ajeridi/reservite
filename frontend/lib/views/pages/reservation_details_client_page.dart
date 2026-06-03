@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/reservation.dart';
-import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 
-import '../../providers/current_reservation_provider.dart';
+import '../../providers/reservation_providers/current_reservation_provider.dart';
+import '../../providers/reservation_providers/selected_reservation_id_provider.dart';
+import '../widgets/btn_annulation_widget.dart';
 import '../widgets/reservation_details_widget.dart';
 
 void main() async {
@@ -119,16 +121,11 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                       onPressed: () {},
                       icon: const Icon(Icons.edit),
                       label: const Text('Modifier'),
+
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.cancel),
-                      label: const Text('Annuler'),
-                    ),
-                  ),
+                  btnaAnulationWidget(currentReservationNotifier : currentReservationNotifier),
                 ],
               ),
           ],
@@ -138,3 +135,4 @@ class ReservationDetailsClientPage extends ConsumerWidget {
   );
   }
 }
+
