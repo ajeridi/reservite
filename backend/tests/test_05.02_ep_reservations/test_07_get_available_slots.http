@@ -8,5 +8,5 @@ Content-Type: application/json
 }
 
 ### recuperation des creneaux disponibles
-GET http://localhost:3000/rpc/get_available_slots?restaurant_id=2&date_of_reservation=2024-12-10
+GET http://localhost:3000/rpc/get_available_slots?restaurant_id=1&date_of_reservation=2024-11-15
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc4MDU4NDE0NX0.fiufgt7EIUZJnz5NfgjX8HhKmDv-S2xaZlUryfBMPLQ
