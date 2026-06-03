@@ -182,4 +182,44 @@ class Reservation {
         throw Exception('Failed to check capacity.');
       }
     }
+
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests,}) async {
+    try {
+      final dateString = DateFormat('yyyy-MM-dd').format(date);
+
+      final parts = slot.split(':');
+
+      final reservationDateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+        int.parse(parts[3]),
+      );
+      final datetimeString =
+      DateFormat('yyyy-MM-dd HH:mm:ss').format(reservationDateTime);
+
+      final response = await ApiClient.post(
+        'save_reservation',
+        body: json.encode({
+          'restaurant_id': restaurantId,
+          'datetime_': dateString,
+          'number_of_guests': numberOfGuests,
+          'special_requests': specialRequests,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Reservation.fromJson(body);
+      }
+      throw Exception(
+        'Failed to save reservation. Status code: ${response.statusCode}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to save reservation.');
+    }
+  }
 }
