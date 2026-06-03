@@ -37,4 +37,9 @@ class ApplicationTimeNotifier extends AbstractAsyncNotifier<DateTime>{
     }
   }
 
+  //update time localement
+  void setTime(DateTime newTime){
+    state = AsyncData(newTime);
+  }
+
 }

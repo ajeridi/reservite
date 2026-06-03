@@ -1,6 +1,9 @@
 
 import 'dart:convert';
 
+
+
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/table.dart';
@@ -18,7 +21,7 @@ enum Status {
 class Reservation {
   final int id;
   final Client client;
-  final Restaurant restaurant;
+  final Restaurant? restaurant;
   final DateTime datetime;
   final int numberOfGuests;
   final Status status;
@@ -111,6 +114,65 @@ class Reservation {
     };
   }
 
+ Reservation copyWith( {
+   int? id,
+   Client? client,
+   Restaurant? restaurant,
+   DateTime? datetime,
+   int? numberOfGuests,
+   Status? status,
+    String? specialRequests,
+   List<Table>? tables}){
+    return Reservation(
+        id: id ?? this.id,
+        client: client ?? this.client,
+        restaurant: restaurant ?? this.restaurant,
+        datetime: datetime ?? this.datetime,
+        numberOfGuests: numberOfGuests ?? this.numberOfGuests,
+        status: status ?? this.status,
+        tables: tables ?? this.tables);
+ }
+
+
+
+  //recup reservation pour cancel
+
+  Future<Reservation> getCancel() async{
+    try {
+      final response = await ApiClient.post(
+        'cancel_reservation',
+      body: json.encode({'reservation_id': id}));
+      if (response.statusCode == 200) {
+        return Reservation.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to get reservation');
+      }
+    }catch(e,st){
+      print(e);
+      throw Exception('Failed to change reservation status to Canceled');
+    }
+
+  }
+
+  // recup reservation pour complete reservation
+
+  Future<Reservation> getCompleted() async{
+    try{
+      final response = await ApiClient.post(
+        'complete_reservation',
+        body:json.encode({'reservation_id' : id})
+      );
+      if(response.statusCode == 200){
+        return Reservation.fromJson(json.decode(response.body));
+      }else{
+        throw Exception('Failed to get reservation');
+      }
+    }catch(e){
+      print(e);
+      throw Exception('Failed to change reservation status to Completed');
+    }
+  }
+
   String statusToString(){
     return switch(this.status){
       Status.pending => 'En attente',
@@ -125,9 +187,76 @@ class Reservation {
   }
 
 
+  static Future<DateTime> getFirstAvailableReservationDateTime() async {
+    try {
+      final response = await ApiClient.get("get_first_available_reservation_datetime");
+      if (response.statusCode == 200){
+        final body = json.decode(response.body);
+        return body['first_available_reservation_datetime'];
+      }
+      throw Exception('Failed to get first available reservation datetime\nResponse code : ${response.statusCode}');
+    } catch (e, st){
+      throw Exception("Failed to get first available reservation datetime.");
+    }
+  }
 
   @override
   String toString() {
     return'$id $client $restaurant $datetime $numberOfGuests $status $tables';
+  }
+
+  static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests}) async {
+      final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
+      try {
+        final response = await ApiClient.get('check_service_tables_capacity?number_of_guests=$numberOfGuests&date_of_reservation=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
+        if (response.statusCode != 200) {
+          throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
+        }
+        final body = json.decode(response.body);
+        return body;
+
+      } catch (e, st) {
+        print('$e\n$st');
+        throw Exception('Failed to check capacity.');
+      }
+    }
+
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests,}) async {
+    try {
+      final dateString = DateFormat('yyyy-MM-dd').format(date);
+
+      final parts = slot.split(':');
+
+      final reservationDateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+      );
+      final datetimeString =
+      DateFormat('yyyy-MM-dd HH:mm:ss').format(reservationDateTime);
+
+      final response = await ApiClient.post(
+        'save_reservation',
+        body: json.encode({
+          'restaurant_id': restaurantId,
+          'datetime_': datetimeString,
+          'number_of_guests_': numberOfGuests,
+          'special_requests_': specialRequests,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Reservation.fromJson(body);
+      }
+      throw Exception(
+        'Failed to save reservation. Status code: ${response.statusCode}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to save reservation.');
+    }
   }
 }
