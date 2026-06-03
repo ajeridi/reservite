@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 
 import '../../providers/application_time_provider.dart';
+import '../widgets/assign_table_1_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -26,6 +29,7 @@ class AssignTablesPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final simulatedTime = ref.watch(applicationTimeProvider).value;
+    final reservation = ref.watch(currentReservationProvider(ref.watch(selectedReservationIdProvider)));
 
     return Scaffold(
       appBar: AppBar(
@@ -77,26 +81,7 @@ class AssignTablesPage extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Réservation',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text('4 convives'),
-                      const Text('05/12/2024 à 20:00'),
-                    ],
-                  ),
-                ),
-              ),
+              child: assign_table_1_widget(reservation: reservation.value!),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
