@@ -118,9 +118,8 @@ class ReservationFormPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 availableSlotsState.when(
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (error, stack) => Text('Erreur: $error'),
                   data: (availableSlots) {
                     return Wrap(
@@ -208,27 +207,24 @@ class ReservationFormPage extends ConsumerWidget {
     );
   }
 
-  List<Widget> showSlots(AvailableSlots availableSlots, ThemeData theme){
+  List<Widget> showSlots(AvailableSlots availableSlots, ThemeData theme) {
     final slotsWidgets = <Widget>[];
-    if (availableSlots.slots != null) {
-      for (var slot in availableSlots.slots!) {
-        slotsWidgets.add(ReservationSlotWidget(theme: theme, slot: slot));
-      }
+    final slots = availableSlots.slots ?? [];
+
+    if (slots.isEmpty && availableSlots.error != null) {
+      return [WarningWidget(error: availableSlots.error!)];
     }
-    else if (availableSlots.error != null){
-      final error = availableSlots.error;
-      slotsWidgets.add(WarningWidget(error: error));
+
+    for (var slot in availableSlots.slots!) {
+      slotsWidgets.add(ReservationSlotWidget(theme: theme, slot: slot));
     }
+
     return slotsWidgets;
   }
-
 }
 
 class WarningWidget extends StatelessWidget {
-  const WarningWidget({
-    super.key,
-    required this.error,
-  });
+  const WarningWidget({super.key, required this.error});
 
   final String? error;
 
@@ -245,7 +241,7 @@ class WarningWidget extends StatelessWidget {
         children: [
           const Icon(Icons.warning, color: Colors.orange),
           const SizedBox(width: 8),
-           Expanded(
+          Expanded(
             child: Text(
               error!,
               style: TextStyle(color: Colors.orange, fontSize: 13),
@@ -256,4 +252,3 @@ class WarningWidget extends StatelessWidget {
     );
   }
 }
-
