@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
@@ -48,7 +51,8 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+
+
 
     // observation de la liste des reservations car currentReservation vient de la
     final selectedReservationId = ref.watch(selectedReservationIdProvider);
@@ -57,14 +61,42 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
       currentReservationProvider(selectedReservationId).notifier,
     );
 
+    //observation du provider de la application_time
+    final applicationTime = ref.watch(applicationTimeProvider);
+
     return currentReservation.when
-      (data: (reservation) => data(context, currentReservationNotifier, theme, simulatedTime, reservation),
-        error: (e, _) => DataErrorWidget(error: e, notifier: currentReservationNotifier),
-        loading: () => Center(child: CircularProgressIndicator(),)
-    );
+      (data: (reservation) =>applicationTime.when(
+        data: (simulatedTime) => 
+          data(context, 
+              currentReservationNotifier, 
+              theme, 
+              simulatedTime, 
+              reservation),
+        error: (e, _) => DataErrorWidget(error: e,
+                                          notifier: currentReservationNotifier),
+        loading: () => Center(child: CircularProgressIndicator()),
+    ),
+      error: (e, _) =>DataErrorWidget(error: e, notifier: currentReservationNotifier),
+      loading: () => const Center(child: CircularProgressIndicator(),));
   }
 
-  Scaffold data(BuildContext context, CurrentReservationNotifier currentReservationNotifier, ThemeData theme, DateTime simulatedTime, Reservation? currentReservation) {
+  Scaffold data(
+      BuildContext context, 
+      CurrentReservationNotifier currentReservationNotifier, 
+      ThemeData theme, 
+      DateTime simulatedTime, 
+      Reservation? currentReservation) {
+    //pour tests
+    //final simulatedTimeTest = DateTime(2024, 10, 4, 16, 0);
+   // final canTerminate = currentReservation?.status == Status.confirmed &&
+     //   !simulatedTimeTest.isBefore(currentReservation!.datetime);
+
+    // terminer si la date appTime est >= à la date de reservation
+    final canTerminate = currentReservation?.status == Status.confirmed &&
+       !simulatedTime.isBefore(currentReservation!.datetime);
+
+
+    
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -209,10 +241,46 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
               if (currentReservation!.status != Status.completed &&
                   currentReservation!.status != Status.cancelled) ...[
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: canTerminate ? () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Expanded(
+                          child: AlertDialog(
+                            title: Text('Terminer la réservation'),
+                            content: Text('Voulez-vous marquer cette résservation commme terminée?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Non'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  currentReservationNotifier.complete();
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Oui',
+                                style: TextStyle(color: Colors.red)),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  } : null, //null = btn disabled
                   icon: Icon(updateStatusIcon(currentReservation!.status)),
                   label: Text(updateStatusMessage(currentReservation!.status)),
                 ),
+                // message d'advertisement si la reservation ne peut pas être terminée a cause de l'appliTime
+                if(!canTerminate)
+                  const Padding(padding: EdgeInsets.only(top: 4.0),
+                  child: Text('La réservation ne peut pas être terminée que durant son service ou après celui-ci',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 12,
+                  ),),),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: () {
@@ -235,7 +303,8 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                                   currentReservationNotifier.cancel();
                                   Navigator.of(context).pop();
                                 },
-                                child: Text('Oui'),
+                                child: Text('Oui',
+                                    style: TextStyle(color: Colors.red)),
                               ),
                             ],
                           ),
