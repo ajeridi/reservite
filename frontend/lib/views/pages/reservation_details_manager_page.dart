@@ -209,7 +209,35 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
               if (currentReservation!.status != Status.completed &&
                   currentReservation!.status != Status.cancelled) ...[
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Expanded(
+                          child: AlertDialog(
+                            title: Text('Terminer la réservation'),
+                            content: Text('Voulez-vous marquer cette résservation commme terminée?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Non'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  //currentReservationNotifier.cancel();
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Oui',
+                                style: TextStyle(color: Colors.red)),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                   icon: Icon(updateStatusIcon(currentReservation!.status)),
                   label: Text(updateStatusMessage(currentReservation!.status)),
                 ),
@@ -235,7 +263,8 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                                   currentReservationNotifier.cancel();
                                   Navigator.of(context).pop();
                                 },
-                                child: Text('Oui'),
+                                child: Text('Oui',
+                                    style: TextStyle(color: Colors.red)),
                               ),
                             ],
                           ),
