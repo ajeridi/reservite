@@ -17,10 +17,15 @@ import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/client_provider.dart';
 import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/special_request_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../../models/reservation.dart';
+import 'capacity_check_provider.dart';
+import 'number_of_guests_provider.dart';
 
 
 final currentReservationProvider = AsyncNotifierProvider.autoDispose
@@ -65,7 +70,40 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
     final canceled = await state.value!.getCancel();
     state = AsyncData(canceled);
     ref.read(reservationsProvider.notifier).updateList(state.value!);
+  }
 
+
+  Future<Reservation> saveReservation() async {
+    // recherche de toutes les donnes entree par l'utilisateur via les providers
+    final restaurantId = ref.read(selectedRestaurantProvider);
+    final selectedDate = await ref.read(selectedReservationDateProvider.future);
+    final selectedSlot = ref.read(selectedSlotProvider);
+    final numberOfGuests = ref.read(numberOfGuestsProvider);
+    final specialRequest = ref.read(specialRequestProvider).trim();
+    final capacityCheck = await ref.read(capacityCheckProvider.future);
+
+    // dernieres validations
+    if (selectedSlot == null) {
+      throw Exception('Veuillez sélectionner un créneau.');
+    }
+    if (!capacityCheck) {
+      throw Exception('Capacité insuffisante pour ce créneau.');
+    }
+
+    final savedReservation = await Reservation.saveReservation(
+      restaurantId: restaurantId,
+      date: selectedDate,
+      slot: selectedSlot,
+      numberOfGuests: numberOfGuests,
+      specialRequests: specialRequest.isEmpty ? null : specialRequest,
+    );
+
+    state = AsyncData(savedReservation);
+
+    // mettre a jour directement la liste soit en ajoutant si nouvelle reseravation, soit en supprimant et en rajoutant la nouvelle
+    ref.read(reservationsProvider.notifier).addOrUpdateReservation(savedReservation);
+
+    return savedReservation;
   }
 
 }
