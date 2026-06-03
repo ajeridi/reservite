@@ -79,6 +79,9 @@ class AssignTablesPage extends ConsumerWidget {
       AsyncValue reservation,
       ) {
 
+    final res = reservation.value;
+    if (res == null) return const Center(child: CircularProgressIndicator());
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
