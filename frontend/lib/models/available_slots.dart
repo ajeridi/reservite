@@ -37,7 +37,7 @@ class AvailableSlots{
     return '{slots: $slots, error: $error}';
   }
 
-  static List<String>? toStringList(List<dynamic> slotsList) {
+  static List<String>? toStringList(List<dynamic>? slotsList) {
     final newList = <String>[];
     if (slotsList == null)
       return newList;
