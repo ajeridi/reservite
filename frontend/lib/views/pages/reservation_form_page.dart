@@ -9,6 +9,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/current_reservatio
 import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/special_request_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/date_time_picker_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
@@ -54,9 +55,10 @@ class ReservationFormPage extends ConsumerWidget {
     final availableSlotsState = ref.watch(availableSlotsProvider);
     final selectedSlot = ref.watch(selectedSlotProvider);
     final selectedSlotNotifier = ref.read(selectedSlotProvider.notifier);
-
     //on regarde l'etat de la validation de la capacite
     final capacityCheckState = ref.watch(capacityCheckProvider);
+    //notifier du special_request pour les validations
+    final specialRequestsNotifier = ref.watch(specialRequestProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -165,6 +167,8 @@ class ReservationFormPage extends ConsumerWidget {
                     border: OutlineInputBorder(),
                     hintText: 'Allergies, préférences...',
                   ),
+                  validator: specialRequestsNotifier.validate,
+                  onChanged: specialRequestsNotifier.setSpecialRequest,
                   maxLines: 3,
                 ),
                 const SizedBox(height: 32),
