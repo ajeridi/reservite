@@ -23,7 +23,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
     final resto = ref.watch(currentRestaurantProvider(ref.read(selectedRestaurantProvider)));
     // id de la reservation selectionnee (a set a 0 si on redirige vers la page de reservation)
     final selectedReservationIdState = ref.watch(selectedReservationIdProvider); // on en a besoin pour build le notifier, et pouvoir set le state
-    final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
+
 
     final simulatedTime = ref.watch(applicationTimeProvider).value;
 
