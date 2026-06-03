@@ -3,6 +3,7 @@ import 'dart:convert';
 
 
 
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/table.dart';
@@ -165,4 +166,20 @@ class Reservation {
   String toString() {
     return'$id $client $restaurant $datetime $numberOfGuests $status $tables';
   }
+
+  static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests}) async {
+      final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
+      try {
+        final response = await ApiClient.get('check_service_tables_capacity?number_of_guests=$numberOfGuests&date_of_reservation=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
+        if (response.statusCode != 200) {
+          throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
+        }
+        final body = json.decode(response.body);
+        return body;
+
+      } catch (e, st) {
+        print('$e\n$st');
+        throw Exception('Failed to check capacity.');
+      }
+    }
 }

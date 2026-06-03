@@ -21,8 +21,8 @@ class CapacityCheckNotifier extends AsyncNotifier<bool> {
     final selectedReservationDate =
     await ref.watch(selectedReservationDateProvider.future);
 
-    if (selectedSlot == null) { // si pas de slot, pas de check donc retourner
-      return false;
+    if (selectedSlot == null) { // si pas de slot, pas de check donc retourner true
+      return true;
     }
 
     return Reservation.checkCapacity(

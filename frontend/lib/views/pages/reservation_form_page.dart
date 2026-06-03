@@ -13,6 +13,7 @@ import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/date_time_picker_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
+import '../../providers/reservation_providers/capacity_check_provider.dart';
 import '../../providers/reservation_providers/selected_slot_provider.dart';
 
 void main() async {
@@ -53,6 +54,9 @@ class ReservationFormPage extends ConsumerWidget {
     final availableSlotsState = ref.watch(availableSlotsProvider);
     final selectedSlot = ref.watch(selectedSlotProvider);
     final selectedSlotNotifier = ref.read(selectedSlotProvider.notifier);
+
+    //on regarde l'etat de la validation de la capacite
+    final capacityCheckState = ref.watch(capacityCheckProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -138,41 +142,21 @@ class ReservationFormPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                const NumberOfGuestsWidget(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.orange),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.warning, color: Colors.orange),
-                            const SizedBox(width: 8),
-                            const Expanded(
-                              child: Text(
-                                'Surréservation (capacité)',
-                                style: TextStyle(
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'La capacité du restaurant pour ce créneau pourrait être insuffisante pour le nombre de convives demandé.',
-                          style: TextStyle(fontSize: 13),
-                        ),
-                      ],
-                    ),
-                  ),
+                capacityCheckState.when(
+                  loading: () => const SizedBox.shrink(), // pour enlever l'espace pris
+                  error: (error, stack) => Text('Erreur capacité: $error'),
+                  data: (hasEnoughCapacity) {
+                    if (hasEnoughCapacity) {
+                      return const SizedBox.shrink();
+                    }
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 16.0),
+                      child: WarningWidget(
+                        error:
+                        'La capacité du restaurant pour ce créneau pourrait être insuffisante pour le nombre de convives demandé.',
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
