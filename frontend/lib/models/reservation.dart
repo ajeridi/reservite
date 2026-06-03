@@ -20,7 +20,7 @@ enum Status {
 class Reservation {
   final int id;
   final Client client;
-  final Restaurant restaurant;
+  final Restaurant? restaurant;
   final DateTime datetime;
   final int numberOfGuests;
   final Status status;
