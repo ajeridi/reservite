@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
@@ -10,6 +11,7 @@ import 'package:prbd_2526_a07/views/widgets/reservation_widget.dart';
 
 import '../../core/tools/my_provider_observer.dart';
 import '../../models/reservation.dart';
+import '../../providers/application_time_provider.dart';
 import '../../providers/reservation_providers/reservations_provider.dart';
 import '../widgets/data_error_widget.dart';
 
@@ -57,16 +59,29 @@ class ManagerReservationsPage extends ConsumerWidget {
     final filteredReservationsNotifier = ref.read(
       filteredReservationsProvider.notifier,
     );
+    //observation du provider de la application_time
+    final applicationTime = ref.watch(applicationTimeProvider);
 
+
+// Il faut imbriquer le .when() de applicationTime autour du reservationsState.when()
     return reservationsState.when(
-      data: (state) => data(
-        context,
-        state,
-        reservationNotifier,
-        theme,
-        filteredReservationsState,
-        filteredReservationsNotifier,
-        authNotifier, restaurantState
+      data: (state) => applicationTime.when(
+        data: (simulatedTime) => data(
+          context,
+          state,
+          reservationNotifier,
+          theme,
+          filteredReservationsState,
+          filteredReservationsNotifier,
+          authNotifier,
+          restaurantState,
+          simulatedTime,
+        ),
+        error: (e, _) => DataErrorWidget(
+          error: e,
+          notifier: reservationNotifier,
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
       ),
       error: (err, _) => DataErrorWidget(
         error: err,
@@ -85,6 +100,7 @@ class ManagerReservationsPage extends ConsumerWidget {
     List<Reservation> filteredReservationsState,
     FilteredReservationsNotifier filteredReservationsNotifier,
     AuthNotifier authNotifier, AsyncValue<Restaurant> restaurantState,
+      DateTime simulatedTime,
   ) {
     return Scaffold(
       appBar: AppBar(
@@ -118,7 +134,7 @@ class ManagerReservationsPage extends ConsumerWidget {
                 message:
                     'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
-                  'mercredi 04/12/2024 16:00',
+                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR').format(simulatedTime),
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
