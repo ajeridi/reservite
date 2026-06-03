@@ -15,6 +15,7 @@ import 'package:prbd_2526_a07/core/tools/abstract_async_notifier.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_tables_provider.dart';
 
 import '../models/reservation.dart';
 
@@ -49,6 +50,28 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
     } catch (e, st) {
       print('$e\n$st');
       throw Exception("Failed to refresh the reservation");
+    }
+  }
+
+
+  Future<void> confirmWithSelectedTables(Set<int> tableIds) async {
+    if (tableIds.isEmpty) {
+      throw Exception('Aucune table sélectionnée');
+    }
+
+    state = AsyncLoading();
+    try {
+      final confirmed = await Reservation.confirmReservation(
+        reservationId: id,
+        tablesId: tableIds.toList(),
+      );
+      state = AsyncData(confirmed);
+
+      ref.read(selectedTableProvider.notifier).clear();
+      await ref.read(reservationsProvider.notifier).refresh();
+    } catch (e, st) {
+      print('$e\n$st');
+      state = AsyncValue.error(e, st);
     }
   }
 }

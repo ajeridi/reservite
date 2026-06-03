@@ -71,3 +71,20 @@ end;
 $$ language plpgsql security definer;
 
 grant execute on function get_table(int) to manager;
+
+
+/*
+    Verifie si la table est déjà occupée ou non
+*/
+
+create or replace function is_occupee(idtable int) returns boolean as
+$$
+begin
+    return exists(select rsv_tbl.table
+                  from reservation_tables rsv_tbl
+                  join tables tbl on rsv_tbl.table = tbl.id
+                  where tbl.id = idtable);
+end;
+$$ language plpgsql security definer;
+
+grant execute on function is_occupee(int) to manager;

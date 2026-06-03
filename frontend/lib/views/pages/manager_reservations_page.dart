@@ -66,8 +66,7 @@ class ManagerReservationsPage extends ConsumerWidget {
         theme,
         filteredReservationsState,
         filteredReservationsNotifier,
-        authNotifier,
-          restaurantState
+        authNotifier, restaurantState
       ),
       error: (err, _) => DataErrorWidget(
         error: err,

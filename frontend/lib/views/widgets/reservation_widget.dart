@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
+import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
@@ -47,6 +48,7 @@ class ReservationCard extends ConsumerWidget {
           onTap: () async {
             // on definit l'id de la reservation selectionee
             selectedReservationIdNotifier.set(reservation.id);
+            ref.invalidate(currentReservationProvider(reservation.id));
             // navigation vers la page de details de la reservation (differente en fonction du role)
             if (userRole == 'client')
               Navigator.pushReplacementNamed(context, '/reservation_details_client_page');

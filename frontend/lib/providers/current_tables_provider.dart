@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/tools/abstract_async_notifier.dart';
 import '../models/table.dart';
 
-final currentReservationProvider = AsyncNotifierProvider.autoDispose
+final currentTableProvider = AsyncNotifierProvider.autoDispose
     .family<CurrentTableNotifier, Table?, int>(
   // autoDispose pour detruire le provider une fois qu'on ne l'utilise plus
   CurrentTableNotifier.new,

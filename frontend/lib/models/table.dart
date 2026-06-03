@@ -56,17 +56,33 @@ class Table {
     }
   }
 
-  static Future<Table?> getTable(int id) async {
+  static Future<Table?> getTable(int idtable) async {
     try {
-      final response = await ApiClient.get("get_table?reservation_id=$id");
+      final response = await ApiClient.get("get_table?reservation_id=$idtable");
       if (response.statusCode == 200){
         final body = json.decode(response.body);
         return Table.fromJson(body);
       }
     } catch (e, st){
       print('$e\n$st');
-      throw Exception('Failed to get reservation.');
+      throw Exception('Failed to get table.');
     }
 
   }
+
+  static Future<bool?> is_occupee({required int idtable}) async {
+    try {
+      final response = await ApiClient.get("is_occupee?idtable=$idtable");
+
+      if (response.statusCode == 200){
+        return json.decode(response.body) as bool;
+      }
+
+    } catch (e, st){
+      print('$e\n$st');
+      throw Exception('Failed to get is_occupee');
+    }
+
+  }
+
 }
