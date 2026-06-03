@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../models/reservation.dart';
-import '../../providers/selected_reservation_id_provider.dart';
-import '../../providers/user_role_provider.dart';
 
 class assign_table_1_widget extends ConsumerWidget {
 
