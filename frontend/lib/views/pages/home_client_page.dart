@@ -4,12 +4,12 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
-import 'package:prbd_2526_a07/providers/filtered_reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/filtered_reservations_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_widget.dart';
 
 import '../../core/tools/my_provider_observer.dart';
 import '../../models/reservation.dart';
-import '../../providers/reservations_provider.dart';
+import '../../providers/reservation_providers/reservations_provider.dart';
 import '../widgets/data_error_widget.dart';
 
 /*

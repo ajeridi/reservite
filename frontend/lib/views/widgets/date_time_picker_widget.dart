@@ -1,44 +1,80 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 
-class DatePickerExample extends StatefulWidget {
-  const DatePickerExample({super.key});
+import '../../providers/reservation_providers/selected_reservation_date_provider.dart';
 
-  @override
-  State<DatePickerExample> createState() => _DatePickerState();
-}
+class DatePickerReservation extends ConsumerWidget {
+  const DatePickerReservation({super.key,});
 
-class _DatePickerState extends State<DatePickerExample> {
-  DateTime? selectedDate;
-
-  Future<void> _selectDate() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2024, 12, 4),
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2040),
-    );
-
-    setState(() {
-      selectedDate = pickedDate;
-    });
-  }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: .min,
-      spacing: 20,
-      children: <Widget>[
-        Text(
-          selectedDate != null
-              ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
-              : 'No date selected',
+  Widget build(BuildContext context, WidgetRef ref){
+    final theme = Theme.of(context);
+
+    // on a besoin de chercher la premier date disponible
+    final selectedReservationDateState = ref.watch(selectedReservationDateProvider);
+    final selectedReservationDateNotifier = ref.watch(selectedReservationDateProvider.notifier);
+    final  applicationTime = ref.watch(applicationTimeProvider);
+
+    return Row(
+      children: [
+        Expanded(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () async {
+                // on va ouvrir le DatePicker, puis attendre la selection qui va etre stockee dans pickedDate
+                final pickedDate = await showDatePicker(
+                    context: context,
+                    firstDate: applicationTime.value!,
+                    lastDate: DateTime(2030),
+                );
+                if (pickedDate != null){
+                  selectedReservationDateNotifier.setDate(pickedDate);
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Date'),
+                          Text(
+                            DateFormat('dd/MM/yyyy', 'fr_FR')
+                                .format(selectedReservationDateState.value!),
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
-        OutlinedButton(
-          onPressed: _selectDate,
-          child: const Text('Select Date'),
+        const SizedBox(width: 8),
+        IconButton(
+          icon: const Icon(Icons.remove),
+          onPressed: () {
+            selectedReservationDateNotifier.subtractDay();
+          },
         ),
+        IconButton(icon: const Icon(Icons.add), onPressed: () {
+          selectedReservationDateNotifier.addDay();
+
+        }),
+        const SizedBox(width: 16),
       ],
     );
   }

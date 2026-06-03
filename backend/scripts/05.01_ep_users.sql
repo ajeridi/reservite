@@ -72,3 +72,13 @@ create or replace function get_role() returns json as
     end;
     $$ language plpgsql security definer;
 grant execute on function get_role() to anon;
+
+-- retourne le client connecte
+create or replace function get_connected_client() returns json as
+    $$
+    begin
+        return (select json_build_object('id', id, 'name', full_name, 'email', email, 'phone', phone) from users where id = auth.id());
+    end;
+    $$ language plpgsql security definer ;
+
+grant execute on function get_connected_client() to client;
