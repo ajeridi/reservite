@@ -33,7 +33,8 @@ class btnaAnulationWidget extends StatelessWidget {
                         currentReservationNotifier.cancel();
                         Navigator.of(context).pop();
                       },
-                      child: Text('Oui'),
+                      child: Text('Oui',
+                          style: TextStyle(color: Colors.red)),
                     ),
                   ],
                 ),
