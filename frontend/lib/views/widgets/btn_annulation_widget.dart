@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../providers/current_reservation_provider.dart';
+import '../../providers/reservation_providers/current_reservation_provider.dart';
 
 class btnaAnulationWidget extends StatelessWidget {
   const btnaAnulationWidget({
@@ -33,7 +33,8 @@ class btnaAnulationWidget extends StatelessWidget {
                         currentReservationNotifier.cancel();
                         Navigator.of(context).pop();
                       },
-                      child: Text('Oui'),
+                      child: Text('Oui',
+                          style: TextStyle(color: Colors.red)),
                     ),
                   ],
                 ),

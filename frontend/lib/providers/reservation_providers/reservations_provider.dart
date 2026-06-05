@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/core/tools/abstract_async_notifier.dart';
@@ -7,20 +8,20 @@ import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 final reservationsProvider =
-    AsyncNotifierProvider<ReservationsNotifier, List<Reservation>>(
+    AsyncNotifierProvider<ReservationsNotifier, SplayTreeSet<Reservation>>(
         () => ReservationsNotifier(),
     );
 
-class ReservationsNotifier extends AbstractAsyncNotifier<List<Reservation>>{
+class ReservationsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Reservation>>{
   @override
-  FutureOr<List<Reservation>> build() async {
+  FutureOr<SplayTreeSet<Reservation>> build() async {
     // on doit regarder l'etat de connexion, car un manager n'a pas la meme liste q'un client
     ref.watch(authProvider);
-    final authNotifier = ref.watch(authProvider.notifier);
+    final authNotifier = ref.read(authProvider.notifier);
     // on doit aussi regarder l'etat de selection de restaurant, car un nouveau restaurant selectionne par le manager implique un nouveau fetch des reservations
     final selectedRestaurantState = ref.watch(selectedRestaurantProvider);
 
-    state = AsyncData(<Reservation>[]);
+    state = AsyncData(SplayTreeSet<Reservation>());
     state = AsyncLoading();
     try {
       if (authNotifier.isLoggedIn){
@@ -30,7 +31,7 @@ class ReservationsNotifier extends AbstractAsyncNotifier<List<Reservation>>{
         else // si on est manager on va aller chercher les reservations du restaurant selectionne
           return await Reservation.getReservations(selectedRestaurant: selectedRestaurantState);
       }
-      return <Reservation>[];
+      return SplayTreeSet();
     }catch (e){
       throw "Something went wrong!\nPlease try again later.";
     }
@@ -68,7 +69,7 @@ class ReservationsNotifier extends AbstractAsyncNotifier<List<Reservation>>{
 
       final selectedRestaurant = ref.read(selectedRestaurantProvider);
       print('selected restaurant is $selectedRestaurant');
-      final List<Reservation> reservations;
+      final SplayTreeSet<Reservation> reservations;
 
       if (isClient) reservations = await Reservation.getReservations();
       else reservations = await Reservation.getReservations(selectedRestaurant: selectedRestaurant);
@@ -81,6 +82,13 @@ class ReservationsNotifier extends AbstractAsyncNotifier<List<Reservation>>{
           StackTrace.current
       );
     }
+  }
+
+  void addOrUpdateReservation(Reservation savedReservation) {
+    final reservations = state.value ?? SplayTreeSet();
+    reservations.removeWhere((reservation) => reservation.id == savedReservation.id);
+    reservations.add(savedReservation);
+    state = AsyncData(reservations);
   }
 
 }

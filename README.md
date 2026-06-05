@@ -12,6 +12,11 @@
 
 ...
 
+### Liste fonctionnalités manquantes
+    * edit_reservation
+    * CRUDL services
+    * CRUDL tables
+
 ### Divers
 
 ...
