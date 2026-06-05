@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
-import 'package:prbd_2526_a07/providers/reservations_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 import 'package:prbd_2526_a07/views/pages/reservation_details_client_page.dart';
 
 import '../../models/reservation.dart';
+import '../../providers/current_reservation_provider.dart';
 
 class ReservationCard extends ConsumerWidget {
 
@@ -47,6 +48,7 @@ class ReservationCard extends ConsumerWidget {
           onTap: () async {
             // on definit l'id de la reservation selectionee
             selectedReservationIdNotifier.set(reservation.id);
+            ref.invalidate(currentReservationProvider(reservation.id));
             // navigation vers la page de details de la reservation (differente en fonction du role)
             if (userRole == 'client')
               Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
@@ -67,7 +69,7 @@ class ReservationCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        (reservation.client.name == ''? reservation.restaurant.name : reservation.client.name), // nous savons que le client_name ne sera jamais null donc on se permet de mettre de !
+                        (reservation.client.name == ''? reservation.restaurant!.name : reservation.client.name), // nous savons que le client_name ne sera jamais null donc on se permet de mettre de !
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -79,7 +81,7 @@ class ReservationCard extends ConsumerWidget {
                           const Icon(Icons.location_on, size: 14),
                           const SizedBox(width: 4),
                           Text(
-                            (reservation.client.name == '' ? reservation.restaurant.city! : reservation.restaurant.name),
+                            (reservation.client.name == '' ? reservation.restaurant!.city! : reservation.restaurant!.name),
                             style: TextStyle(fontSize: 12, color: Colors
                                 .grey[600]),
                           ),

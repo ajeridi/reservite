@@ -53,7 +53,7 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '${currentReservationState?.restaurant.name}',
+                    '${currentReservationState?.restaurant!.name}',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -66,7 +66,7 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    '${currentReservationState?.restaurant.address}, ${currentReservationState?.restaurant.city}',
+                    '${currentReservationState?.restaurant!.address}, ${currentReservationState?.restaurant!.city}',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ),
@@ -78,7 +78,7 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const Icon(Icons.phone, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(
-                  '${currentReservationState?.restaurant.phone}',
+                  '${currentReservationState?.restaurant!.phone}',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               ],

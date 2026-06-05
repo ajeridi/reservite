@@ -1,8 +1,10 @@
 
+import 'dart:collection';
 import 'dart:convert';
 
 
 
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/table.dart';
@@ -17,10 +19,10 @@ enum Status {
   cancelled
 }
 
-class Reservation {
+class Reservation  implements Comparable<Reservation>{
   final int id;
   final Client client;
-  final Restaurant restaurant;
+  final Restaurant? restaurant;
   final DateTime datetime;
   final int numberOfGuests;
   final Status status;
@@ -68,18 +70,38 @@ class Reservation {
   }
 
   // methode qui va rechercher les reservations d'un client (Future, car on va chercher dans la DB)
-  static Future<List<Reservation>> getReservations({int? selectedRestaurant = null}) async{
+  static Future<SplayTreeSet<Reservation>> getReservations({int? selectedRestaurant = null}) async{
     String enpoint = 'get_reservations';
     if (selectedRestaurant != null) enpoint += '?restaurant_id=$selectedRestaurant';
     final response = await ApiClient.get(enpoint);
     if (response.statusCode == 200){
       // un user qui n'a pas de reservations, a un response.body == 'null'
-      if (response.body == 'null') return <Reservation>[]; // on retourne liste vide si null
+      if (response.body == 'null') return SplayTreeSet<Reservation>(); // on retourne liste vide si null
       final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
-      return body.map((dynamic reservation) => Reservation.fromJson(reservation)).toList(); // mappage de chaque element de la liste d'objets Json en objet Reservation
+      return SplayTreeSet.of(body.map((dynamic reservation) => Reservation.fromJson(reservation)).toList()); // mappage de chaque element de la liste d'objets Json en objet Reservation
     }
     else {
+      print(response.body);
       throw Exception("Failed to fetch reservations from the database");
+    }
+  }
+
+  static Future<Reservation?> confirmReservation({
+    required int reservationId,
+    required List<int> tablesId,
+  }) async {
+    final response = await ApiClient.post('confirm_reservation',
+      body: json.encode({
+        'reservation_id': reservationId,
+        'tables_id' : tablesId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      return Reservation.fromJson(body);
+    } else {
+      throw Exception('Failed to confirm reservation: ${response.body}');
     }
   }
 
@@ -129,9 +151,28 @@ class Reservation {
       }
     }catch(e,st){
       print(e);
-      throw Exception('Failed to get user');
+      throw Exception('Failed to change reservation status to Canceled');
     }
 
+  }
+
+  // recup reservation pour complete reservation
+
+  Future<Reservation> getCompleted() async{
+    try{
+      final response = await ApiClient.post(
+        'complete_reservation',
+        body:json.encode({'reservation_id' : id})
+      );
+      if(response.statusCode == 200){
+        return Reservation.fromJson(json.decode(response.body));
+      }else{
+        throw Exception('Failed to get reservation');
+      }
+    }catch(e){
+      print(e);
+      throw Exception('Failed to change reservation status to Completed');
+    }
   }
 
   String statusToString(){
@@ -148,9 +189,82 @@ class Reservation {
   }
 
 
+  static Future<DateTime> getFirstAvailableReservationDateTime() async {
+    try {
+      final response = await ApiClient.get("get_first_available_reservation_datetime");
+      if (response.statusCode == 200){
+        final body = json.decode(response.body);
+        return body['first_available_reservation_datetime'];
+      }
+      throw Exception('Failed to get first available reservation datetime\nResponse code : ${response.statusCode}');
+    } catch (e, st){
+      throw Exception("Failed to get first available reservation datetime.");
+    }
+  }
 
   @override
   String toString() {
     return'$id $client $restaurant $datetime $numberOfGuests $status $tables';
+  }
+
+  static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests}) async {
+      final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
+      try {
+        final response = await ApiClient.get('check_service_tables_capacity?number_of_guests=$numberOfGuests&date_of_reservation=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
+        if (response.statusCode != 200) {
+          throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
+        }
+        final body = json.decode(response.body);
+        return body;
+
+      } catch (e, st) {
+        print('$e\n$st');
+        throw Exception('Failed to check capacity.');
+      }
+    }
+
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests,}) async {
+    try {
+      final dateString = DateFormat('yyyy-MM-dd').format(date);
+
+      final parts = slot.split(':');
+
+      final reservationDateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+      );
+      final datetimeString =
+      DateFormat('yyyy-MM-dd HH:mm:ss').format(reservationDateTime);
+
+      final response = await ApiClient.post(
+        'save_reservation',
+        body: json.encode({
+          'restaurant_id': restaurantId,
+          'datetime_': datetimeString,
+          'number_of_guests_': numberOfGuests,
+          'special_requests_': specialRequests,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Reservation.fromJson(body);
+      }
+      throw Exception(
+        'Failed to save reservation. Status code: ${response.statusCode}\nBody: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to save reservation.');
+    }
+  }
+
+  @override
+  int compareTo(Reservation other) {
+    // TODO: implement compareTo
+    return this.datetime.compareTo(other.datetime) == 0 ? other.id.compareTo(this.id) : other.datetime.compareTo(this.datetime);
   }
 }

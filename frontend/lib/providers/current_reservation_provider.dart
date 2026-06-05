@@ -12,9 +12,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/core/tools/abstract_async_notifier.dart';
-import 'package:prbd_2526_a07/providers/auth_provider.dart';
-import 'package:prbd_2526_a07/providers/reservations_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_tables_provider.dart';
 
 import '../models/reservation.dart';
 
@@ -52,13 +51,27 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
     }
   }
 
-  Future<void> cancel()  async{
-    final canceled = await state.value!.getCancel();
-    state = AsyncData(canceled);
-    ref.read(reservationsProvider.notifier).updateList(state.value!);
 
+  Future<void> confirmWithSelectedTables(Set<int> tableIds) async {
+    if (tableIds.isEmpty) {
+      throw Exception('Aucune table sélectionnée');
+    }
+
+    state = AsyncLoading();
+    try {
+      final confirmed = await Reservation.confirmReservation(
+        reservationId: id,
+        tablesId: tableIds.toList(),
+      );
+      state = AsyncData(confirmed);
+
+      ref.read(selectedTableProvider.notifier).clear();
+      await ref.read(reservationsProvider.notifier).refresh();
+    } catch (e, st) {
+      print('$e\n$st');
+      state = AsyncValue.error(e, st);
+    }
   }
-
 }
 
 // a garder pour des raisons pedagogiques
@@ -76,7 +89,3 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
     return null;
   }
 */
-
-
-
-
