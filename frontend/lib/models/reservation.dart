@@ -81,6 +81,7 @@ class Reservation  implements Comparable<Reservation>{
       return SplayTreeSet.of(body.map((dynamic reservation) => Reservation.fromJson(reservation)).toList()); // mappage de chaque element de la liste d'objets Json en objet Reservation
     }
     else {
+      print(response.body);
       throw Exception("Failed to fetch reservations from the database");
     }
   }
