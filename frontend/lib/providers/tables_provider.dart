@@ -62,10 +62,10 @@ class TablesNotifier extends AbstractAsyncNotifier<List<Table>> {
     }
   }
 
-  Future<bool?> is_occupee(int idtable) async {
+  Future<bool?> is_occupee(int idtable, DateTime reservation_datetime) async {
     try {
 
-      bool? response = await Table.is_occupee(idtable: idtable);
+      bool? response = await Table.is_occupee(idtable: idtable, reservation_datetime: reservation_datetime);
       return response;
 
     } catch (e){

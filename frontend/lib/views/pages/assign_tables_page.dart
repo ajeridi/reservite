@@ -47,6 +47,9 @@ class AssignTablesPage extends ConsumerWidget {
     final tableNotifier = ref.read(tablesProvider.notifier);
     final authNotifier = ref.read(authProvider.notifier);
 
+    final selectedTables = ref.watch(selectedTableProvider);
+    final selectedTablesNotifier = ref.read(selectedTableProvider.notifier);
+
     return tablesState.when(
       data: (state) => data(
               context,
@@ -57,6 +60,7 @@ class AssignTablesPage extends ConsumerWidget {
               authNotifier,
               simulatedTime,
               reservation,
+              selectedTablesNotifier
           ),
       error: (err, _) =>
           DataErrorWidget(
@@ -77,6 +81,7 @@ class AssignTablesPage extends ConsumerWidget {
       AuthNotifier authNotifier,
       DateTime? simulatedTime,
       AsyncValue reservation,
+      SelectedTableNotifier selectedTablesNotifier
       ) {
 
     final res = reservation.value;
@@ -157,7 +162,7 @@ class AssignTablesPage extends ConsumerWidget {
                 children: [
                   for (final table in tables)
                     FutureBuilder<bool?>(
-                      future: Table.is_occupee(idtable: table.id),
+                      future: Table.is_occupee(idtable: table.id, reservation_datetime: res.datetime),
                       builder: (context, snapshot) {
                         if (snapshot.data == true) {
                           return assign_table_3_widget(table: table);
@@ -173,7 +178,8 @@ class AssignTablesPage extends ConsumerWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: !selectedTablesNotifier.isOk() ? null :
+                      () async {
                     final reservationId = ref.read(selectedReservationIdProvider);
                     final selected = ref.read(selectedTableProvider);
                     await ref.read(currentReservationProvider(reservationId).notifier).confirmWithSelectedTables(selected);

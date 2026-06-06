@@ -77,14 +77,26 @@ grant execute on function get_table(int) to manager;
     Verifie si la table est déjà occupée ou non
 */
 
-create or replace function is_occupee(idtable int) returns boolean as
+create or replace function is_occupee(idtable int, reservation_datetime timestamp) returns boolean as
 $$
+declare
+    restaurant_id int;
 begin
+        -- on récupère le restaurant de la table
+        select tbl.restaurant into restaurant_id
+        from tables tbl
+        where tbl.id = idtable;
+
     return exists(select rsv_tbl.table
-                  from reservation_tables rsv_tbl
-                  join tables tbl on rsv_tbl.table = tbl.id
-                  where tbl.id = idtable);
+                  from reservation_tables rsv_tbl,
+                       get_service_by_datetime(reservation_datetime::date, reservation_datetime::time, restaurant_id) s,
+                       reservations rsv
+                  where rsv_tbl.table = idtable AND rsv.id = rsv_tbl.reservation
+                    AND (rsv.datetime::time >= s.start_time AND rsv.datetime::time <= s.end_time) /* ::time donne l'h/min/sec (ex: 18:00:00) */
+                    AND rsv.datetime::date = reservation_datetime::date /* ::date donne le jour */
+                    AND rsv.status <> 'cancelled'
+                  );
 end;
 $$ language plpgsql security definer;
 
-grant execute on function is_occupee(int) to manager;
+grant execute on function is_occupee(int, timestamp) to manager;
