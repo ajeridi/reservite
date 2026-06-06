@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
 
+import '../../core/tools/pick_date_time.dart';
+
 class LoginMockupScreen extends ConsumerStatefulWidget {
   const LoginMockupScreen({super.key});
 
@@ -46,9 +48,9 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
     authState.when(
       data: (token) async {
         if (token != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Connecté !')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Connecté !')));
 
           if (await authNotifier.isClient()) {
             Navigator.pushReplacementNamed(context, '/home_client_page');
@@ -61,9 +63,9 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
           }
         }
       },
-      error: (error, _) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $error')),
-      ),
+      error: (error, _) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur: $error'))),
       loading: () {},
     );
   }
@@ -101,16 +103,33 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime!),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
+              //GestureDetector pour detecter la touche
+              child: GestureDetector(
+                onTap: () async {
+                  final newDatetime = await pickDateTime(
+                    context,
+                    initialDate: simulatedTime,
+                  );
+                  if (newDatetime != null) {
+                    //on met à jour le provider avec la nouvelle date
+                    ref
+                        .read(applicationTimeProvider.notifier)
+                        .setTime(newDatetime);
+                  }
+                },
+                child: Tooltip(
+                  message:
+                      'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                  child: Text(
+                    DateFormat(
+                      'EEEE dd/MM/yyyy HH:mm',
+                      'fr_FR',
+                    ).format(simulatedTime!),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
@@ -170,8 +189,8 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: ref.watch(authProvider).isLoading
-                          ? null
-                          : () => _submitForm(context),
+                            ? null
+                            : () => _submitForm(context),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
@@ -179,10 +198,9 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
                       ),
                       const SizedBox(height: 6),
                       TextButton(
-                        onPressed: () => Navigator.pushNamed(context, '/signup'),
-                        child: const Text(
-                          'Pas encore de compte ? S\'inscrire',
-                        ),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/signup'),
+                        child: const Text('Pas encore de compte ? S\'inscrire'),
                       ),
                     ],
                   ),
@@ -216,7 +234,11 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => _login(context, 'brlacroix@epfc.eu', password: 'Password1,'),
+                          onPressed: () => _login(
+                            context,
+                            'brlacroix@epfc.eu',
+                            password: 'Password1,',
+                          ),
                           icon: const Icon(Icons.person),
                           label: const Text('Client (Bruno)'),
                           style: OutlinedButton.styleFrom(
@@ -227,7 +249,11 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => _login(context, 'mamichel@epfc.eu', password: 'Password1,'),
+                          onPressed: () => _login(
+                            context,
+                            'mamichel@epfc.eu',
+                            password: 'Password1,',
+                          ),
                           icon: const Icon(Icons.person),
                           label: const Text('Client (Marc)'),
                           style: OutlinedButton.styleFrom(
@@ -242,7 +268,11 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => _login(context, 'bepenelle@epfc.eu', password: 'Password1,'),
+                          onPressed: () => _login(
+                            context,
+                            'bepenelle@epfc.eu',
+                            password: 'Password1,',
+                          ),
                           icon: const Icon(Icons.manage_accounts),
                           label: const Text('Manager (Benoît)'),
                           style: OutlinedButton.styleFrom(
@@ -253,7 +283,11 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => _login(context, 'gedielman@epfc.eu', password: 'Password1,'),
+                          onPressed: () => _login(
+                            context,
+                            'gedielman@epfc.eu',
+                            password: 'Password1,',
+                          ),
                           icon: const Icon(Icons.manage_accounts),
                           label: const Text('Manager (Geoffrey)'),
                           style: OutlinedButton.styleFrom(
