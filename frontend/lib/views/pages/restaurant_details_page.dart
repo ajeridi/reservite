@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
+import '../../core/tools/pick_date_time.dart';
 import '../../providers/application_time_provider.dart';
 import '../../providers/current_restaurant_provider.dart';
 import '../widgets/restaurant_details_widget.dart';
@@ -66,18 +67,33 @@ class RestaurantDetailsPage extends ConsumerWidget {
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(top: 2.0),
-                child: Tooltip(
-                  message:
-                      'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                  child: Text(
-                    DateFormat(
-                      'EEEE dd/MM/yyyy HH:mm',
-                      'fr_FR',
-                    ).format(simulatedTime),
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.normal,
+                //GestureDetector pour detecter la touche
+                child: GestureDetector(
+                  onTap: () async {
+                    final newDatetime = await pickDateTime(
+                      context,
+                      initialDate: simulatedTime,
+                    );
+                    if (newDatetime != null) {
+                      //on met à jour le provider avec la nouvelle date
+                      ref
+                          .read(applicationTimeProvider.notifier)
+                          .setTime(newDatetime);
+                    }
+                  },
+                  child: Tooltip(
+                    message:
+                        'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                    child: Text(
+                      DateFormat(
+                        'EEEE dd/MM/yyyy HH:mm',
+                        'fr_FR',
+                      ).format(simulatedTime),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey[400],
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   ),
                 ),
