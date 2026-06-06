@@ -6,7 +6,7 @@ import 'package:prbd_2526_a07/models/table.dart';
 import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 
-
+import '../../core/tools/pick_date_time.dart';
 import '../../providers/application_time_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/selected_tables_provider.dart';
@@ -37,11 +37,10 @@ class AssignTablesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = ref
-        .watch(applicationTimeProvider)
-        .value;
+    final simulatedTime = ref.watch(applicationTimeProvider).value;
     final reservation = ref.watch(
-        currentReservationProvider(ref.watch(selectedReservationIdProvider)));
+      currentReservationProvider(ref.watch(selectedReservationIdProvider)),
+    );
 
     final tablesState = ref.watch(tablesProvider);
     final tableNotifier = ref.read(tablesProvider.notifier);
@@ -49,36 +48,34 @@ class AssignTablesPage extends ConsumerWidget {
 
     return tablesState.when(
       data: (state) => data(
-              context,
-              ref,
-              state,
-              tableNotifier,
-              theme,
-              authNotifier,
-              simulatedTime,
-              reservation,
-          ),
-      error: (err, _) =>
-          DataErrorWidget(
-            error: err,
-            stackTrace: StackTrace.current,
-            notifier: tableNotifier,
-          ),
+        context,
+        ref,
+        state,
+        tableNotifier,
+        theme,
+        authNotifier,
+        simulatedTime,
+        reservation,
+      ),
+      error: (err, _) => DataErrorWidget(
+        error: err,
+        stackTrace: StackTrace.current,
+        notifier: tableNotifier,
+      ),
       loading: () => loading(),
     );
   }
 
   Widget data(
-      BuildContext context,
-      WidgetRef ref,
-      List<Table> tables,
-      TablesNotifier tableNotifier,
-      ThemeData theme,
-      AuthNotifier authNotifier,
-      DateTime? simulatedTime,
-      AsyncValue reservation,
-      ) {
-
+    BuildContext context,
+    WidgetRef ref,
+    List<Table> tables,
+    TablesNotifier tableNotifier,
+    ThemeData theme,
+    AuthNotifier authNotifier,
+    DateTime? simulatedTime,
+    AsyncValue reservation,
+  ) {
     final res = reservation.value;
     if (res == null) return const Center(child: CircularProgressIndicator());
 
@@ -110,16 +107,33 @@ class AssignTablesPage extends ConsumerWidget {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime!),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
+              //GestureDetector pour detecter la touche
+              child: GestureDetector(
+                onTap: () async {
+                  final newDatetime = await pickDateTime(
+                    context,
+                    initialDate: simulatedTime,
+                  );
+                  if (newDatetime != null) {
+                    //on met à jour le provider avec la nouvelle date
+                    ref
+                        .read(applicationTimeProvider.notifier)
+                        .setTime(newDatetime);
+                  }
+                },
+                child: Tooltip(
+                  message:
+                      'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                  child: Text(
+                    DateFormat(
+                      'EEEE dd/MM/yyyy HH:mm',
+                      'fr_FR',
+                    ).format(simulatedTime!),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
@@ -136,7 +150,10 @@ class AssignTablesPage extends ConsumerWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: assign_table_4_widget(reservation: reservation.value!, tables: tables,),
+              child: assign_table_4_widget(
+                reservation: reservation.value!,
+                tables: tables,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -174,18 +191,29 @@ class AssignTablesPage extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    final reservationId = ref.read(selectedReservationIdProvider);
+                    final reservationId = ref.read(
+                      selectedReservationIdProvider,
+                    );
                     final selected = ref.read(selectedTableProvider);
-                    await ref.read(currentReservationProvider(reservationId).notifier).confirmWithSelectedTables(selected);
+                    await ref
+                        .read(
+                          currentReservationProvider(reservationId).notifier,
+                        )
+                        .confirmWithSelectedTables(selected);
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Réservation confirmée avec les tables assignées'),
+                        content: Text(
+                          'Réservation confirmée avec les tables assignées',
+                        ),
                         backgroundColor: Colors.green,
                       ),
                     );
 
-                    Navigator.pushReplacementNamed(context, '/manager_reservations_page');
+                    Navigator.pushReplacementNamed(
+                      context,
+                      '/manager_reservations_page',
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),

@@ -10,6 +10,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/filtered_reservati
 import 'package:prbd_2526_a07/views/widgets/reservation_widget.dart';
 
 import '../../core/tools/my_provider_observer.dart';
+import '../../core/tools/pick_date_time.dart';
 import '../../models/reservation.dart';
 import '../../providers/reservation_providers/reservations_provider.dart';
 import '../widgets/data_error_widget.dart';
@@ -60,21 +61,16 @@ class HomeClientPage extends ConsumerWidget {
     final simulatedTime = ref.watch(applicationTimeProvider);
 
     return reservationsState.when(
-      data: (state) => data(
-        context,
-        state,
-        reservationNotifier,
-        theme,
-        filteredReservationsState,
-        filteredReservationsNotifier,
-        authNotifier,
-        simulatedTime,
+      data: (state) => simulatedTime.when(                    // ✅ imbrique
+        data: (time) => data(
+          context, state, reservationNotifier, theme,
+          filteredReservationsState, filteredReservationsNotifier,
+          authNotifier, time,ref,                                 // ✅ time = DateTime
+        ),
+        error: (e, _) => DataErrorWidget(error: e, notifier: reservationNotifier),
+        loading: () => const Center(child: CircularProgressIndicator()),
       ),
-      error: (err, _) => DataErrorWidget(
-        error: err,
-        stackTrace: StackTrace.current,
-        notifier: reservationNotifier,
-      ),
+      error: (err, _) => DataErrorWidget(error: err, stackTrace: StackTrace.current, notifier: reservationNotifier),
       loading: () => loading(),
     );
   }
@@ -87,7 +83,8 @@ class HomeClientPage extends ConsumerWidget {
     SplayTreeSet<Reservation> filteredReservationsState,
     FilteredReservationsNotifier filteredReservationsNotifier,
     AuthNotifier authNotifier,
-    AsyncValue<DateTime> simulatedTime,
+    DateTime simulatedTime,
+    WidgetRef ref
   ) {
     return Scaffold(
       appBar: AppBar(
@@ -128,16 +125,30 @@ class HomeClientPage extends ConsumerWidget {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  '${DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                                .format(simulatedTime.value!)}',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
+              //GestureDetector pour detecter la touche
+              child: GestureDetector(
+                onTap: () async {
+                  final newDatetime = await pickDateTime(
+                    context,
+                    initialDate: simulatedTime,
+                  );
+                  if (newDatetime != null) {
+                    //on met à jour le provider avec la nouvelle date
+                    ref
+                        .read(applicationTimeProvider.notifier)
+                        .setTime(newDatetime);
+                  }
+                },
+                child: Tooltip(
+                  message:
+                      'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                  child: Text(
+                    '${DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR').format(simulatedTime)}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
