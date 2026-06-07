@@ -12,6 +12,7 @@ import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_widget.dart';
 
 import '../../core/tools/my_provider_observer.dart';
+import '../../core/tools/pick_date_time.dart';
 import '../../models/reservation.dart';
 import '../../providers/application_time_provider.dart';
 import '../../providers/reservation_providers/reservations_provider.dart';
@@ -47,8 +48,12 @@ class ManagerReservationsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final idRestaurant = ref.watch(selectedRestaurantProvider); // recherche l'id du restaurant sélectionné
-    final restaurantState = ref.watch(currentRestaurantProvider(idRestaurant)); // recherche du nom grâce à l'id
+    final idRestaurant = ref.watch(
+      selectedRestaurantProvider,
+    ); // recherche l'id du restaurant sélectionné
+    final restaurantState = ref.watch(
+      currentRestaurantProvider(idRestaurant),
+    ); // recherche du nom grâce à l'id
 
     // etat de connexion
     final authState = ref.watch(authProvider);
@@ -64,13 +69,13 @@ class ManagerReservationsPage extends ConsumerWidget {
     //observation du provider de la application_time
     final applicationTime = ref.watch(applicationTimeProvider);
 
-
-// Il faut imbriquer le .when() de applicationTime autour du reservationsState.when()
+    // Il faut imbriquer le .when() de applicationTime autour du reservationsState.when()
     return reservationsState.when(
       data: (state) => applicationTime.when(
         data: (simulatedTime) => data(
           context,
           state,
+          ref,
           reservationNotifier,
           theme,
           filteredReservationsState,
@@ -79,10 +84,8 @@ class ManagerReservationsPage extends ConsumerWidget {
           restaurantState,
           simulatedTime,
         ),
-        error: (e, _) => DataErrorWidget(
-          error: e,
-          notifier: reservationNotifier,
-        ),
+        error: (e, _) =>
+            DataErrorWidget(error: e, notifier: reservationNotifier),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       error: (err, _) => DataErrorWidget(
@@ -97,12 +100,14 @@ class ManagerReservationsPage extends ConsumerWidget {
   Widget data(
     BuildContext context,
     SplayTreeSet<Reservation> reservations,
+    WidgetRef ref,
     ReservationsNotifier notifier,
     ThemeData theme,
     SplayTreeSet<Reservation> filteredReservationsState,
     FilteredReservationsNotifier filteredReservationsNotifier,
-    AuthNotifier authNotifier, AsyncValue<Restaurant> restaurantState,
-      DateTime simulatedTime,
+    AuthNotifier authNotifier,
+    AsyncValue<Restaurant> restaurantState,
+    DateTime simulatedTime,
   ) {
     return Scaffold(
       appBar: AppBar(
@@ -112,7 +117,10 @@ class ManagerReservationsPage extends ConsumerWidget {
             Navigator.pushReplacementNamed(context, '/my_restaurants_page');
           },
         ),
-        title: restaurantState.whenData((restaurant) => Text(restaurant.name)).value, // https://stackoverflow.com/questions/67552886/futureprovider-using-whendata-shorthand
+        title: restaurantState
+            .whenData((restaurant) => Text(restaurant.name))
+            .value,
+        // https://stackoverflow.com/questions/67552886/futureprovider-using-whendata-shorthand
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -132,15 +140,33 @@ class ManagerReservationsPage extends ConsumerWidget {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR').format(simulatedTime),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
+              //GestureDetector pour detecter la touche
+              child: GestureDetector(
+                onTap: () async {
+                  final newDatetime = await pickDateTime(
+                    context,
+                    initialDate: simulatedTime,
+                  );
+                  if (newDatetime != null) {
+                    //on met à jour le provider avec la nouvelle date
+                    ref
+                        .read(applicationTimeProvider.notifier)
+                        .setTime(newDatetime);
+                  }
+                },
+                child: Tooltip(
+                  message:
+                      'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                  child: Text(
+                    DateFormat(
+                      'EEEE dd/MM/yyyy HH:mm',
+                      'fr_FR',
+                    ).format(simulatedTime),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
