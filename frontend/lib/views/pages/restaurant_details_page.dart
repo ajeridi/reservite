@@ -40,7 +40,7 @@ class RestaurantDetailsPage extends ConsumerWidget {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/my_restaurants_page');
+              Navigator.pop(context);
             },
           ),
           title: const Text('Détails du restaurant'),

@@ -261,7 +261,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
                   // comme c'est la creation d'une nouvelle reservation, il faut set le selected_reservation_id a 0
                   selectedReservationIdNotifier.set(0);
                   // redirection vers la page de creation/edition d'une reservation
-                  Navigator.pushReplacementNamed(context, '/reservation_form_page');
+                  Navigator.pushNamed(context, '/reservation_form_page');
                 },
                 icon: const Icon(Icons.add),
                 label: const Text('Réserver'),

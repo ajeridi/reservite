@@ -109,7 +109,7 @@ class ManagerReservationsPage extends ConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/my_restaurants_page');
+            Navigator.pop(context);
           },
         ),
         title: restaurantState.whenData((restaurant) => Text(restaurant.name)).value, // https://stackoverflow.com/questions/67552886/futureprovider-using-whendata-shorthand

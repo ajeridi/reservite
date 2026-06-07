@@ -74,7 +74,7 @@ class ReservationFormPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             // retour a search_restaurant
-            Navigator.pushReplacementNamed(context, '/search_restaurants_page');
+            Navigator.pop(context);
           },
         ),
         title: const Text('Nouvelle réservation'),

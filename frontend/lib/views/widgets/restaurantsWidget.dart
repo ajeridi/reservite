@@ -81,7 +81,7 @@ class RestaurantCard extends ConsumerWidget {
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
           selectedRestaurantNotifier.setValue(restaurant.id);
-          Navigator.pushReplacementNamed(
+          Navigator.pushNamed(
             context,
             (userRole.value == 'manager'
                 ? '/manager_reservations_page'
