@@ -122,10 +122,11 @@ class ReservationFormPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  currentRestaurantState.value!.name,
+                currentRestaurantState.whenData((resto) =>
+                Text(resto.name,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                )
+                ).value!,
                 const SizedBox(height: 24),
                 DatePickerReservation(),
                 const Divider(),
