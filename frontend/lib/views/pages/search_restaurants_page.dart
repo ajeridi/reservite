@@ -129,6 +129,7 @@ class _SearchRestaurantsScreenState extends ConsumerState<SearchRestaurantsScree
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacementNamed(context, '/home_client_page');
+           searchBarNot.clearString();
           },
         ),
         title: const Text('Rechercher un restaurant'),
@@ -140,6 +141,7 @@ class _SearchRestaurantsScreenState extends ConsumerState<SearchRestaurantsScree
             onPressed: () {
               print(search);
               filterRestoNotifier.refresh(search);
+
             },
           ),
         ],

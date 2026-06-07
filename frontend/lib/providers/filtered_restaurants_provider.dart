@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
+import 'package:prbd_2526_a07/providers/search_bar_provider.dart';
 
 final filteredRestaurantsProvider =
   NotifierProvider<FilteredRestaurantsNotifier, SplayTreeSet<Restaurant>>(() => FilteredRestaurantsNotifier(),);
@@ -15,8 +16,10 @@ class FilteredRestaurantsNotifier extends Notifier<SplayTreeSet<Restaurant>>{
   SplayTreeSet<Restaurant> build() {
     final restaurants = ref.watch(restaurantProvider);
 
+    final searchBar = ref.watch(searchBarProvider);
+
     //retourne seulement quand restaurants a des data
-    return restaurants.when(data: (data){ return getFilteredRestaurants(data, '');},
+    return restaurants.when(data: (data){ return getFilteredRestaurants(data, searchBar);},
         error: (err,_) =>SplayTreeSet<Restaurant>(),
         loading: () => SplayTreeSet<Restaurant>());
   }

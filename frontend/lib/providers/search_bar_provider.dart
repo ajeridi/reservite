@@ -13,5 +13,9 @@ class SearchBarNotifier extends Notifier<String> {
   void setString(String s){
     state = s;
   }
+
+  void clearString(){
+    state ="";
+  }
 }
 
