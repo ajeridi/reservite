@@ -1,23 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_provider.dart';
 
-class ReservationSlotWidget extends StatelessWidget {
+class ReservationSlotWidget extends ConsumerWidget {
   const ReservationSlotWidget({
     super.key,
     required this.theme,
     required this.slot,
-    required this.selectedSlotNotifier,
-    this.selected = false,
   });
 
   final ThemeData theme;
   final String slot;
-  final bool selected;
-  final SelectedSlotNotifier selectedSlotNotifier;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    //recherche du slot selectionne pour savoir si faut highlight ou pas
+    final selectedSlotState = ref.watch(selectedSlotProvider);
+    final selectedSlotNotifier = ref.read(selectedSlotProvider.notifier);
+    final selected = selectedSlotState == slot;
+
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
@@ -43,7 +47,7 @@ class ReservationSlotWidget extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            slot,
+            DateFormat('HH:mm', 'fr_FR',).format(DateTime.parse("00000000 $slot")),
             style: TextStyle(
               color: selected
                   ? theme.colorScheme.onPrimary
