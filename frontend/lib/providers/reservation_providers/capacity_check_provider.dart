@@ -34,6 +34,7 @@ class CapacityCheckNotifier extends AsyncNotifier<bool> {
       date: selectedReservationDate,
       slot: selectedSlot,
       numberOfGuests: numberOfGuests,
+      reservation_id: selectedReservationId
     );
   }
 }

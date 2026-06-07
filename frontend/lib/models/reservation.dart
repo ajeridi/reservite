@@ -207,14 +207,14 @@ class Reservation  implements Comparable<Reservation>{
     return'$id $client $restaurant $datetime $numberOfGuests $status $tables';
   }
 
-  static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests}) async {
+  static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, required int reservation_id}) async {
       final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
       print("$restaurantId");
       print("$date");
       print("$slot");
       print("$numberOfGuests");
       try {
-        final response = await ApiClient.get('check_capacity?nombre_convive=$numberOfGuests&date_simulee=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
+        final response = await ApiClient.get('check_capacity?nombre_convive=$numberOfGuests&date_simulee=$dateString&time_slot=$slot&restaurant_id=$restaurantId&reservation_id=$reservation_id');
         if (response.statusCode != 200) {
           throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
         }
@@ -227,7 +227,7 @@ class Reservation  implements Comparable<Reservation>{
       }
     }
 
-  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests,}) async {
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int reservation_id}) async {
     try {
       final dateString = DateFormat('yyyy-MM-dd').format(date);
 
@@ -250,6 +250,7 @@ class Reservation  implements Comparable<Reservation>{
           'datetime_': datetimeString,
           'number_of_guests_': numberOfGuests,
           'special_requests_': specialRequests,
+          'reservation_id' : reservation_id == 0 ? null : reservation_id,
         }),
       );
 

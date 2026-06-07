@@ -76,7 +76,13 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
 
   Future<Reservation> saveReservation({required DateTime selectedDate, required String selectedSlot, required int numberOfGuests, required bool capacityCheck, String? specialRequest,}) async {
     // recherche de toutes les donnes entree par l'utilisateur via les providers
-    final restaurantId = ref.read(selectedRestaurantProvider);
+    var restaurantId = ref.read(selectedRestaurantProvider);
+
+    var reservationId = ref.read(selectedReservationIdProvider);
+
+    if (restaurantId == 0) {
+      restaurantId = state.value!.restaurant!.id;
+    }
 
     // dernieres validations
     if (selectedSlot == null) {
@@ -92,12 +98,13 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
       slot: selectedSlot,
       numberOfGuests: numberOfGuests,
       specialRequests: specialRequest!.isEmpty ? null : specialRequest,
+      reservation_id: reservationId
     );
 
     state = AsyncData(savedReservation);
 
     // mettre a jour directement la liste soit en ajoutant si nouvelle reseravation, soit en supprimant et en rajoutant la nouvelle
-    ref.read(reservationsProvider.notifier).addOrUpdateReservation(savedReservation);
+    ref.read(reservationsProvider.notifier).updateListAfterEdit(savedReservation);
 
     return savedReservation;
   }

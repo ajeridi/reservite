@@ -16,6 +16,7 @@ import 'package:prbd_2526_a07/views/widgets/date_time_picker_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
 import '../../providers/reservation_providers/capacity_check_provider.dart';
+import '../../providers/reservation_providers/reservations_provider.dart';
 import '../../providers/reservation_providers/selected_slot_provider.dart';
 import '../widgets/available_slots_widget.dart';
 import '../widgets/edit_reservation_description.dart';
@@ -175,7 +176,7 @@ class EditReservationFormPage extends ConsumerWidget {
                         capacityCheck: capacityCheckState.value!,
                         specialRequest: specialRequestsState);
                     Navigator.pushReplacementNamed(
-                        context, '/home_client_page');
+                        context, '/reservation_details_client_page');
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),

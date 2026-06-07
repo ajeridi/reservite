@@ -32,6 +32,7 @@ class _EditReservationDescriptionState extends ConsumerState<EditReservationDesc
         hintText: 'Allergies, préférences...',
       ),
       validator: specialRequestsNotifier.validate,
+      controller: editingController,
       onChanged: specialRequestsNotifier.setSpecialRequest,
       maxLines: 3,
     );

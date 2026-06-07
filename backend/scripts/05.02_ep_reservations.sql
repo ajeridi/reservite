@@ -220,7 +220,7 @@ begin
             number_of_guests = number_of_guests_,
             special_requests = special_requests_
         WHERE client = auth.id()
-          AND restaurant = restaurant_id;
+          AND id = reservation_id;
     end if;
     return get_reservation(updated_reservation_id);
 end;
@@ -444,7 +444,7 @@ create or replace function get_service_by_datetime(service_date date, time_slot 
     $$ language sql security definer;
 
 
-create or replace function check_capacity(nombre_convive int, date_simulee date, time_slot time, restaurant_id int)
+create or replace function check_capacity(nombre_convive int, date_simulee date, time_slot time, restaurant_id int, reservation_id int DEFAULT 0)
     returns bool as
     $$
     declare
@@ -457,10 +457,11 @@ create or replace function check_capacity(nombre_convive int, date_simulee date,
                 where restaurant_id = reservations.restaurant -- restaurant actuel
                     AND (reservations.status = 'pending' OR reservations.status = 'confirmed') -- on somme aussi les pendings ou confirmed
                     AND reservations.datetime::time between s.start_time and s.end_time -- l'heure actuelle doit etre compris dans le service qui a été get dans le from
-                    AND reservations.datetime::date = date_simulee) -- pour le même jour (on veut pas que ca calcule aussi pour semaine pro)
+                    AND reservations.datetime::date = date_simulee -- pour le même jour (on veut pas que ca calcule aussi pour semaine pro)
+                    AND reservations.id <> reservation_id) -- si je veux modifier moi-même pour éviter erreur
                 + nombre_convive) <= capacite_max;
     end;
     $$ language plpgsql security definer;
 
 grant execute on function get_service_by_datetime(date, time, int) to client;
-grant execute on function check_capacity(int, date, time, int) to client;
+grant execute on function check_capacity(int, date, time, int, int) to client;
