@@ -17,10 +17,10 @@ class AvailableSlots{
     );
   }
 
-  static Future<AvailableSlots> getAvailableSlots(int restaurantId, DateTime date) async {
+  static Future<AvailableSlots> getAvailableSlots(int restaurantId, DateTime date, int ?reservationId) async {
       final dateString =  DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
       try{
-        final response = await ApiClient.get("get_available_slots?restaurant_id=${restaurantId}&date_of_reservation=$dateString");
+        final response = await ApiClient.get("get_available_slots?restaurant_id=${restaurantId}&date_of_reservation=$dateString&reservation_id=$reservationId");
         if (response.statusCode != 200){
           throw Exception("Failed to get available slots from database.\nStatus Code: ${response.statusCode}");
         }

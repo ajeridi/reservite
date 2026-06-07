@@ -209,8 +209,12 @@ class Reservation  implements Comparable<Reservation>{
 
   static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests}) async {
       final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
+      print("$restaurantId");
+      print("$date");
+      print("$slot");
+      print("$numberOfGuests");
       try {
-        final response = await ApiClient.get('check_service_tables_capacity?number_of_guests=$numberOfGuests&date_of_reservation=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
+        final response = await ApiClient.get('check_capacity?nombre_convive=$numberOfGuests&date_simulee=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
         if (response.statusCode != 200) {
           throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
         }

@@ -3,10 +3,10 @@ POST http://localhost:3000/rpc/login
 Content-Type: application/json
 
 {
-  "email" : "xapigeolet@reservite.com",
+  "email" : "brlacroix@reservite.com",
   "password" : "Password1,"
 }
 
 ### recuperation des creneaux disponibles
-GET http://localhost:3000/rpc/get_available_slots?restaurant_id=1&date_of_reservation=2024-11-15
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc4MDU4NDE0NX0.fiufgt7EIUZJnz5NfgjX8HhKmDv-S2xaZlUryfBMPLQ
+GET http://localhost:3000/rpc/get_available_slots?restaurant_id=3&date_of_reservation=2024-12-04&reservation_id=23
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoiYnJsYWNyb2l4QGVwZmMuZXUiLCJuYW1lIjoiQnJ1bm8iLCJ1c2VyX2lkIjo2LCJleHAiOjE3ODA5NDY3NzN9.TEL85sCg8lV4Yt2U-JC22SPPK3k6SurI1MLohbprV7M

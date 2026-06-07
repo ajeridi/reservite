@@ -347,13 +347,13 @@ create or replace function services_containing_reservations(date_of_reservation 
     select s.id
     from services s join restaurants rst on s.restaurant = rst.id
                     join reservations rsv on rsv.restaurant = rst.id
-    where   rsv.client = 6 and -- les reservations qui ont comme client l'utilisateur connecte
+    where   rsv.client = auth.id() and -- les reservations qui ont comme client l'utilisateur connecte
             rsv.datetime::date = date_of_reservation and -- qui sont a la date de selectionnee
             s.day_of_week = extract(isodow from date_of_reservation::date) and  -- les services du jour de la reservation
             rsv.datetime::time between s.start_time and s.end_time; -- dont la reservation se trouve dans ce service
     $$ language sql security definer;
 
-
+grant execute on function services_containing_reservations(date) to client;
 
 create or replace function get_available_slots(restaurant_id int, date_of_reservation date, reservation_id int DEFAULT 0) returns json as
 $$
@@ -377,7 +377,7 @@ begin
             WHERE   s.restaurant = restaurant_id AND
                     s.day_of_week = reservation_dow AND
                     -- et qui ne contient pas une reservation existante dans le cas d'une nouvelle reservation
-                    (reservation_id != 0 OR
+                    (reservation_id != 0 OR -- edit
                     reservation_id = 0 AND  s.id not in (select services_containing_reservations(date_of_reservation))) -- liste des services contenant une reservation du client pour le meme jour
             LOOP
                 -- pour chacun des services calculer les heures de reservations
@@ -444,33 +444,23 @@ create or replace function get_service_by_datetime(service_date date, time_slot 
     $$ language sql security definer;
 
 
-create or replace function get_occupied_tables(date_of_reservation date, time_slot time, restaurant_id int)
-    returns table(id int) as
-    $$
-        select distinct rt."table" as id
-        from reservation_tables rt
-                 join reservations r on r.id = rt.reservation
-                 join get_service_by_datetime(date_of_reservation,time_slot,restaurant_id) s
-                      on r.datetime::time >= s.start_time
-                          and r.datetime::time < s.end_time
-        where r.restaurant = restaurant_id
-          and r.datetime::date = date_of_reservation
-          and r.status <> 'cancelled';
-    $$ language sql security definer;
-
-create or replace function check_service_tables_capacity(number_of_guests int, date_of_reservation date, time_slot time, restaurant_id int)
+create or replace function check_capacity(nombre_convive int, date_simulee date, time_slot time, restaurant_id int)
     returns bool as
-$$
-select coalesce(sum(t.capacity), 0) >= number_of_guests
-from tables t
-where t.restaurant = restaurant_id
-  and not exists (
-    select 1
-    from get_occupied_tables(date_of_reservation,time_slot,restaurant_id) ot
-    where ot.id = t.id
-);
-$$ language sql security definer;
+    $$
+    declare
+        capacite_max int := (select sum(t.capacity)
+                                 from tables t
+                                 where t.restaurant = restaurant_id);
+    begin
+        return ((select coalesce(sum(reservations.number_of_guests), 0)
+                from reservations, restaurants, tables t, get_service_by_datetime(datetime::date, time_slot, restaurant_id) as s
+                where restaurant_id = reservations.restaurant -- restaurant actuel
+                    AND (reservations.status = 'pending' OR reservations.status = 'confirmed') -- on somme aussi les pendings ou confirmed
+                    AND reservations.datetime::time between s.start_time and s.end_time -- l'heure actuelle doit etre compris dans le service qui a été get dans le from
+                    AND reservations.datetime::date = date_simulee) -- pour le même jour (on veut pas que ca calcule aussi pour semaine pro)
+                + nombre_convive) <= capacite_max;
+    end;
+    $$ language plpgsql security definer;
 
 grant execute on function get_service_by_datetime(date, time, int) to client;
-grant execute on function get_occupied_tables(date, time, int) to client;
-grant execute on function check_service_tables_capacity(int, date, time, int) to client;
+grant execute on function check_capacity(int, date, time, int) to client;

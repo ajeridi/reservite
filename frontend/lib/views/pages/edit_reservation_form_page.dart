@@ -17,6 +17,9 @@ import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
 import '../../providers/reservation_providers/capacity_check_provider.dart';
 import '../../providers/reservation_providers/selected_slot_provider.dart';
+import '../widgets/available_slots_widget.dart';
+import '../widgets/edit_reservation_description.dart';
+import '../widgets/warning_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -38,30 +41,35 @@ class EditReservationFormPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = ref.watch(applicationTimeProvider).value;
+    final simulatedTime = ref
+        .watch(applicationTimeProvider)
+        .value;
 
     // on a besoin du restaurant dans lequel on effectue la reservation
     final selectedRestaurantId = ref.read(selectedRestaurantProvider);
-    final currentRestaurantState = ref.watch(currentRestaurantProvider(selectedRestaurantId));
+    final currentRestaurantState = ref.watch(
+        currentRestaurantProvider(selectedRestaurantId));
 
     // on va chercher la reservation courante (donc si elle est nouvelle elle aura un id de 0)
     final selectedReservationId = ref.read(selectedReservationIdProvider);
-    final currentReservationState = ref.watch(currentReservationProvider(selectedReservationId));
-    final currentReservationNotifier = ref.read(currentReservationProvider(selectedReservationId).notifier);
+    final currentReservationState = ref.watch(
+        currentReservationProvider(selectedReservationId));
+    final currentReservationNotifier = ref.read(
+        currentReservationProvider(selectedReservationId).notifier);
 
-    final selectedReservationDateState = ref.watch(selectedReservationDateProvider);
+    final selectedReservationDateState = ref.watch(
+        selectedReservationDateProvider);
 
     // on  va chercher les crenaux disponibles
     final availableSlotsState = ref.watch(availableSlotsProvider);
     final selectedSlot = ref.watch(selectedSlotProvider);
     final selectedSlotNotifier = ref.read(selectedSlotProvider.notifier);
     //on regarde l'etat de la validation de la capacite
-    final  numberOfGuestsState = ref.watch(numberOfGuestsProvider);
+    final numberOfGuestsState = ref.watch(numberOfGuestsProvider);
     final capacityCheckState = ref.watch(capacityCheckProvider);
     //notifier du special_request pour les validations
     final specialRequestsNotifier = ref.watch(specialRequestProvider.notifier);
     final specialRequestsState = ref.watch(specialRequestProvider);
-
 
 
     return Scaffold(
@@ -70,7 +78,8 @@ class EditReservationFormPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             // retour a search_restaurant
-            Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
+            Navigator.pushReplacementNamed(
+                context, '/reservation_details_client_page');
           },
         ),
         title: const Text('Modifier une réservation'),
@@ -118,10 +127,12 @@ class EditReservationFormPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ?currentRestaurantState.whenData((e) => Text(
-                  e.name,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                )).value,
+                currentReservationState.whenData((e) =>
+                    Text(
+                      e!.restaurant!.name,
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    )).value!,
                 const SizedBox(height: 24),
                 DatePickerReservation(),
                 const Divider(),
@@ -131,25 +142,12 @@ class EditReservationFormPage extends ConsumerWidget {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
-                availableSlotsState.when(
-                  loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => Text('Erreur: $error'),
-                  data: (availableSlots) {
-                    return Wrap(
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      children: showSlots(availableSlots,
-                        theme,
-                        selectedSlot,
-                        selectedSlotNotifier, ),
-                    );
-                  },
-                ),
+                AvailableSlotsWidget(),
                 const SizedBox(height: 24),
                 const NumberOfGuestsWidget(),
                 capacityCheckState.when(
-                  loading: () => const SizedBox.shrink(), // pour enlever l'espace pris
+                  loading: () => const SizedBox.shrink(),
+                  // pour enlever l'espace pris
                   error: (error, stack) => Text('Erreur capacité: $error'),
                   data: (hasEnoughCapacity) {
                     if (hasEnoughCapacity) {
@@ -165,86 +163,30 @@ class EditReservationFormPage extends ConsumerWidget {
                   },
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Demandes spéciales (optionnel)',
-                    border: OutlineInputBorder(),
-                    hintText: 'Allergies, préférences...',
-                  ),
-                  validator: specialRequestsNotifier.validate,
-                  onChanged: specialRequestsNotifier.setSpecialRequest,
-                  maxLines: 3,
-                ),
+                EditReservationDescription(specialRequestsNotifier: specialRequestsNotifier),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
                   onPressed: () async {
-                    final savedReseravation = await currentReservationNotifier.saveReservation(
+                    final savedReseravation = await currentReservationNotifier
+                        .saveReservation(
                         selectedDate: selectedReservationDateState.value!,
                         selectedSlot: selectedSlot!,
                         numberOfGuests: numberOfGuestsState,
                         capacityCheck: capacityCheckState.value!,
                         specialRequest: specialRequestsState);
-                    Navigator.pushReplacementNamed(context, '/home_client_page');
+                    Navigator.pushReplacementNamed(
+                        context, '/home_client_page');
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Créer la réservation'),
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Modifier la réservation'),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  List<Widget> showSlots(
-      AvailableSlots availableSlots,
-      ThemeData theme,
-      String? selectedSlot,
-      SelectedSlotNotifier selectedSlotNotifier,) {
-    final slotsWidgets = <Widget>[];
-    final slots = availableSlots.slots ?? [];
-
-    if (slots.isEmpty && availableSlots.error != null) {
-      return [WarningWidget(error: availableSlots.error!)];
-    }
-
-    for (var slot in availableSlots.slots!) {
-      slotsWidgets.add(ReservationSlotWidget(theme: theme, slot: slot, selected: selectedSlot == slot, selectedSlotNotifier: selectedSlotNotifier, ));
-    }
-
-    return slotsWidgets;
-  }
-}
-
-class WarningWidget extends StatelessWidget {
-  const WarningWidget({super.key, required this.error});
-
-  final String? error;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.orange.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.orange),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.warning, color: Colors.orange),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              error!,
-              style: TextStyle(color: Colors.orange, fontSize: 13),
-            ),
-          ),
-        ],
       ),
     );
   }

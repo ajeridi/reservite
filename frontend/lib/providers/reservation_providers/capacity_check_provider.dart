@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_provider.dart';
 
 import '../../models/reservation.dart';
@@ -16,7 +18,9 @@ class CapacityCheckNotifier extends AsyncNotifier<bool> {
   Future<bool> build() async {
     final numberOfGuests = ref.watch(numberOfGuestsProvider);
     final selectedSlot = ref.watch(selectedSlotProvider);
-    final selectedRestaurantId = ref.watch(selectedRestaurantProvider);
+
+    final selectedReservationId = ref.read(selectedReservationIdProvider);
+    final currentRestaurant = ref.watch(currentReservationProvider(selectedReservationId)).value!.restaurant!.id;
 
     final selectedReservationDate =
     await ref.watch(selectedReservationDateProvider.future);
@@ -26,7 +30,7 @@ class CapacityCheckNotifier extends AsyncNotifier<bool> {
     }
 
     return Reservation.checkCapacity(
-      restaurantId: selectedRestaurantId,
+      restaurantId: currentRestaurant,
       date: selectedReservationDate,
       slot: selectedSlot,
       numberOfGuests: numberOfGuests,

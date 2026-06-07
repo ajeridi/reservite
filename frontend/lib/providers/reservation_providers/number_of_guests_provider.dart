@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 
 final numberOfGuestsProvider =
 NotifierProvider<NumberOfGuestsNotifier, int>(
@@ -8,7 +10,10 @@ NotifierProvider<NumberOfGuestsNotifier, int>(
 class NumberOfGuestsNotifier extends Notifier<int> {
   @override
   int build() {
-    return 2;
+    final selectedReservationId = ref.read(selectedReservationIdProvider);
+    final currentReservation = ref.watch(currentReservationProvider(selectedReservationId));
+
+    return currentReservation.value!.numberOfGuests;
   }
 
   void increment() {

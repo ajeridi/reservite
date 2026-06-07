@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/available_slots.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
@@ -18,12 +20,14 @@ class AvailableSlotsNotifier extends AsyncNotifier<AvailableSlots> {
     final selectedReservationDate =
     await ref.watch(selectedReservationDateProvider.future);
 
-    final selectedRestaurantId = ref.watch(selectedRestaurantProvider);
+    final selectedReservationId = ref.watch(selectedReservationIdProvider);
+    final idRestaurantFromReservation = ref.watch(currentReservationProvider(selectedReservationId)).value?.restaurant?.id;
 
     try {
       final availableSlots = await AvailableSlots.getAvailableSlots(
-        selectedRestaurantId,
+        idRestaurantFromReservation!,
         selectedReservationDate,
+        selectedReservationId
       );
 
       final slots = availableSlots.slots ?? [];

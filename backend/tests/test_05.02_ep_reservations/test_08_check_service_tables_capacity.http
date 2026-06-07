@@ -1,0 +1,12 @@
+### connection d'un client
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "brlacroix@reservite.com",
+  "password" : "Password1,"
+}
+
+### recuperation des creneaux disponibles
+GET http://localhost:3000/rpc/check_capacity?nombre_convive=8&date_simulee=2024-12-04&time_slot=18:00:00&restaurant_id=3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoiYnJsYWNyb2l4QGVwZmMuZXUiLCJuYW1lIjoiQnJ1bm8iLCJ1c2VyX2lkIjo2LCJleHAiOjE3ODA5NTIwNzd9._WjfEBWQFz8yy7d9-nvM7NHerUei-LMir6g4GPXUX10
