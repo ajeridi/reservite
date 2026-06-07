@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/filtered_restaurants_provider.dart';
+import 'package:prbd_2526_a07/providers/search_bar_provider.dart';
 
 import '../../core/tools/my_provider_observer.dart';
 import '../../core/tools/pick_date_time.dart';
@@ -26,19 +27,42 @@ void main() async {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
-        home: const SearchRestaurantsScreen(),
+        home:  SearchRestaurantsScreen(),
       ),
     ),
   );
 }
 
-String search = '';
-
-class SearchRestaurantsScreen extends ConsumerWidget {
-  const SearchRestaurantsScreen({super.key});
+class SearchRestaurantsScreen extends ConsumerStatefulWidget{
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SearchRestaurantsScreen> createState() => _SearchRestaurantsScreenState();
+
+
+}
+// pour stocker ce qu'il est tapé dans le search_bar
+String search = '';
+
+class _SearchRestaurantsScreenState extends ConsumerState<SearchRestaurantsScreen> {
+  late TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    //init du controller avec la valeur du provider
+    _searchController = TextEditingController(text: ref.read(searchBarProvider));
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose(); //il faut tjr disposer un controller
+    super.dispose();
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final applicationTime = ref.watch(applicationTimeProvider);
 
@@ -47,6 +71,9 @@ class SearchRestaurantsScreen extends ConsumerWidget {
 
     final filterRestaurantState = ref.watch(filteredRestaurantsProvider);
     final filterRestoNotifier = ref.read(filteredRestaurantsProvider.notifier);
+
+    final searchBarState = ref.watch(searchBarProvider);
+    final searchBarNot =ref.read(searchBarProvider.notifier);
 
     return asyncState.when(
       data: (state) => applicationTime.when(
@@ -60,6 +87,8 @@ class SearchRestaurantsScreen extends ConsumerWidget {
           filterRestoNotifier,
           context,
           ref,
+          searchBarNot,
+            searchBarState,
         ),
         error: (e, _) => DataErrorWidget(error: e, notifier: notifier),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -78,6 +107,8 @@ class SearchRestaurantsScreen extends ConsumerWidget {
         filterRestoNotifier,
         context,
         ref,
+        searchBarNot,
+        searchBarState
       ),
     );
   }
@@ -90,7 +121,7 @@ class SearchRestaurantsScreen extends ConsumerWidget {
     SplayTreeSet<Restaurant> filterRestaurantState,
     FilteredRestaurantsNotifier filterRestoNotifier,
     BuildContext context,
-      WidgetRef ref,
+      WidgetRef ref, SearchBarNotifier searchBarNot, String searchBarState,
   ) {
     return Scaffold(
       appBar: AppBar(
@@ -162,13 +193,17 @@ class SearchRestaurantsScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 autofocus: true,
-                decoration: const InputDecoration(
+                controller: _searchController,// lier le controller au search_bar
+                decoration:  InputDecoration(
                   hintText: 'Rechercher par nom, ville, description...',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
+                  labelText: searchBarState
                 ),
+
                 onChanged: (s) {
                   search = s;
+                  searchBarNot.setString(s);
                   filterRestoNotifier.updateFilter(restaurants, s);
                 },
               ),
@@ -224,3 +259,5 @@ class SearchRestaurantsScreen extends ConsumerWidget {
     );
   }
 }
+
+
