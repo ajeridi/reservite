@@ -2,15 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a07/providers/auth_provider.dart';
-import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
-import 'package:prbd_2526_a07/views/pages/reservation_details_client_page.dart';
 
 import '../../models/reservation.dart';
-import '../../providers/current_reservation_provider.dart';
+import '../../providers/reservation_providers/current_reservation_provider.dart';
 
 class ReservationCard extends ConsumerWidget {
 

@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/table.dart';
-import 'package:prbd_2526_a07/providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 
 
 import '../../providers/application_time_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/reservation_providers/current_reservation_provider.dart';
 import '../../providers/selected_tables_provider.dart';
 import '../../providers/tables_provider.dart';
 import '../widgets/assign_table_1_widget.dart';
@@ -16,7 +16,6 @@ import '../widgets/assign_table_2_widget.dart';
 import '../widgets/assign_table_3_widget.dart';
 import '../widgets/assign_table_4_widget.dart';
 import '../widgets/data_error_widget.dart';
-import 'home_client_page.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -48,6 +47,9 @@ class AssignTablesPage extends ConsumerWidget {
     final tableNotifier = ref.read(tablesProvider.notifier);
     final authNotifier = ref.read(authProvider.notifier);
 
+    final selectedTables = ref.watch(selectedTableProvider);
+    final selectedTablesNotifier = ref.read(selectedTableProvider.notifier);
+
     return tablesState.when(
       data: (state) => data(
               context,
@@ -58,6 +60,7 @@ class AssignTablesPage extends ConsumerWidget {
               authNotifier,
               simulatedTime,
               reservation,
+              selectedTablesNotifier
           ),
       error: (err, _) =>
           DataErrorWidget(
@@ -78,7 +81,11 @@ class AssignTablesPage extends ConsumerWidget {
       AuthNotifier authNotifier,
       DateTime? simulatedTime,
       AsyncValue reservation,
+      SelectedTableNotifier selectedTablesNotifier
       ) {
+
+    final res = reservation.value;
+    if (res == null) return const Center(child: CircularProgressIndicator());
 
     return Scaffold(
       appBar: AppBar(
@@ -155,7 +162,7 @@ class AssignTablesPage extends ConsumerWidget {
                 children: [
                   for (final table in tables)
                     FutureBuilder<bool?>(
-                      future: Table.is_occupee(idtable: table.id),
+                      future: Table.is_occupee(idtable: table.id, reservation_datetime: res.datetime),
                       builder: (context, snapshot) {
                         if (snapshot.data == true) {
                           return assign_table_3_widget(table: table);
@@ -171,7 +178,8 @@ class AssignTablesPage extends ConsumerWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: !selectedTablesNotifier.isOk() ? null :
+                      () async {
                     final reservationId = ref.read(selectedReservationIdProvider);
                     final selected = ref.read(selectedTableProvider);
                     await ref.read(currentReservationProvider(reservationId).notifier).confirmWithSelectedTables(selected);
@@ -197,4 +205,8 @@ class AssignTablesPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget loading() {
+  return Center(child: CircularProgressIndicator(color: Colors.black));
 }

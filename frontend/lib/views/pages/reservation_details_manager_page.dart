@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -94,12 +92,10 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
    // final canTerminate = currentReservation?.status == Status.confirmed &&
      //   !simulatedTimeTest.isBefore(currentReservation!.datetime);
 
+    final isPending = currentReservation!.status == Status.pending;
     // terminer si la date appTime est >= à la date de reservation
-    final canTerminate = currentReservation?.status == Status.confirmed &&
-       !simulatedTime.isBefore(currentReservation!.datetime);
-    debugPrint(' simulatedTime: $simulatedTime');
-    debugPrint('reservation dateTime: ${currentReservation!.datetime}');
-    debugPrint('canTerminate: $canTerminate');
+    final canTerminate = currentReservation.status == Status.confirmed &&
+        !simulatedTime.isBefore(currentReservation.datetime);
 
 
     return Scaffold(
@@ -258,48 +254,62 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 ),
               const SizedBox(height: 24),
               if (currentReservation!.status != Status.completed &&
-                  currentReservation!.status != Status.cancelled) ...[
+                  currentReservation!.status != Status.cancelled ) ...[
                 ElevatedButton.icon(
-                  onPressed: canTerminate ? () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Expanded(
-                          child: AlertDialog(
-                            title: Text('Terminer la réservation'),
-                            content: Text('Voulez-vous marquer cette résservation commme terminée?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text('Non'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  currentReservationNotifier.complete();
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text('Oui',
-                                style: TextStyle(color: Colors.red)),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  } : null, //null = btn disabled
+                  onPressed: (isPending || canTerminate)
+                      ? () {
+                          if (isPending) {
+                            Navigator.pushNamed(
+                              context,
+                              '/assign_tables_page',
+                            );
+                            return;
+                          }
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Terminer la réservation'),
+                                content: const Text(
+                                  'Voulez-vous marquer cette réservation comme terminée ?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Non'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      currentReservationNotifier.complete();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text(
+                                      'Oui',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      : null,
                   icon: Icon(updateStatusIcon(currentReservation!.status)),
                   label: Text(updateStatusMessage(currentReservation!.status)),
                 ),
-                // message d'advertisement si la reservation ne peut pas être terminée a cause de l'appliTime
-                if(!canTerminate)
-                  const Padding(padding: EdgeInsets.only(top: 4.0),
-                  child: Text('La réservation ne peut pas être terminée que durant son service ou après celui-ci',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 12,
-                  ),),),
+                if (currentReservation!.status == Status.confirmed && !canTerminate)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      'La réservation ne peut pas être terminée que durant son service ou après celui-ci',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: () {
