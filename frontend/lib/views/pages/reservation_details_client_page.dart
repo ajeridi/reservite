@@ -68,6 +68,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
+          // nettoyage des providers lorsqu'on quitte la page (+ d'infos sur le invalidate https://riverpod.dev/docs/concepts2/refs#resetting-a-providers-state)
           ref.invalidate(currentReservationProvider);
           ref.invalidate(selectedReservationIdProvider);
           Navigator.pushReplacementNamed(context, '/home_client_page');

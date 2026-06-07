@@ -92,9 +92,9 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
    // final canTerminate = currentReservation?.status == Status.confirmed &&
      //   !simulatedTimeTest.isBefore(currentReservation!.datetime);
 
-    final isPending = currentReservation!.status == Status.pending;
+    final isPending = (currentReservation != null && currentReservation!.status == Status.pending);
     // terminer si la date appTime est >= à la date de reservation
-    final canTerminate = currentReservation.status == Status.confirmed &&
+    final canTerminate = currentReservation != null && currentReservation.status == Status.confirmed &&
         !simulatedTime.isBefore(currentReservation.datetime);
 
 
@@ -103,6 +103,8 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
+            // nettoyage du selectedId provider (retour a 0)
+            ref.invalidate(selectedReservationIdProvider);
             // redirection vers la page des reservations pour le manager
             Navigator.pushReplacementNamed(
               context,
@@ -187,7 +189,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                         children: [
                           Icon(Icons.person, size: 20),
                           SizedBox(width: 8),
-                          Text('Nom: ${currentReservation?.client!.name}'),
+                          Text('Nom: ${currentReservation != null ? currentReservation?.client!.name : ""}'),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -195,7 +197,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                         children: [
                           Icon(Icons.email, size: 20),
                           SizedBox(width: 8),
-                          Text('Email: ${currentReservation?.client.email}'),
+                          Text('Email: ${currentReservation != null ?  currentReservation?.client.email : ""}'),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -204,7 +206,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                           const Icon(Icons.phone, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'Téléphone: ${currentReservation?.client.phone == '' ? 'Non renseigné' : currentReservation?.client.phone}',
+                            'Téléphone: ${currentReservation != null ? currentReservation?.client.phone == '' ? 'Non renseigné' : currentReservation?.client.phone : ""}',
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                         ],
@@ -223,7 +225,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              if (currentReservation?.tables.length == 0)
+              if (currentReservation != null && currentReservation?.tables.length == 0)
                 Text('Aucune table assignee ${currentReservation!.status == Status.cancelled ? '' : '(en attente de confirmation)'}')
               else
                 Card(
@@ -232,28 +234,30 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        for (var table in currentReservation!.tables)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.table_restaurant, size: 20),
-                                const SizedBox(width: 8),
-                                Text('Table ${table.tableNumber}'),
-                                const SizedBox(width: 16),
-                                Text(
-                                  '(${table.capacity} places)',
-                                  style: TextStyle(color: Colors.grey[600]),
-                                ),
-                              ],
+                        if (currentReservation != null) ... [
+                          for (var table in currentReservation!.tables)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.table_restaurant, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text('Table ${table.tableNumber}'),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    '(${table.capacity} places)',
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+                        ],
                       ],
                     ),
                   ),
                 ),
               const SizedBox(height: 24),
-              if (currentReservation!.status != Status.completed &&
+              if (currentReservation != null && currentReservation!.status != Status.completed &&
                   currentReservation!.status != Status.cancelled ) ...[
                 ElevatedButton.icon(
                   onPressed: (isPending || canTerminate)
@@ -299,7 +303,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
                   icon: Icon(updateStatusIcon(currentReservation!.status)),
                   label: Text(updateStatusMessage(currentReservation!.status)),
                 ),
-                if (currentReservation!.status == Status.confirmed && !canTerminate)
+                if (currentReservation !=  null && currentReservation!.status == Status.confirmed && !canTerminate)
                   const Padding(
                     padding: EdgeInsets.only(top: 4.0),
                     child: Text(
