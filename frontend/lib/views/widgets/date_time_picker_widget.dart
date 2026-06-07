@@ -16,8 +16,9 @@ class DatePickerReservation extends ConsumerWidget {
 
     // on a besoin de chercher la premier date disponible
     final selectedReservationDateState = ref.watch(selectedReservationDateProvider);
-    final selectedReservationDateNotifier = ref.watch(selectedReservationDateProvider.notifier);
+    final selectedReservationDateNotifier = ref.read(selectedReservationDateProvider.notifier);
     final  applicationTime = ref.watch(applicationTimeProvider);
+    final firstDate = applicationTime.value!; // date au dela de laquelle nous ne pouvons plus aller dans le passe
 
     return Row(
       children: [
@@ -29,7 +30,8 @@ class DatePickerReservation extends ConsumerWidget {
                 // on va ouvrir le DatePicker, puis attendre la selection qui va etre stockee dans pickedDate
                 final pickedDate = await showDatePicker(
                     context: context,
-                    firstDate: applicationTime.value!,
+                    initialDate: selectedReservationDateState.value!,
+                    firstDate: firstDate,
                     lastDate: DateTime(2030),
                 );
                 if (pickedDate != null){
