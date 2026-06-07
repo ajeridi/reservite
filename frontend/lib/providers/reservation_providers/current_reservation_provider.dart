@@ -44,12 +44,12 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
   FutureOr<Reservation?> build() async {
     state = AsyncData(null);
     state = AsyncLoading();
-    final  currentRestaurantState = ref.watch(currentRestaurantProvider(ref.watch(selectedRestaurantProvider))).value;
-    final clientState = ref.watch(clientProvider);
-    final applicationTime = ref.watch(applicationTimeProvider);
     try {
+      // si id != 0, on a clique sur une reservation, on va donc la chercher avec son id
       if (id != 0) return await Reservation.getReservation(id);
-      else return new Reservation(id: 0, client: clientState.value!, restaurant: currentRestaurantState, datetime: applicationTime.value!, tables: []);
+      else { // si l'id vaut 0, on retourne une reservation vide
+        return null;
+      }
     } catch (e, st) {
       throw Exception("Something went wrong.\nPlease retry later.");
     }

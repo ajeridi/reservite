@@ -68,6 +68,8 @@ class ReservationDetailsClientPage extends ConsumerWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
+          ref.invalidate(currentReservationProvider);
+          ref.invalidate(selectedReservationIdProvider);
           Navigator.pushReplacementNamed(context, '/home_client_page');
         },
       ),
@@ -133,7 +135,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
               currentReservationState: reservation,
             ),
             const SizedBox(height: 24),
-            if (reservation!.canEdit())
+            if (reservation != null && reservation.canEdit())
               Row(
                 children: [
                   Expanded(
