@@ -347,7 +347,7 @@ create or replace function services_containing_reservations(date_of_reservation 
     select s.id
     from services s join restaurants rst on s.restaurant = rst.id
                     join reservations rsv on rsv.restaurant = rst.id
-    where   rsv.client = 6 and -- les reservations qui ont comme client l'utilisateur connecte
+    where   rsv.client = auth.id() and -- les reservations qui ont comme client l'utilisateur connecte
             rsv.datetime::date = date_of_reservation and -- qui sont a la date de selectionnee
             s.day_of_week = extract(isodow from date_of_reservation::date) and  -- les services du jour de la reservation
             rsv.datetime::time between s.start_time and s.end_time; -- dont la reservation se trouve dans ce service
