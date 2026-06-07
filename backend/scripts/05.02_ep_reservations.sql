@@ -336,9 +336,26 @@ grant execute on function complete_reservation(int) to manager;
     ENDPOINT qui va retourner les creneaux disponible le jour d'une reservation
         la disponibilites des creneaux depends de deux choses : 1 - si le restaurant est ouvert
                                                                 2 - si le client a deja une reservation ce jour la dans un service
-
+    Si une reservation existe deja le jour selectionne, on doit afficher le service dans lequel se trouve cette reservation
+    Si c'est une nouvelle reservation, on ne prends pas en compte les services contenant deja une reservation
 */
-create or replace function get_available_slots(restaurant_id int, date_of_reservation date) returns json as
+
+-- methode qui va retourner les services qui contiennent les reservations d'un utilisateur pour un jour donne
+create or replace function services_containing_reservations(date_of_reservation date) returns
+    TABLE (id int) as -- attention a bien faire attention au retour (au debut j'avais fait int puis ca ne retournait q'un resultat alors qu'il pouvait en avoir plusieurs)
+    $$
+    select s.id
+    from services s join restaurants rst on s.restaurant = rst.id
+                    join reservations rsv on rsv.restaurant = rst.id
+    where   rsv.client = 6 and -- les reservations qui ont comme client l'utilisateur connecte
+            rsv.datetime::date = date_of_reservation and -- qui sont a la date de selectionnee
+            s.day_of_week = extract(isodow from date_of_reservation::date) and  -- les services du jour de la reservation
+            rsv.datetime::time between s.start_time and s.end_time; -- dont la reservation se trouve dans ce service
+    $$ language sql security definer;
+
+
+
+create or replace function get_available_slots(restaurant_id int, date_of_reservation date, reservation_id int DEFAULT 0) returns json as
 $$
 declare
     service                 RECORD;
@@ -352,21 +369,16 @@ begin
     -- check si utilisateur est connecte
     perform auth.check_logged();
     if (auth.role() = 'client') then
-        -- recuperation des services pour le jour de la reservatino
+        -- recuperation des services pour le jour de la reservation (si new reservation -> on ne l'inclut pas)
         FOR service IN
-            select s.start_time, s.end_time
-            from services s
-            where s.restaurant = restaurant_id
-              and s.day_of_week = reservation_dow
-              and s.id not in -- liste des services contenant une reservation du client pour le meme jour
-                  (select s2.id
-                   from reservations rsv
-                            join restaurants rst on rst.id = rsv.restaurant
-                            join services s2 on s2.restaurant = rst.id
-                   where rsv.datetime::date = date_of_reservation -- meme jour que la date de reservation
-                     and rsv.client = auth.id()                   -- reservation effectuee par le client
-                     and s2.day_of_week = reservation_dow         -- services du meme jour que la reservation
-                     and rsv.datetime::time BETWEEN s2.start_time AND s2.end_time) -- qui contiennent une reservation
+            SELECT s.start_time, s.end_time
+            FROM services s
+                    -- qui se trouve dans le restaurant a la date de la reservation
+            WHERE   s.restaurant = restaurant_id AND
+                    s.day_of_week = reservation_dow AND
+                    -- et qui ne contient pas une reservation existante dans le cas d'une nouvelle reservation
+                    (reservation_id != 0 OR
+                    reservation_id = 0 AND  s.id not in (select services_containing_reservations(date_of_reservation))) -- liste des services contenant une reservation du client pour le meme jour
             LOOP
                 -- pour chacun des services calculer les heures de reservations
                 first_slot = service.start_time;
@@ -395,7 +407,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
-grant execute on function get_available_slots(int, date) to client;
+grant execute on function get_available_slots(int, date, int) to client;
 
 
 -- =====================================================================================================================
@@ -403,8 +415,6 @@ grant execute on function get_available_slots(int, date) to client;
 /*
         ENDPOINT QUI RETOURNE SI LE RESTAURANT A ASSEZ DE PLACES POUR ACCEUILLIR LES CONVIVES
 */
-
-
 
 /*
 Retourne le nombre de reservations en attentes
