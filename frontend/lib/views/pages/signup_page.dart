@@ -6,6 +6,7 @@ import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/core/tools/validating_text_editing_controller.dart';
 import 'package:prbd_2526_a07/models/user.dart';
 
+import '../../core/tools/pick_date_time.dart';
 import '../../providers/application_time_provider.dart';
 
 class SignupMockupScreen extends ConsumerStatefulWidget {
@@ -68,8 +69,10 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
 
     setState(() {});
 
-    if (_fullNameController.errorText != null || _emailController.errorText != null ||
-        _passwordController.errorText != null || _confirmPasswordController.errorText != null) {
+    if (_fullNameController.errorText != null ||
+        _emailController.errorText != null ||
+        _passwordController.errorText != null ||
+        _confirmPasswordController.errorText != null) {
       return;
     }
 
@@ -78,23 +81,27 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
       email: _emailController.text.trim(),
       password: _passwordController.text,
       fullName: _fullNameController.text.trim(),
-      phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
+      phone: _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
     );
   }
 
   void _signup(
-      BuildContext context, {
-        required String email,
-        required String password,
-        required String fullName,
-        String? phone,
-      }) async {
-    await ref.read(authProvider.notifier).signup(
-      email: email,
-      password: password,
-      fullName: fullName,
-      phone: phone,
-    );
+    BuildContext context, {
+    required String email,
+    required String password,
+    required String fullName,
+    String? phone,
+  }) async {
+    await ref
+        .read(authProvider.notifier)
+        .signup(
+          email: email,
+          password: password,
+          fullName: fullName,
+          phone: phone,
+        );
     final authState = ref.read(authProvider);
 
     if (!context.mounted) return;
@@ -108,9 +115,9 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
           Navigator.pop(context); // retour à la page de login
         }
       },
-      error: (error, _) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $error')),
-      ),
+      error: (error, _) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur: $error'))),
       loading: () {},
     );
   }
@@ -144,16 +151,33 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime!),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
+              //GestureDetector pour detecter la touche
+              child: GestureDetector(
+                onTap: () async {
+                  final newDatetime = await pickDateTime(
+                    context,
+                    initialDate: simulatedTime,
+                  );
+                  if (newDatetime != null) {
+                    //on met à jour le provider avec la nouvelle date
+                    ref
+                        .read(applicationTimeProvider.notifier)
+                        .setTime(newDatetime);
+                  }
+                },
+                child: Tooltip(
+                  message:
+                      'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                  child: Text(
+                    DateFormat(
+                      'EEEE dd/MM/yyyy HH:mm',
+                      'fr_FR',
+                    ).format(simulatedTime!),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
@@ -174,10 +198,7 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
                 const SizedBox(height: 32),
                 const Text(
                   'Créez votre compte',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
@@ -236,8 +257,8 @@ class _SignupMockupScreenState extends ConsumerState<SignupMockupScreen> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: ref.watch(authProvider).isLoading
-                    ? null
-                    : () => _submitForm(context),
+                      ? null
+                      : () => _submitForm(context),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
