@@ -13,6 +13,7 @@ class CurrentRestaurantNotifier extends AsyncNotifier<Restaurant> {
 
   @override
   Future<Restaurant> build() async {
+    state = AsyncLoading();
     try {
       final response = await Restaurant.getRestaurant(id);
       state = AsyncData(response);

@@ -123,7 +123,9 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/edit_reservation_form_page');
+                      },
                       icon: const Icon(Icons.edit),
                       label: const Text('Modifier'),
 
