@@ -17,7 +17,14 @@ class AvailableSlotsWidget extends ConsumerWidget{
 
     return availableSlotsState.when(
         loading: () =>
-        const Center(child: CircularProgressIndicator()),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // dans le premier tuto du cours dans 'Centrer l'UI'
+            children: [
+              CircularProgressIndicator(),
+            ],
+          ),
+        ),
         error: (error, stack) => Text('Erreur: $error'),
         data: (availableSlots) {
           return Wrap(
