@@ -70,9 +70,9 @@ class Table {
 
   }
 
-  static Future<bool?> is_occupee({required int idtable}) async {
+  static Future<bool?> is_occupee({required int idtable, required DateTime reservation_datetime}) async {
     try {
-      final response = await ApiClient.get("is_occupee?idtable=$idtable");
+      final response = await ApiClient.get("is_occupee?idtable=$idtable&reservation_datetime=$reservation_datetime");
 
       if (response.statusCode == 200){
         return json.decode(response.body) as bool;

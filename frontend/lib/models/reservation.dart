@@ -1,4 +1,5 @@
 
+import 'dart:collection';
 import 'dart:convert';
 
 
@@ -18,7 +19,7 @@ enum Status {
   cancelled
 }
 
-class Reservation {
+class Reservation  implements Comparable<Reservation>{
   final int id;
   final Client client;
   final Restaurant? restaurant;
@@ -69,17 +70,18 @@ class Reservation {
   }
 
   // methode qui va rechercher les reservations d'un client (Future, car on va chercher dans la DB)
-  static Future<List<Reservation>> getReservations({int? selectedRestaurant = null}) async{
+  static Future<SplayTreeSet<Reservation>> getReservations({int? selectedRestaurant = null}) async{
     String enpoint = 'get_reservations';
     if (selectedRestaurant != null) enpoint += '?restaurant_id=$selectedRestaurant';
     final response = await ApiClient.get(enpoint);
     if (response.statusCode == 200){
       // un user qui n'a pas de reservations, a un response.body == 'null'
-      if (response.body == 'null') return <Reservation>[]; // on retourne liste vide si null
+      if (response.body == 'null') return SplayTreeSet<Reservation>(); // on retourne liste vide si null
       final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
-      return body.map((dynamic reservation) => Reservation.fromJson(reservation)).toList(); // mappage de chaque element de la liste d'objets Json en objet Reservation
+      return SplayTreeSet.of(body.map((dynamic reservation) => Reservation.fromJson(reservation)).toList()); // mappage de chaque element de la liste d'objets Json en objet Reservation
     }
     else {
+      print(response.body);
       throw Exception("Failed to fetch reservations from the database");
     }
   }
@@ -252,11 +254,17 @@ class Reservation {
         return Reservation.fromJson(body);
       }
       throw Exception(
-        'Failed to save reservation. Status code: ${response.statusCode}',
+        'Failed to save reservation. Status code: ${response.statusCode}\nBody: ${response.body}',
       );
     } catch (e, st) {
       print('$e\n$st');
       throw Exception('Failed to save reservation.');
     }
+  }
+
+  @override
+  int compareTo(Reservation other) {
+    // TODO: implement compareTo
+    return this.datetime.compareTo(other.datetime) == 0 ? other.id.compareTo(this.id) : other.datetime.compareTo(this.datetime);
   }
 }

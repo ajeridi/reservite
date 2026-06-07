@@ -24,6 +24,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/special_request_pr
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../../models/reservation.dart';
+import '../selected_tables_provider.dart';
 import 'capacity_check_provider.dart';
 import 'number_of_guests_provider.dart';
 
@@ -107,6 +108,27 @@ Future<void> complete() async{
     state = AsyncData(completed);
     ref.read(reservationsProvider.notifier).updateList(state.value!);
 }
+
+  Future<void> confirmWithSelectedTables(Set<int> tableIds) async {
+    if (tableIds.isEmpty) {
+      throw Exception('Aucune table sélectionnée');
+    }
+
+    state = AsyncLoading();
+    try {
+      final confirmed = await Reservation.confirmReservation(
+        reservationId: id,
+        tablesId: tableIds.toList(),
+      );
+      state = AsyncData(confirmed);
+
+      ref.read(selectedTableProvider.notifier).clear();
+      await ref.read(reservationsProvider.notifier).refresh();
+    } catch (e, st) {
+      print('$e\n$st');
+      state = AsyncValue.error(e, st);
+    }
+  }
 
 }
 
