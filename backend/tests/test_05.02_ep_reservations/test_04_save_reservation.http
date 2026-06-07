@@ -12,7 +12,7 @@ POST http://localhost:3000/rpc/login
 Content-Type: application/json
 
 {
-  "email" : "xapigeolet@epfc.eu",
+  "email" : "brlacroix@epfc.eu",
   "password" : "Password1,"
 }
 
@@ -53,3 +53,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50I
   "special_requests_" : "updated reservation",
   "reservation_id" : 23
 }
+### si reservation_id = 0, ne doit pas afficher le service du soir (18:00 - 23:00), si reservation=22, doit afficher le service du soir
+GET http://localhost:3000/rpc/get_available_slots?restaurant_id=4&date_of_reservation=2024-12-06&reservation_id=0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoiYnJsYWNyb2l4QGVwZmMuZXUiLCJuYW1lIjoiQnJ1bm8iLCJ1c2VyX2lkIjo2LCJleHAiOjE3ODA5MzIxNDN9.qZpuwUbal973mXivsNIJqmdXkKlU3xScjJuwz_gQjXg
+
