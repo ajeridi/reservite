@@ -12,11 +12,13 @@ import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservati
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/special_request_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/views/widgets/available_slots_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/date_time_picker_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
 import '../../providers/reservation_providers/capacity_check_provider.dart';
 import '../../providers/reservation_providers/selected_slot_provider.dart';
+import '../widgets/warning_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -56,9 +58,7 @@ class ReservationFormPage extends ConsumerWidget {
     final selectedReservationDateState = ref.watch(selectedReservationDateProvider);
 
     // on  va chercher les crenaux disponibles
-    final availableSlotsState = ref.watch(availableSlotsProvider);
     final selectedSlot = ref.watch(selectedSlotProvider);
-    final selectedSlotNotifier = ref.read(selectedSlotProvider.notifier);
     //on regarde l'etat de la validation de la capacite
     final  numberOfGuestsState = ref.watch(numberOfGuestsProvider);
     final capacityCheckState = ref.watch(capacityCheckProvider);
@@ -122,10 +122,11 @@ class ReservationFormPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  currentRestaurantState.value!.name,
+                currentRestaurantState.whenData((resto) =>
+                Text(resto.name,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                )
+                ).value!,
                 const SizedBox(height: 24),
                 DatePickerReservation(),
                 const Divider(),
@@ -135,21 +136,7 @@ class ReservationFormPage extends ConsumerWidget {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
-                availableSlotsState.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => Text('Erreur: $error'),
-                  data: (availableSlots) {
-                    return Wrap(
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      children: showSlots(availableSlots,
-                      theme,
-                      selectedSlot,
-                      selectedSlotNotifier, ),
-                    );
-                  },
-                ),
+                AvailableSlotsWidget(),
                 const SizedBox(height: 24),
                const NumberOfGuestsWidget(),
                 capacityCheckState.when(
@@ -204,52 +191,5 @@ class ReservationFormPage extends ConsumerWidget {
     );
   }
 
-  List<Widget> showSlots(
-      AvailableSlots availableSlots,
-      ThemeData theme,
-      String? selectedSlot,
-      SelectedSlotNotifier selectedSlotNotifier,) {
-    final slotsWidgets = <Widget>[];
-    final slots = availableSlots.slots ?? [];
-
-    if (slots.isEmpty && availableSlots.error != null) {
-      return [WarningWidget(error: availableSlots.error!)];
-    }
-
-    for (var slot in availableSlots.slots!) {
-      slotsWidgets.add(ReservationSlotWidget(theme: theme, slot: slot, selected: selectedSlot == slot, selectedSlotNotifier: selectedSlotNotifier, ));
-    }
-
-    return slotsWidgets;
-  }
 }
 
-class WarningWidget extends StatelessWidget {
-  const WarningWidget({super.key, required this.error});
-
-  final String? error;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.orange.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.orange),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.warning, color: Colors.orange),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              error!,
-              style: TextStyle(color: Colors.orange, fontSize: 13),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

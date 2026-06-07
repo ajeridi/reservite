@@ -20,4 +20,8 @@ class SelectedRestaurantNotifier extends Notifier<int> {
   void setValue(int selectedRestaurantId){
     state = selectedRestaurantId;
   }
+
+  void clear() {
+    state = 0;
+  }
 }

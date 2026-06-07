@@ -18,4 +18,8 @@ class SelectedReservationIdNotifier extends Notifier<int> {
   void set(int newId) {
     state = newId;
   }
+
+  void clear(){
+    state = 0;
+  }
 }

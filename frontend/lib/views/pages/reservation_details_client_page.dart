@@ -6,6 +6,7 @@ import 'package:prbd_2526_a07/models/reservation.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 
+import '../../core/tools/pick_date_time.dart';
 import '../../providers/application_time_provider.dart';
 import '../../providers/reservation_providers/current_reservation_provider.dart';
 import '../../providers/reservation_providers/selected_reservation_id_provider.dart';
@@ -45,7 +46,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
 
     return currentReservationState.when(
       data: (reservation) => applicationTime.when(                    // ✅
-        data: (simulatedTime) => data(context, reservation, currentReservationNotifier, theme, simulatedTime),
+        data: (simulatedTime) => data(context,ref, reservation, currentReservationNotifier, theme, simulatedTime),
         error: (e, _) => DataErrorWidget(error: e, notifier: currentReservationNotifier),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
@@ -56,6 +57,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
 
   Scaffold data(
       BuildContext context,
+      WidgetRef ref,
       Reservation? reservation,
       CurrentReservationNotifier currentReservationNotifier,
       ThemeData theme,
@@ -89,6 +91,18 @@ class ReservationDetailsClientPage extends ConsumerWidget {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(top: 2.0),
+            //GestureDetector pour detecter la touche
+            child : GestureDetector(
+              onTap: () async{
+                final newDatetime = await pickDateTime(
+                  context,
+                  initialDate: simulatedTime,
+                );
+                if(newDatetime != null){
+                  //on met à jour le provider avec la nouvelle date
+                  ref.read(applicationTimeProvider.notifier).setTime(newDatetime);
+                }
+              },
             child: Tooltip(
               message:
                   'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
@@ -103,6 +117,7 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                   fontWeight: FontWeight.normal,
                 ),
               ),
+            ),
             ),
           ),
         ),
