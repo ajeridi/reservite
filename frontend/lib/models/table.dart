@@ -85,7 +85,12 @@ class Table {
       print('$e\n$st');
       throw Exception('Failed to get is_occupee');
     }
+  }
 
+
+  @override
+  String toString() {
+    return "Table: {id: $id, Restaurant: $restaurant, TableNumber: $tableNumber, Capacity: $capacity, HasReservations: $hasReservations";
   }
 
 }

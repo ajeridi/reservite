@@ -1,7 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/table.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
+import 'package:prbd_2526_a07/providers/current_table_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
+import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
+
+import '../widgets/table_number_form_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -23,87 +30,104 @@ class EditTablePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+    final simulatedTime = ref.watch(applicationTimeProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
-        ),
-        title: const Text('Modifier la table'),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            tooltip: 'Enregistrer',
-            onPressed: () {},
-            icon: const Icon(Icons.save),
+    final selectedTableIdState= ref.watch(selectedTableIdProvider);
+    final selectedTableIdNotifier = ref.read(selectedTableIdProvider.notifier);
+    
+    final currentTable = ref.watch(currentTableProvider(selectedTableIdState));
+    final currentTableNotifier = ref.read(currentTableProvider(selectedTableIdState).notifier);
+
+    return currentTable.when(
+        data: (table) => data(selectedTableIdNotifier, context, theme, simulatedTime, table),
+        error: (err, st) => DataErrorWidget(error: err, notifier: currentTableNotifier),
+        loading: () => Center(
+          child: Column(
+            children: [
+              CircularProgressIndicator(),
+            ],
           ),
-        ],
-        elevation: 2,
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        surfaceTintColor: Colors.transparent,
-        flexibleSpace: Align(
-          alignment: Alignment.topCenter,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
-                  ),
+        )
+    );
+  }
+
+  Scaffold data(SelectedTableIdNotifier selectedTableIdNotifier, BuildContext context, ThemeData theme, AsyncValue<DateTime> simulatedTime, Table? table) {
+    return Scaffold(
+    appBar: AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          selectedTableIdNotifier.clear();
+          Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
+        },
+      ),
+      title: table != null ? const Text('Modifier la table') : const Text('Nouvelle table'),
+      automaticallyImplyLeading: false,
+      actions: [
+        IconButton(
+          tooltip: 'Enregistrer',
+          onPressed: () {},
+          icon: const Icon(Icons.save),
+        ),
+      ],
+      elevation: 2,
+      backgroundColor: theme.colorScheme.primary,
+      foregroundColor: theme.colorScheme.onPrimary,
+      surfaceTintColor: Colors.transparent,
+      flexibleSpace: Align(
+        alignment: Alignment.topCenter,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: Tooltip(
+              message:
+                  'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+              child: Text(
+                DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
+                    .format(simulatedTime.value!),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[400],
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),
           ),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  initialValue: '2',
-                  decoration: const InputDecoration(
-                    labelText: 'Numéro de table',
-                    border: OutlineInputBorder(),
+    ),
+    body: SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TableNumberFormWidget(),
+              const SizedBox(height: 16),
+              const Text('Capacité'),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: () {
+                    },
                   ),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 16),
-                const Text('Capacité'),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove),
-                      onPressed: () {},
-                    ),
-                    const Text(
-                      '4 personnes',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  const Text(
+                    ' personnes',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
