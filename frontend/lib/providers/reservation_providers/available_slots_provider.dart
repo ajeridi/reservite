@@ -27,7 +27,8 @@ class AvailableSlotsNotifier extends AsyncNotifier<AvailableSlots> {
     try {
 
       // si restaurant Id vaut 0, on est sur une modification de reservation (donc faut donner l'id du restaurant de la reservation modifiee
-      if (selectedRestaurantId == 0)
+      // fix : ne pas prendre en compte le selectedRestaurant, car il ne s'actualise pas correctement lorsqu'on change de reservations dans le cas d'edit
+      if (selectedReservationId != 0) // si en mode edit
         selectedRestaurantId = ref.watch(currentReservationProvider(selectedReservationId)).value!.restaurant!.id;
 
       final availableSlots = await AvailableSlots.getAvailableSlots(
