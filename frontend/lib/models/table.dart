@@ -93,4 +93,15 @@ class Table {
     return "Table: {id: $id, Restaurant: $restaurant, TableNumber: $tableNumber, Capacity: $capacity, HasReservations: $hasReservations";
   }
 
+  static String? validateTableNumber(String tableNumberString){
+    if (tableNumberString.isEmpty) return "Un numero est requis";
+    final tableNumber = int.tryParse(tableNumberString);
+    if (tableNumber == null) return "Veuillez entrer un numero de table valide.";
+    return null;
+  }
+
+  static Future<String?> checkTableNumberUnicity(String newTableNumber, int tableId) async {
+    final response = await ApiClient.get('check_table_number_unicity?table_number=$newTableNumber&table_id=$tableId');
+  }
+
 }
