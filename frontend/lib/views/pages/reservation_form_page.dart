@@ -50,9 +50,6 @@ class ReservationFormPage extends ConsumerWidget {
 
     // on va chercher la reservation courante (donc si elle est nouvelle elle aura un id de 0)
     final selectedReservationId = ref.watch(selectedReservationIdProvider);
-    final currentReservationState = ref.watch(
-      currentReservationProvider(selectedReservationId),
-    );
     final currentReservationNotifier = ref.read(currentReservationProvider(selectedReservationId).notifier);
 
     final selectedReservationDateState = ref.watch(selectedReservationDateProvider);
