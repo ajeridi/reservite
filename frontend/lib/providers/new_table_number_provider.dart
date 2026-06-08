@@ -15,4 +15,9 @@ class NewTableNumberNotifier extends Notifier<int?>{
     return currentTableState.value!.tableNumber;
   }
 
+  void setValue(String value) {
+    final number = int.tryParse(value);
+    state = number;
+  }
+
 }

@@ -76,4 +76,12 @@ class TablesNotifier extends AbstractAsyncNotifier<List<Table>> {
       );
     }
   }
+
+  updateList(Table newTable) {
+    state = AsyncLoading();
+    final tables = state.value!;
+    tables.removeWhere((table) => table.id == newTable.id);
+    tables.add(newTable);
+    state = AsyncData(tables);
+  }
 }

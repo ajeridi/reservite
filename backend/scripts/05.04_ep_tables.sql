@@ -117,6 +117,7 @@ create or replace function check_table_number_unicity(_table_number int, table_i
             end if;
         return json_build_object('is_unique', result);
         end if;
+        raise exception 'Not allowed';
     end;
     $$ language plpgsql security definer;
 
@@ -124,3 +125,22 @@ grant execute on function check_table_number_unicity(int, int, int) to manager;
 
 -- tests
 --select ((select t.table_number from tables t where t.id = 11) = 4) OR (not exists(select t.id from tables t where t.table_number = 4 and t.restaurant = 4));
+
+create or replace function save_table(table_id int, new_table_number int, new_capacity int, restaurant_id int) returns json as
+    $$
+    declare updated_id int := table_id;
+    begin
+        perform auth.check_logged();
+        if (auth.role() = 'manager' and check_manager_works_in_restaurant(auth.id(), restaurant_id)) then
+            if (table_id = 0) then
+                INSERT INTO tables(restaurant, table_number, capacity) VALUES (restaurant_id, new_table_number, new_capacity) into updated_id;
+            else
+                UPDATE tables set table_number = new_table_number, capacity = new_capacity where id = table_id;
+            end if;
+        return get_table(updated_id, restaurant_id);
+        end if;
+        raise exception 'Not allowed';
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function save_table(int, int, int, int) to manager;

@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/table.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/current_table_provider.dart';
+import 'package:prbd_2526_a07/providers/new_table_capacity_provider.dart';
+import 'package:prbd_2526_a07/providers/new_table_number_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 
@@ -39,8 +41,11 @@ class EditTablePage extends ConsumerWidget {
     final currentTable = ref.watch(currentTableProvider(selectedTableIdState));
     final currentTableNotifier = ref.read(currentTableProvider(selectedTableIdState).notifier);
 
+    final newTableNumber = ref.watch(newTableNumberProvider);
+    final newCapacity = ref.watch(newTableCapacityProvider);
+
     return currentTable.when(
-        data: (table) => data(selectedTableIdNotifier, context, theme, simulatedTime, table),
+        data: (table) => data(selectedTableIdNotifier, context, theme, simulatedTime, table, currentTableNotifier, newTableNumber, newCapacity),
         error: (err, st) => DataErrorWidget(error: err, notifier: currentTableNotifier),
         loading: () => Center(
           child: Column(
@@ -52,7 +57,7 @@ class EditTablePage extends ConsumerWidget {
     );
   }
 
-  Scaffold data(SelectedTableIdNotifier selectedTableIdNotifier, BuildContext context, ThemeData theme, AsyncValue<DateTime> simulatedTime, Table? table) {
+  Scaffold data(SelectedTableIdNotifier selectedTableIdNotifier, BuildContext context, ThemeData theme, AsyncValue<DateTime> simulatedTime, Table? table, CurrentTableNotifier currentTableNotifier, int? newTableNumber, int newCapacity) {
     return Scaffold(
     appBar: AppBar(
       leading: IconButton(
@@ -67,7 +72,13 @@ class EditTablePage extends ConsumerWidget {
       actions: [
         IconButton(
           tooltip: 'Enregistrer',
-          onPressed: () {},
+          onPressed: () async {
+            if (await currentTableNotifier.validateAll(newTableNumber)){
+              await currentTableNotifier.saveTable(newTableNumber, newCapacity);
+              Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
+            }
+            return null;
+          },
           icon: const Icon(Icons.save),
         ),
       ],
