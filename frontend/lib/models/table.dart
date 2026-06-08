@@ -9,6 +9,7 @@ class Table {
   final int ?restaurant;
   final int tableNumber;
   final int capacity;
+  final bool? hasReservations;
 
   //constructeur
   const Table({
@@ -16,6 +17,7 @@ class Table {
     this.restaurant = 0,
     this.tableNumber = 0,
     this.capacity = 0,
+    this.hasReservations,
 });
 
   // constructeur from Json
@@ -25,6 +27,7 @@ class Table {
       restaurant: json['restaurant'] ?? 0,
       tableNumber: json['table_number'] ?? 0,
       capacity: json['capacity'] ?? 0,
+      hasReservations: json['has_reservations']
     );
   }
 
@@ -56,9 +59,9 @@ class Table {
     }
   }
 
-  static Future<Table?> getTable(int idtable) async {
+  static Future<Table?> getTable(int tableId, int restaurantId) async {
     try {
-      final response = await ApiClient.get("get_table?reservation_id=$idtable");
+      final response = await ApiClient.get("get_table?table_id=$tableId&restaurant_id=$restaurantId");
       if (response.statusCode == 200){
         final body = json.decode(response.body);
         return Table.fromJson(body);
