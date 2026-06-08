@@ -17,6 +17,7 @@ import '../../models/reservation.dart';
 import '../../providers/application_time_provider.dart';
 import '../../providers/reservation_providers/reservations_provider.dart';
 import '../widgets/data_error_widget.dart';
+import '../widgets/navigation_bar_widget.dart';
 
 /*
   Utilisation de segmentedButton :
@@ -239,9 +240,14 @@ class ManagerReservationsPage extends ConsumerWidget {
           ],
         ),
       ),
+      bottomNavigationBar: NavigationBarWidget(currentIndex: 0),
     );
   }
 }
+
+
+
+
 
 Widget loading() {
   return Center(child: CircularProgressIndicator(color: Colors.black));

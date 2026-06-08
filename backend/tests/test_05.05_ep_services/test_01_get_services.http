@@ -1,0 +1,39 @@
+### connection d'un manager
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "boverhaegen@reservite.com",
+  "password" : "Password1,"
+}
+
+
+### services d'un manager dans un restaurant (ok)
+GET http://localhost:3000/rpc/get_services?restaurant_id=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODEwMzUwNDl9.pb6973Q4YR0lgOHU7ju35Fu8waGp5PoVV6ELlbMoSV4
+
+### get service par id
+GET http://localhost:3000/rpc/get_service?service_id=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODEwMzUwNDl9.pb6973Q4YR0lgOHU7ju35Fu8waGp5PoVV6ELlbMoSV4
+
+### save service insert or update
+POST http://localhost:3000/rpc/save_service
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODEwMzUwNDl9.pb6973Q4YR0lgOHU7ju35Fu8waGp5PoVV6ELlbMoSV4
+
+{
+"service_id" : 1,
+"restaurant_id" : 1,
+"day_of_week" : 1,
+"start_time" : "12:00:00",
+"end_time" : "15:00:00"
+}
+
+### delete service with active reservation
+POST http://localhost:3000/rpc/delete_service
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODEwMzUwNDl9.pb6973Q4YR0lgOHU7ju35Fu8waGp5PoVV6ELlbMoSV4
+
+{
+  "service_id" : 1
+}
