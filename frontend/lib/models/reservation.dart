@@ -223,7 +223,7 @@ class Reservation  implements Comparable<Reservation>{
       }
     }
 
-  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests,}) async {
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int? reservationId}) async {
     try {
       final dateString = DateFormat('yyyy-MM-dd').format(date);
 
@@ -246,6 +246,7 @@ class Reservation  implements Comparable<Reservation>{
           'datetime_': datetimeString,
           'number_of_guests_': numberOfGuests,
           'special_requests_': specialRequests,
+          'reservation_id' : reservationId,
         }),
       );
 
