@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/reservation_providers/number_of_guests_provider.dart';
+import '../../providers/restaurant_capacity_provider.dart';
 
 class NumberOfGuestsWidget extends ConsumerWidget {
   const NumberOfGuestsWidget({super.key});
@@ -9,8 +10,8 @@ class NumberOfGuestsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final numberOfGuests = ref.watch(numberOfGuestsProvider);
-    final numberOfGuestsNotifier =
-    ref.read(numberOfGuestsProvider.notifier);
+    final numberOfGuestsNotifier = ref.read(numberOfGuestsProvider.notifier);
+    final restaurantCapacity = ref.watch(restaurantCapacityProvider);
 
     return ListTile(
       leading: const Icon(Icons.people),
@@ -27,7 +28,15 @@ class NumberOfGuestsWidget extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: numberOfGuestsNotifier.increment,
+            onPressed:
+            restaurantCapacity.when(
+              data: (capacity) =>
+                  numberOfGuests < capacity
+                      ? numberOfGuestsNotifier.increment
+                      : null,
+              error: (err, _) => null,
+              loading: () => null,
+            ),
           ),
         ],
       ),
