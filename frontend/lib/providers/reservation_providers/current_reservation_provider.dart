@@ -29,7 +29,7 @@ import 'capacity_check_provider.dart';
 import 'number_of_guests_provider.dart';
 
 
-final currentReservationProvider = AsyncNotifierProvider.autoDispose
+final currentReservationProvider = AsyncNotifierProvider
     .family<CurrentReservationNotifier, Reservation?, int>(
       // autoDispose pour detruire le provider une fois qu'on ne l'utilise plus
       CurrentReservationNotifier.new,

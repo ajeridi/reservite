@@ -50,10 +50,11 @@ class DatePickerReservation extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Text('Date'),
-                          Text(
-                            DateFormat('EEEE dd/MM/yyyy', 'fr_FR')
-                                .format(selectedReservationDateState.value!),
-                            style: theme.textTheme.bodySmall,
+                          selectedReservationDateState.when(
+                              data: (selected) => Text(DateFormat('EEEE dd/MM/yyyy', 'fr_FR').format(selected),
+                              style: theme.textTheme.bodySmall,),
+                            error: (e, _) => Text("Erreur de chargement de la date"),
+                            loading: () => Text("Chargement de la date...")
                           ),
                         ],
                       ),
@@ -68,7 +69,8 @@ class DatePickerReservation extends ConsumerWidget {
         const SizedBox(width: 8),
         IconButton(
           icon: const Icon(Icons.remove),
-          onPressed: () {
+          // si date selectionnee == premiere date, desactive le bouton - (bug quand on selectionne avec datetime, le bouton ne se desactive plus)
+          onPressed: selectedReservationDateNotifier.isFirstDate(firstDate) ? null : ()  {
             selectedReservationDateNotifier.subtractDay();
           },
         ),
