@@ -52,7 +52,7 @@ class Table {
       return body.map((dynamic table) => Table.fromJson(table)).toList(); // mappage de chaque element de la liste d'objets Json en objet Table
     }
     else {
-      throw Exception("Failed to fetch tables from the database");
+      throw Exception("Failed to fetch tables from the database.\nResponse body: ${response.body}");
     }
   }
 

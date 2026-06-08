@@ -35,7 +35,7 @@ return (select json_agg(
                                'restaurant', tbl.restaurant,
                                'table_number', tbl.table_number,
                                'capacity', tbl.capacity
-                       )
+                       ) ORDER BY capacity ASC, table_number ASC
                )
         from tables tbl
         where tbl.restaurant = restaurant_id);
