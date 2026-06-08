@@ -87,9 +87,6 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
     if (selectedSlot == null) {
       throw Exception('Veuillez sélectionner un créneau.');
     }
-    if (!capacityCheck) {
-      throw Exception('Capacité insuffisante pour ce créneau.');
-    }
 
     final savedReservation = await Reservation.saveReservation(
       restaurantId: restaurantId,

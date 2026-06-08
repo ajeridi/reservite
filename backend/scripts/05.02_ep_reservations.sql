@@ -215,10 +215,14 @@ begin
         returning id into updated_reservation_id;
         -- sinon on update reservation
     else
+        -- si la reservation a des tables on va les enlever (car si on modifie une reservation confirmee, son statut passe a pending
+        DELETE from reservation_tables where reservation = reservation_id;
+
         UPDATE reservations
         set datetime         = datetime_,
             number_of_guests = number_of_guests_,
-            special_requests = special_requests_
+            special_requests = special_requests_,
+            status = 'pending'::status_type
         WHERE id = reservation_id;
     end if;
     return get_reservation(updated_reservation_id);
