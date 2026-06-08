@@ -1,4 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
+
+import '../../models/reservation.dart';
 
 final specialRequestProvider = NotifierProvider<SpecialRequestNotifier, String>(
   SpecialRequestNotifier.new,
@@ -7,7 +11,15 @@ final specialRequestProvider = NotifierProvider<SpecialRequestNotifier, String>(
 class SpecialRequestNotifier extends Notifier<String> {
   @override
   String build() {
-    return '';
+    final selectedReservationId = ref.watch(selectedReservationIdProvider);
+
+    // si en mode add on retourne ''
+    if (selectedReservationId == 0)
+      return '';
+
+    // sinon en mode edit, on retourne la special request de la reservation en cours de modfication
+      final currentReservationState = ref.watch(currentReservationProvider(selectedReservationId));
+      return currentReservationState.value!.specialRequests!;
   }
 
   void setSpecialRequest(String value) {
@@ -15,16 +27,7 @@ class SpecialRequestNotifier extends Notifier<String> {
   }
 
   String? validate(String? value) {
-    final text = value?.trim() ?? '';
-
-    if (text.isEmpty) {
-      return null;
-    }
-
-    if (text.length < 10) {
-      return 'La demande spéciale doit contenir au moins 10 caractères.';
-    }
-    return null;
+    return Reservation.validateSpecialRequests(value);
   }
 
   void clear() {
