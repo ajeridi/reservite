@@ -17,3 +17,15 @@ create or replace function get_simulated_time() returns json as
     $$ language plpgsql security definer;
 
 grant execute on function get_simulated_time() to anon;
+
+-- methode qui va sauvegarder la nouvelle date modifiee
+create or replace function save_simulated_time(new_time timestamp) returns json as
+    $$
+    begin
+        update system_time set simulated_time = new_time;
+
+        return json_build_object('system_time', (SELECT * from system_time));
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function save_simulated_time(timestamp) to anon;
