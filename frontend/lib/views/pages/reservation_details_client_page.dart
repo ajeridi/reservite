@@ -141,7 +141,10 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed:
+                        reservation.datetime.isBefore(simulatedTime)
+                            ? null
+                            : () {
                         Navigator.pushReplacementNamed(context, '/reservation_form_page');
                       },
                       icon: const Icon(Icons.edit),
