@@ -112,4 +112,19 @@ class Restaurant implements Comparable<Restaurant>{
       throw Exception('Failed to get the restaurants');
     }
   }
+
+  static Future<int> getRestaurantCapacity(int restaurant_id) async {
+    try {
+      final response = await ApiClient.get('get_restaurant_capacity?restaurant_id=$restaurant_id');
+      if (response.statusCode == 200){
+        final body = json.decode(response.body);
+        return body['restaurant_capacity'];
+      } else {
+        throw Exception('Failed to get restaurant capacity from DB.\nResponse: ${response.body}');
+      }
+    } catch(e, st){
+      print('$e\n$st');
+      throw Exception('Failed to get restaurant capacity.');
+    }
+  }
 }
