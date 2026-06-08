@@ -439,6 +439,7 @@ create or replace function check_number_of_guests_validity(restaurant_id int, se
     end;
     $$ language plpgsql security definer;
 
+grant execute on function check_number_of_guests_validity(int, date, time, int, int) to client;
 
 /*
 Retourne le nombre de reservations en attentes
