@@ -168,7 +168,7 @@ class ReservationFormPage extends ConsumerWidget {
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
                   onPressed:
-                      !specialRequestsNotifier.isValid()
+                      !specialRequestsNotifier.isValid() || selectedSlot == null
                           ? null
                           : () async {
                             final savedReseravation = await currentReservationNotifier
