@@ -10,7 +10,8 @@ final newTableCapacityProvider = NotifierProvider<NewTableCapacityNotifier, int>
 class NewTableCapacityNotifier extends Notifier<int>{
   @override
   int build() {
-    final currentTable = ref.watch(currentTableProvider(ref.watch(selectedTableIdProvider)));
+    final selectedTableId = ref.watch(selectedTableIdProvider);
+    final currentTable = ref.watch(currentTableProvider(selectedTableId));
     if (currentTable.value == null) return 2;
     return currentTable.value!.capacity;
   }
