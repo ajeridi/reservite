@@ -51,7 +51,12 @@ class _TableNumberFormWidgetState extends ConsumerState<TableNumberFormWidget> {
         labelText: 'Numéro de table',
         border: OutlineInputBorder(),
       ),
+      onChanged:(value) =>  _setNewTableNumber(value),
       keyboardType: TextInputType.number,
     );
+  }
+
+  void _setNewTableNumber(String value) {
+    ref.read(newTableNumberProvider.notifier).setValue(value);
   }
 }

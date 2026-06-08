@@ -117,4 +117,24 @@ class Table {
     }
   }
 
+  static Future<Table> save_table(int? newTableNumber, int newCapacity, int tableId, int restaurantId) async {
+    final response = await ApiClient.post('save_table',
+      body: json.encode({
+        'table_id' : tableId,
+        'new_table_number' : newTableNumber,
+        'new_capacity' : newCapacity,
+        'restaurant_id' : restaurantId
+      })
+    );
+
+    if (response.statusCode == 200 ){
+      print('${response.body}');
+      final body = json.decode(response.body);
+      return Table.fromJson(body);
+    }
+    else{
+      throw Exception("Failed to save table");
+    }
+  }
+
 }
