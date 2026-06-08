@@ -46,10 +46,7 @@ class AvailableSlotsNotifier extends AsyncNotifier<AvailableSlots> {
         if (selectedReservationId == 0)
           ref.read(selectedSlotProvider.notifier).setSelectedSlot(slots.first);
         else { // on selectionne le slot qui est celui de la reservation existante
-          final currentReservation = await ref.watch(currentReservationProvider(selectedReservationId).future);
-          final reservationDateTime = currentReservation!.datetime;
-          final reservationSlot =  DateFormat('HH:mm:ss', 'fr_FR',).format(reservationDateTime);
-          ref.read(selectedSlotProvider.notifier).setSelectedSlot(reservationSlot);
+          await selectSlot(selectedReservationId, slots);
         }
       }
       return availableSlots;
@@ -57,5 +54,17 @@ class AvailableSlotsNotifier extends AsyncNotifier<AvailableSlots> {
       debugPrint('$e\n$st');
       throw Exception('Failed to build available slots notifier');
     }
+  }
+
+  Future<void> selectSlot(int selectedReservationId, List<String> slots) async {
+     final currentReservation = await ref.watch(currentReservationProvider(selectedReservationId).future);
+    final reservationDateTime = currentReservation!.datetime;
+    final reservationSlot =  DateFormat('HH:mm:ss', 'fr_FR',).format(reservationDateTime);
+    final selectedSlotNotifier = ref.read(selectedSlotProvider.notifier);
+    // si le creneau existe dans la liste des creneau
+    if (slots.contains(reservationSlot))
+      selectedSlotNotifier.setSelectedSlot(reservationSlot);
+    else // sinon on dit qu'il est null
+      selectedSlotNotifier.setSelectedSlot(null);
   }
 }

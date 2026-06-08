@@ -16,6 +16,7 @@ import 'package:prbd_2526_a07/views/widgets/available_slots_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/date_time_picker_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
+import '../../models/reservation.dart';
 import '../../providers/reservation_providers/capacity_check_provider.dart';
 import '../../providers/reservation_providers/selected_slot_provider.dart';
 import '../widgets/special_requests_widget.dart';
@@ -168,17 +169,51 @@ class ReservationFormPage extends ConsumerWidget {
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
                   onPressed:
-                      !specialRequestsNotifier.isValid()
+                      !specialRequestsNotifier.isValid() || selectedSlot == null
                           ? null
                           : () async {
-                            final savedReseravation = await currentReservationNotifier
-                                .saveReservation(
-                                selectedDate: selectedReservationDateState.value!,
-                                selectedSlot: selectedSlot!,
-                                numberOfGuests: numberOfGuestsState,
-                                capacityCheck: capacityCheckState.value!,
-                                specialRequest: specialRequestsState.value);
-                            Navigator.pushReplacementNamed(context, '/home_client_page');
+                            // si le status de la reservation est confirmee, il faut afficher le popup qui va avertir du retour vers pending
+                            if (selectedReservationId != 0 && currentReservationState.value!.status == Status.confirmed){
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) => AlertDialog( // https://api.flutter.dev/flutter/material/AlertDialog-class.html
+                                        title: const Text('Modifier une réservation confirmée'),
+                                        content: const Text('Cette réservation est confirmée. La modifier la remettra en attente et les tables associées seront libérées. Souhaitez-vous continuer ?'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, 'Cancel'),
+                                            child: const Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              await currentReservationNotifier.saveReservation(
+                                              selectedDate: selectedReservationDateState.value!,
+                                              selectedSlot: selectedSlot!,
+                                              numberOfGuests: numberOfGuestsState,
+                                              capacityCheck: capacityCheckState.value!,
+                                              specialRequest: specialRequestsState.value);
+                                              Navigator.pop(context, 'OK');
+                                              Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
+                                            },
+                                            child: const Text('Continuer', style: TextStyle(color: Colors.red),),
+                                          ),
+                                        ],
+                                      )
+                                  );
+                            } else {
+                              final savedReseravation = await currentReservationNotifier
+                                  .saveReservation(
+                                  selectedDate: selectedReservationDateState
+                                      .value!,
+                                  selectedSlot: selectedSlot!,
+                                  numberOfGuests: numberOfGuestsState,
+                                  capacityCheck: capacityCheckState.value!,
+                                  specialRequest: specialRequestsState.value);
+
+                              selectedReservationId == 0
+                                  ? Navigator.pushReplacementNamed(context, '/home_client_page')
+                                  : Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
+                            }
                           },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
