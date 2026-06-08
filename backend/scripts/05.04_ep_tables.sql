@@ -101,3 +101,26 @@ end;
 $$ language plpgsql security definer;
 
 grant execute on function is_occupee(int, timestamp) to manager;
+
+create or replace function check_table_number_unicity(_table_number int, table_id int, restaurant_id int) returns json as
+    $$
+    declare result bool;
+    begin
+        perform auth.check_logged();
+        if (auth.role() = 'manager' and check_manager_works_in_restaurant(auth.id(), restaurant_id )) then
+            -- nouvelle table, on on regarde si le non est unique dans toute la table
+            if (table_id = 0) then
+                select (not exists((select t.id from tables t where t.restaurant = restaurant_id and t.table_number = _table_number))) into result;
+            else
+                -- si c'est une table existante, on regarde si d'abord le table_number number est le table_number existant sinon on regarde s'il est unique
+                select( ((select t.table_number from tables t where t.id = table_id) = _table_number) OR (not exists(select t.id from tables t where t.table_number = _table_number and t.restaurant = restaurant_id))) into result;
+            end if;
+        return json_build_object('is_unique', result);
+        end if;
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function check_table_number_unicity(int, int, int) to manager;
+
+-- tests
+--select ((select t.table_number from tables t where t.id = 11) = 4) OR (not exists(select t.id from tables t where t.table_number = 4 and t.restaurant = 4));

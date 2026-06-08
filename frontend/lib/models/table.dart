@@ -100,8 +100,21 @@ class Table {
     return null;
   }
 
-  static Future<String?> checkTableNumberUnicity(String newTableNumber, int tableId) async {
-    final response = await ApiClient.get('check_table_number_unicity?table_number=$newTableNumber&table_id=$tableId');
+  static Future<String?> checkTableNumberUnicity(String newTableNumber, int tableId, int selectedRestaurantId) async {
+    if (newTableNumber.isEmpty) return null;
+    try {
+      final response = await ApiClient.get(
+          'check_table_number_unicity?_table_number=$newTableNumber&table_id=$tableId&restaurant_id=$selectedRestaurantId');
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        final isUnique = body['is_unique'];
+        return !isUnique ? "Numero de table non unique." : null;
+      }else{
+        throw Exception('Failed to get checkTableNumberUnicity from db.Response: ${response.body}');
+      }
+    } catch(e, st){
+      throw Exception('$e\n$st');
+    }
   }
 
 }
