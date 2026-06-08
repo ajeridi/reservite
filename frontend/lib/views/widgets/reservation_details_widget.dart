@@ -52,10 +52,11 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const Icon(Icons.restaurant),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    '${currentReservationState?.restaurant!.name}',
+                  child:
+                  currentReservationState != null ? Text(
+                    '${currentReservationState!.restaurant!.name}',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  ) : Text(""),
                 ),
               ],
             ),
@@ -65,10 +66,11 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const Icon(Icons.location_on, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Expanded(
-                  child: Text(
-                    '${currentReservationState?.restaurant!.address}, ${currentReservationState?.restaurant!.city}',
+                  child:
+                  currentReservationState != null ? Text(
+                    '${currentReservationState!.restaurant!.address}, ${currentReservationState!.restaurant!.city}',
                     style: TextStyle(color: Colors.grey[600]),
-                  ),
+                  ) : Text(""),
                 ),
               ],
             ),
@@ -78,7 +80,7 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const Icon(Icons.phone, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(
-                  '${currentReservationState?.restaurant!.phone}',
+                  '${currentReservationState != null ? currentReservationState!.restaurant!.phone : ""}',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               ],
@@ -91,7 +93,7 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const Icon(Icons.calendar_today, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Date: ${DateFormat('EE dd/MM/yyyy', 'fr_FR').format(currentReservationState!.datetime)}',
+                  'Date: ${currentReservationState != null ? DateFormat('EE dd/MM/yyyy', 'fr_FR').format(currentReservationState!.datetime) : ""}',
                 ),
               ],
             ),
@@ -101,7 +103,7 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const Icon(Icons.access_time, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Heure: ${DateFormat('HH:mm', 'fr_FR').format(currentReservationState!.datetime)}',
+                  'Heure: ${currentReservationState != null ? DateFormat('HH:mm', 'fr_FR').format(currentReservationState!.datetime) : ""}',
                 ),
               ],
             ),
@@ -111,7 +113,7 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const Icon(Icons.people, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Nombre de convives: ${currentReservationState?.numberOfGuests}',
+                  'Nombre de convives: ${currentReservationState != null ? currentReservationState?.numberOfGuests : ""}',
                 ),
               ],
             ),
@@ -123,16 +125,16 @@ class ReservationDetailsWidget extends ConsumerWidget {
                 const Text('Statut: '),
                 Chip(
                   label: Text(
-                    '${currentReservationState?.statusToString()}',
+                    '${currentReservationState != null ? currentReservationState?.statusToString() : ""}',
                     style: TextStyle(fontSize: 12, color: Colors.white),
                   ),
-                  backgroundColor: statusColor(currentReservationState!.status),
+                  backgroundColor: currentReservationState != null ? statusColor(currentReservationState!.status) : Colors.white,
                   padding: EdgeInsets.zero,
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            if (currentReservationState?.specialRequests != null) ...[
+            if (currentReservationState != null && currentReservationState?.specialRequests != null) ...[
               // faut rajouter les '...' pour inclure plusieurs widgets dans un if
               const Divider(),
               const SizedBox(height: 8),

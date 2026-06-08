@@ -207,10 +207,10 @@ class Reservation  implements Comparable<Reservation>{
     return'$id $client $restaurant $datetime $numberOfGuests $status $tables';
   }
 
-  static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests}) async {
+  static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, required int reservation_id}) async {
       final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
       try {
-        final response = await ApiClient.get('check_service_tables_capacity?number_of_guests=$numberOfGuests&date_of_reservation=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
+        final response = await ApiClient.get('check_number_of_guests_validity?restaurant_id=$restaurantId&selected_date=$dateString&time_slot=$slot&_number_of_guests=$numberOfGuests&reservation_id=$reservation_id');
         if (response.statusCode != 200) {
           throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
         }
@@ -223,7 +223,7 @@ class Reservation  implements Comparable<Reservation>{
       }
     }
 
-  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests,}) async {
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int? reservationId}) async {
     try {
       final dateString = DateFormat('yyyy-MM-dd').format(date);
 
@@ -246,6 +246,7 @@ class Reservation  implements Comparable<Reservation>{
           'datetime_': datetimeString,
           'number_of_guests_': numberOfGuests,
           'special_requests_': specialRequests,
+          'reservation_id' : reservationId,
         }),
       );
 
@@ -266,5 +267,18 @@ class Reservation  implements Comparable<Reservation>{
   int compareTo(Reservation other) {
     // TODO: implement compareTo
     return this.datetime.compareTo(other.datetime) == 0 ? other.id.compareTo(this.id) : other.datetime.compareTo(this.datetime);
+  }
+
+  static String? validateSpecialRequests(String? newSpecialRequests){
+    final text = newSpecialRequests?.trim() ?? '';
+
+    if (text.isEmpty) {
+      return null;
+    }
+
+    if (text.length < 10) {
+      return 'La demande spéciale doit contenir au moins 10 caractères.';
+    }
+    return null;
   }
 }

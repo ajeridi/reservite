@@ -125,3 +125,19 @@ grant execute on function get_restaurants(text) to authenticated;
 --                         'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1))) from restaurants r
 --                                                         join public.restaurant_managers rm on r.id = rm.restaurant
 --                                                         where rm.manager = auth.id();
+
+-- endpoint qui va retourner la capacite d'un restaurant (somme des ses tables)
+create or replace function get_restaurant_capacity(restaurant_id int) returns json as
+    $$
+    declare restaurant_capacity  int := (select sum(capacity) from tables where restaurant = restaurant_id);
+    begin
+        perform auth.check_logged();
+        if (auth.role() != 'client') then
+            raise exception 'Not allowed';
+        end if;
+        return json_build_object('restaurant_capacity', restaurant_capacity);
+    end;
+    $$language plpgsql security definer ;
+
+grant execute on function get_restaurant_capacity(int) to client;
+

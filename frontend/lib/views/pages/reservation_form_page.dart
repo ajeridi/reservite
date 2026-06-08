@@ -18,6 +18,7 @@ import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
 import '../../providers/reservation_providers/capacity_check_provider.dart';
 import '../../providers/reservation_providers/selected_slot_provider.dart';
+import '../widgets/special_requests_widget.dart';
 import '../widgets/warning_widget.dart';
 
 void main() async {
@@ -50,9 +51,7 @@ class ReservationFormPage extends ConsumerWidget {
 
     // on va chercher la reservation courante (donc si elle est nouvelle elle aura un id de 0)
     final selectedReservationId = ref.watch(selectedReservationIdProvider);
-    final currentReservationState = ref.watch(
-      currentReservationProvider(selectedReservationId),
-    );
+    final currentReservationState = ref.watch(currentReservationProvider(selectedReservationId));
     final currentReservationNotifier = ref.read(currentReservationProvider(selectedReservationId).notifier);
 
     final selectedReservationDateState = ref.watch(selectedReservationDateProvider);
@@ -73,11 +72,14 @@ class ReservationFormPage extends ConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // retour a search_restaurant
-            Navigator.pushReplacementNamed(context, '/search_restaurants_page');
+            // retour a search_restaurant si c'est une nouvelle reservation
+            if (selectedReservationId == 0)
+              Navigator.pushReplacementNamed(context, '/search_restaurants_page');
+            else // sinon on va vers le detail de la reservation
+              Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
           },
         ),
-        title: const Text('Nouvelle réservation'),
+        title: Text('${selectedReservationId == 0 ? 'Nouvelle' : 'Modifier une'} réservation'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -122,11 +124,17 @@ class ReservationFormPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                selectedReservationId == 0 ? // si nouvelle reservation, charger le nom du restaurant selectionnne, sinon charger le nom du restaurant de la reservation selectionnee
                 currentRestaurantState.whenData((resto) =>
                 Text(resto.name,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 )
-                ).value!,
+                ).value! : 
+                currentReservationState.when(
+                  data: (res) => Text(res!.restaurant!.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  error: (err, _) => Text("Error finding restaurant name"),
+                  loading: () => CircularProgressIndicator()
+                ),
                 const SizedBox(height: 24),
                 DatePickerReservation(),
                 const Divider(),
@@ -156,32 +164,27 @@ class ReservationFormPage extends ConsumerWidget {
                   },
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Demandes spéciales (optionnel)',
-                    border: OutlineInputBorder(),
-                    hintText: 'Allergies, préférences...',
-                  ),
-                  validator: specialRequestsNotifier.validate,
-                  onChanged: specialRequestsNotifier.setSpecialRequest,
-                  maxLines: 3,
-                ),
+                SpecialRequestsWidget(),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    final savedReseravation = await currentReservationNotifier.saveReservation(
-                        selectedDate: selectedReservationDateState.value!,
-                        selectedSlot: selectedSlot!,
-                        numberOfGuests: numberOfGuestsState,
-                        capacityCheck: capacityCheckState.value!,
-                        specialRequest: specialRequestsState);
-                    Navigator.pushReplacementNamed(context, '/home_client_page');
-                  },
+                  onPressed:
+                      !specialRequestsNotifier.isValid()
+                          ? null
+                          : () async {
+                            final savedReseravation = await currentReservationNotifier
+                                .saveReservation(
+                                selectedDate: selectedReservationDateState.value!,
+                                selectedSlot: selectedSlot!,
+                                numberOfGuests: numberOfGuestsState,
+                                capacityCheck: capacityCheckState.value!,
+                                specialRequest: specialRequestsState.value);
+                            Navigator.pushReplacementNamed(context, '/home_client_page');
+                          },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   icon: const Icon(Icons.add),
-                  label: const Text('Créer la réservation'),
+                  label: Text('${selectedReservationId == 0 ? "Créer" : "Modifier"} la réservation'),
                 ),
               ],
             ),

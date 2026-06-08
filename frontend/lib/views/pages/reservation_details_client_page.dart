@@ -68,6 +68,9 @@ class ReservationDetailsClientPage extends ConsumerWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
+          // nettoyage des providers lorsqu'on quitte la page (+ d'infos sur le invalidate https://riverpod.dev/docs/concepts2/refs#resetting-a-providers-state)
+          ref.invalidate(currentReservationProvider);
+          ref.invalidate(selectedReservationIdProvider);
           Navigator.pushReplacementNamed(context, '/home_client_page');
         },
       ),
@@ -133,12 +136,14 @@ class ReservationDetailsClientPage extends ConsumerWidget {
               currentReservationState: reservation,
             ),
             const SizedBox(height: 24),
-            if (reservation!.canEdit())
+            if (reservation != null && reservation.canEdit())
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/reservation_form_page');
+                      },
                       icon: const Icon(Icons.edit),
                       label: const Text('Modifier'),
 

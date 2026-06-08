@@ -219,8 +219,7 @@ begin
         set datetime         = datetime_,
             number_of_guests = number_of_guests_,
             special_requests = special_requests_
-        WHERE client = auth.id()
-          AND restaurant = restaurant_id;
+        WHERE id = reservation_id;
     end if;
     return get_reservation(updated_reservation_id);
 end;
@@ -414,7 +413,32 @@ grant execute on function get_available_slots(int, date, int) to client;
 
 /*
         ENDPOINT QUI RETOURNE SI LE RESTAURANT A ASSEZ DE PLACES POUR ACCEUILLIR LES CONVIVES
+
+        Ce qu'il faut faire c'est comparer la capacite totale du restaurant (somme des tables au sein du restaurant) et
+        la somme des convives des reservations le jour de la reservation au service de la reservation
+        (si la reservation existe, on en prends pas en compte son nombre de convive de la base)
 */
+
+create or replace function check_number_of_guests_validity(restaurant_id int, selected_date date, time_slot time, _number_of_guests int,  reservation_id int default 0) returns bool as
+    $$
+    declare restaurant_capacity int := (select sum(capacity) from tables where restaurant = restaurant_id);
+    declare total_number_of_guests int;
+    begin
+        select sum(rsv.number_of_guests)
+        from reservations rsv   join restaurants rst on rst.id = rsv.restaurant,
+        (select * from get_service_by_datetime(selected_date, time_slot, restaurant_id)) as s -- retourne le service du jour de la reservation qui contient le creneau
+        where rsv.datetime::date = selected_date and -- reservations a la date selectionne
+              rsv.restaurant = restaurant_id and -- reservation dans le restaurant selectionne
+              rsv.status in ('pending'::status_type, 'confirmed'::status_type) and -- ayant le status en attente ou confirmee
+              s.day_of_week = extract(isodow from rsv.datetime::date) and -- au jour du service selectionne
+              rsv.datetime::time between s.start_time and s.end_time and -- compris dans le service selectionne
+              (reservation_id = 0 OR (reservation_id != 0 and rsv.id != reservation_id)) -- si c'est une nouvelle reservation prendre en compte toutes les reservations, si ce n'est pas une nouvelle, ne pas prendre en compte la reservation en cours d'edition
+        into total_number_of_guests;
+        return (coalesce(total_number_of_guests,0) + _number_of_guests) <= restaurant_capacity; -- retourne vrai si ya assez de places
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function check_number_of_guests_validity(int, date, time, int, int) to client;
 
 /*
 Retourne le nombre de reservations en attentes
@@ -435,11 +459,12 @@ grant execute on function get_pending_reservation_count(int) to manager;
 create or replace function get_service_by_datetime(service_date date, time_slot time, restaurant_id int)
     returns setof services as
     $$
+        -- cherchons tous les services...
         select s.*
         from services s
-        where s.restaurant = restaurant_id
-          and s.day_of_week = extract(isodow from service_date)::int
-          and time_slot >= s.start_time
+        where s.restaurant = restaurant_id -- dans le restaurant selectionne
+          and s.day_of_week = extract(isodow from service_date)::int -- au jour selectionne
+          and time_slot >= s.start_time -- tel que le creneau est situe entre le debut et la fin de ce service
           and time_slot < s.end_time;
     $$ language sql security definer;
 
