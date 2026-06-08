@@ -85,6 +85,7 @@ class ReservationsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Reservatio
   }
 
   void addOrUpdateReservation(Reservation savedReservation) {
+    state = AsyncLoading();
     final reservations = state.value ?? SplayTreeSet();
     reservations.removeWhere((reservation) => reservation.id == savedReservation.id);
     reservations.add(savedReservation);

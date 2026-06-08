@@ -10,10 +10,13 @@ NotifierProvider<NumberOfGuestsNotifier, int>(
 class NumberOfGuestsNotifier extends Notifier<int> {
   @override
   int build() {
-    final selectedReservationId = ref.read(selectedReservationIdProvider);
-    final currentReservation = ref.watch(currentReservationProvider(selectedReservationId));
-
-    return currentReservation.value!.numberOfGuests;
+    final selectedReservationId = ref.watch(selectedReservationIdProvider);
+    // si c'est une nouvelle reservation on retourne 2
+    if (selectedReservationId == 0)
+      return 2;
+    // si c'est une reservation existante on retourne le number of guest de la reservation
+    final currentReservation = ref.watch(currentReservationProvider(selectedReservationId)).asData;
+    return currentReservation!.value!.numberOfGuests;
   }
 
   void increment() {

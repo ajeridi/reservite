@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
 
 class ApplicationTime {
@@ -22,5 +23,21 @@ class ApplicationTime {
     }
 
 
+  }
+
+  static Future<void> saveTime(DateTime newTime) async {
+    final dateString = DateFormat("yyyy-MM-dd HH:mm:ss", "fr_FR").format(newTime);
+    try {
+      final response = await ApiClient.post('save_simulated_time',
+        body: json.encode({
+          'new_time': dateString,
+        }),
+      );
+      if (response.statusCode != 200){
+        throw Exception("Failed to save date time");
+      }
+    } catch(e, st){
+      throw Exception("Failed to save date time.\n$e\n$st");
+    }
   }
 }

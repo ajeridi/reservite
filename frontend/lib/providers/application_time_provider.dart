@@ -38,8 +38,10 @@ class ApplicationTimeNotifier extends AbstractAsyncNotifier<DateTime>{
   }
 
   //update time localement
-  void setTime(DateTime newTime){
+  void setTime(DateTime newTime) async {
     state = AsyncData(newTime);
+    // update dans la base de donnee du nouveau temps
+    await ApplicationTime.saveTime(newTime);
   }
 
 }

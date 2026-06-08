@@ -41,7 +41,9 @@ class RestaurantDetailsPage extends ConsumerWidget {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context);
+              //nettoyage du provider de l'id du restaurant selectionne
+              ref.invalidate(selectedRestaurantProvider);
+              Navigator.pushReplacementNamed(context, '/search_restaurants_page');
             },
           ),
           title: const Text('Détails du restaurant'),

@@ -39,19 +39,19 @@ class Reservation  implements Comparable<Reservation>{
     this.status = Status.pending,
     this.specialRequests = null,
     required this.tables,
-});
+  });
 
   //constructeur from Json
   factory Reservation.fromJson(Map<String, dynamic> json){
     return Reservation(
-        id: json['id'],
-        client: Client.fromJson(json['client']),
-        restaurant: Restaurant.makeRestaurantOfReservation(json['restaurant']),
-        datetime: DateTime.parse(json['datetime']),
-        numberOfGuests: json['number_of_guests'],
-        status: toStatus(json['status']),
-        specialRequests: json['special_requests'],
-        tables: Table.tablesFromJson(json['tables']),
+      id: json['id'],
+      client: Client.fromJson(json['client']),
+      restaurant: Restaurant.makeRestaurantOfReservation(json['restaurant']),
+      datetime: DateTime.parse(json['datetime']),
+      numberOfGuests: json['number_of_guests'],
+      status: toStatus(json['status']),
+      specialRequests: json['special_requests'],
+      tables: Table.tablesFromJson(json['tables']),
     );
   }
 
@@ -116,15 +116,15 @@ class Reservation  implements Comparable<Reservation>{
     };
   }
 
- Reservation copyWith( {
-   int? id,
-   Client? client,
-   Restaurant? restaurant,
-   DateTime? datetime,
-   int? numberOfGuests,
-   Status? status,
+  Reservation copyWith( {
+    int? id,
+    Client? client,
+    Restaurant? restaurant,
+    DateTime? datetime,
+    int? numberOfGuests,
+    Status? status,
     String? specialRequests,
-   List<Table>? tables}){
+    List<Table>? tables}){
     return Reservation(
         id: id ?? this.id,
         client: client ?? this.client,
@@ -133,7 +133,7 @@ class Reservation  implements Comparable<Reservation>{
         numberOfGuests: numberOfGuests ?? this.numberOfGuests,
         status: status ?? this.status,
         tables: tables ?? this.tables);
- }
+  }
 
 
 
@@ -142,8 +142,8 @@ class Reservation  implements Comparable<Reservation>{
   Future<Reservation> getCancel() async{
     try {
       final response = await ApiClient.post(
-        'cancel_reservation',
-      body: json.encode({'reservation_id': id}));
+          'cancel_reservation',
+          body: json.encode({'reservation_id': id}));
       if (response.statusCode == 200) {
         return Reservation.fromJson(json.decode(response.body));
       } else {
@@ -161,8 +161,8 @@ class Reservation  implements Comparable<Reservation>{
   Future<Reservation> getCompleted() async{
     try{
       final response = await ApiClient.post(
-        'complete_reservation',
-        body:json.encode({'reservation_id' : id})
+          'complete_reservation',
+          body:json.encode({'reservation_id' : id})
       );
       if(response.statusCode == 200){
         return Reservation.fromJson(json.decode(response.body));
@@ -208,26 +208,22 @@ class Reservation  implements Comparable<Reservation>{
   }
 
   static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, required int reservation_id}) async {
-      final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
-      print("$restaurantId");
-      print("$date");
-      print("$slot");
-      print("$numberOfGuests");
-      try {
-        final response = await ApiClient.get('check_capacity?nombre_convive=$numberOfGuests&date_simulee=$dateString&time_slot=$slot&restaurant_id=$restaurantId&reservation_id=$reservation_id');
-        if (response.statusCode != 200) {
-          throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
-        }
-        final body = json.decode(response.body);
-        return body;
-
-      } catch (e, st) {
-        print('$e\n$st');
-        throw Exception('Failed to check capacity.');
+    final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
+    try {
+      final response = await ApiClient.get('check_number_of_guests_validity?restaurant_id=$restaurantId&selected_date=$dateString&time_slot=$slot&_number_of_guests=$numberOfGuests&reservation_id=$reservation_id');
+      if (response.statusCode != 200) {
+        throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
       }
-    }
+      final body = json.decode(response.body);
+      return body;
 
-  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int reservation_id}) async {
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to check capacity.');
+    }
+  }
+
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int? reservationId}) async {
     try {
       final dateString = DateFormat('yyyy-MM-dd').format(date);
 
@@ -250,7 +246,7 @@ class Reservation  implements Comparable<Reservation>{
           'datetime_': datetimeString,
           'number_of_guests_': numberOfGuests,
           'special_requests_': specialRequests,
-          'reservation_id' : reservation_id == 0 ? null : reservation_id,
+          'reservation_id' : reservationId,
         }),
       );
 
@@ -271,5 +267,18 @@ class Reservation  implements Comparable<Reservation>{
   int compareTo(Reservation other) {
     // TODO: implement compareTo
     return this.datetime.compareTo(other.datetime) == 0 ? other.id.compareTo(this.id) : other.datetime.compareTo(this.datetime);
+  }
+
+  static String? validateSpecialRequests(String? newSpecialRequests){
+    final text = newSpecialRequests?.trim() ?? '';
+
+    if (text.isEmpty) {
+      return null;
+    }
+
+    if (text.length < 10) {
+      return 'La demande spéciale doit contenir au moins 10 caractères.';
+    }
+    return null;
   }
 }

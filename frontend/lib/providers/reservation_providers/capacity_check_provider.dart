@@ -18,19 +18,24 @@ class CapacityCheckNotifier extends AsyncNotifier<bool> {
   Future<bool> build() async {
     final numberOfGuests = ref.watch(numberOfGuestsProvider);
     final selectedSlot = ref.watch(selectedSlotProvider);
-
-    final selectedReservationId = ref.read(selectedReservationIdProvider);
-    final currentRestaurant = ref.watch(currentReservationProvider(selectedReservationId)).value!.restaurant!.id;
+    var selectedRestaurantId = ref.watch(selectedRestaurantProvider);
 
     final selectedReservationDate =
     await ref.watch(selectedReservationDateProvider.future);
+
+    final selectedReservationId = ref.watch(selectedReservationIdProvider);
+
+    if (selectedReservationId != 0) { // si en mode edition il faut prendre le restaurant de la reservation selectionnee (ne pas se baser sur selectedRestaurant = 0)
+      final currentReservation = await ref.watch(currentReservationProvider(selectedReservationId).future);
+      selectedRestaurantId = currentReservation!.restaurant!.id;
+    }
 
     if (selectedSlot == null) { // si pas de slot, pas de check donc retourner true
       return true;
     }
 
     return Reservation.checkCapacity(
-      restaurantId: currentRestaurant,
+      restaurantId: selectedRestaurantId,
       date: selectedReservationDate,
       slot: selectedSlot,
       numberOfGuests: numberOfGuests,

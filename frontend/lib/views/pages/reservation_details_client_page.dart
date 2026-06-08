@@ -9,7 +9,6 @@ import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import '../../core/tools/pick_date_time.dart';
 import '../../providers/application_time_provider.dart';
 import '../../providers/reservation_providers/current_reservation_provider.dart';
-import '../../providers/reservation_providers/reservations_provider.dart';
 import '../../providers/reservation_providers/selected_reservation_id_provider.dart';
 import '../widgets/btn_annulation_widget.dart';
 import '../widgets/reservation_details_widget.dart';
@@ -65,97 +64,103 @@ class ReservationDetailsClientPage extends ConsumerWidget {
       DateTime simulatedTime,
       ) {
     return Scaffold(
-    appBar: AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, '/home_client_page');
-        },
-      ),
-      title: const Text('Détails de la réservation'),
-      automaticallyImplyLeading: false,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.refresh),
-          tooltip: 'Rafraîchir les données',
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            currentReservationNotifier.refresh();
+            // nettoyage des providers lorsqu'on quitte la page (+ d'infos sur le invalidate https://riverpod.dev/docs/concepts2/refs#resetting-a-providers-state)
+            ref.invalidate(currentReservationProvider);
+            ref.invalidate(selectedReservationIdProvider);
+            Navigator.pushReplacementNamed(context, '/home_client_page');
           },
         ),
-      ],
-      elevation: 2,
-      backgroundColor: theme.colorScheme.primary,
-      foregroundColor: theme.colorScheme.onPrimary,
-      surfaceTintColor: Colors.transparent,
-      flexibleSpace: Align(
-        alignment: Alignment.topCenter,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 2.0),
-            //GestureDetector pour detecter la touche
-            child : GestureDetector(
-              onTap: () async{
-                final newDatetime = await pickDateTime(
-                  context,
-                  initialDate: simulatedTime,
-                );
-                if(newDatetime != null){
-                  //on met à jour le provider avec la nouvelle date
-                  ref.read(applicationTimeProvider.notifier).setTime(newDatetime);
-                }
-              },
-            child: Tooltip(
-              message:
+        title: const Text('Détails de la réservation'),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Rafraîchir les données',
+            onPressed: () {
+              currentReservationNotifier.refresh();
+            },
+          ),
+        ],
+        elevation: 2,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        surfaceTintColor: Colors.transparent,
+        flexibleSpace: Align(
+          alignment: Alignment.topCenter,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2.0),
+              //GestureDetector pour detecter la touche
+              child : GestureDetector(
+                onTap: () async{
+                  final newDatetime = await pickDateTime(
+                    context,
+                    initialDate: simulatedTime,
+                  );
+                  if(newDatetime != null){
+                    //on met à jour le provider avec la nouvelle date
+                    ref.read(applicationTimeProvider.notifier).setTime(newDatetime);
+                  }
+                },
+                child: Tooltip(
+                  message:
                   'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-              child: Text(
-                DateFormat(
-                  'EEEE dd/MM/yyyy HH:mm',
-                  'fr_FR',
-                ).format(simulatedTime),
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.grey[400],
-                  fontWeight: FontWeight.normal,
+                  child: Text(
+                    DateFormat(
+                      'EEEE dd/MM/yyyy HH:mm',
+                      'fr_FR',
+                    ).format(simulatedTime),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
                 ),
               ),
-            ),
             ),
           ),
         ),
       ),
-    ),
-    body: SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ReservationDetailsWidget(
-              currentReservationState: reservation,
-            ),
-            const SizedBox(height: 24),
-            if (reservation!.canEdit())
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/edit_reservation_form_page');
-                      },
-                      icon: const Icon(Icons.edit),
-                      label: const Text('Modifier'),
-
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  btnaAnulationWidget(currentReservationNotifier : currentReservationNotifier),
-                ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ReservationDetailsWidget(
+                currentReservationState: reservation,
               ),
-          ],
+              const SizedBox(height: 24),
+              if (reservation != null && reservation.canEdit())
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed:
+                        reservation.datetime.isBefore(simulatedTime)
+                            ? null
+                            : () {
+                          Navigator.pushReplacementNamed(context, '/reservation_form_page');
+                        },
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Modifier'),
+
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    btnaAnulationWidget(currentReservationNotifier : currentReservationNotifier),
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
   }
 }
 

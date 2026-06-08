@@ -29,11 +29,11 @@ import 'capacity_check_provider.dart';
 import 'number_of_guests_provider.dart';
 
 
-final currentReservationProvider = AsyncNotifierProvider.autoDispose
+final currentReservationProvider = AsyncNotifierProvider
     .family<CurrentReservationNotifier, Reservation?, int>(
-      // autoDispose pour detruire le provider une fois qu'on ne l'utilise plus
-      CurrentReservationNotifier.new,
-    );
+  // autoDispose pour detruire le provider une fois qu'on ne l'utilise plus
+  CurrentReservationNotifier.new,
+);
 
 class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
   CurrentReservationNotifier(this.id);
@@ -44,12 +44,12 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
   FutureOr<Reservation?> build() async {
     state = AsyncData(null);
     state = AsyncLoading();
-    final  currentRestaurantState = ref.watch(currentRestaurantProvider(ref.watch(selectedRestaurantProvider))).value;
-    final clientState = ref.watch(clientProvider);
-    final applicationTime = ref.watch(applicationTimeProvider);
     try {
+      // si id != 0, on a clique sur une reservation, on va donc la chercher avec son id
       if (id != 0) return await Reservation.getReservation(id);
-      else return new Reservation(id: 0, client: clientState.value!, restaurant: currentRestaurantState, datetime: applicationTime.value!, tables: []);
+      else { // si l'id vaut 0, on retourne une reservation vide
+        return null;
+      }
     } catch (e, st) {
       throw Exception("Something went wrong.\nPlease retry later.");
     }
@@ -76,20 +76,16 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
 
   Future<Reservation> saveReservation({required DateTime selectedDate, required String selectedSlot, required int numberOfGuests, required bool capacityCheck, String? specialRequest,}) async {
     // recherche de toutes les donnes entree par l'utilisateur via les providers
-    var restaurantId = ref.read(selectedRestaurantProvider);
+    int restaurantId = ref.read(selectedRestaurantProvider);
+    final reservationId = ref.read(selectedReservationIdProvider);
 
-    var reservationId = ref.read(selectedReservationIdProvider);
-
-    if (restaurantId == 0) {
+    if (reservationId != 0){ // si on modifie une reservation, il faut chercher l'id du restaurant (sinon il vaut 0)
       restaurantId = state.value!.restaurant!.id;
     }
 
     // dernieres validations
     if (selectedSlot == null) {
       throw Exception('Veuillez sélectionner un créneau.');
-    }
-    if (!capacityCheck) {
-      throw Exception('Capacité insuffisante pour ce créneau.');
     }
 
     final savedReservation = await Reservation.saveReservation(
@@ -98,23 +94,23 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
       slot: selectedSlot,
       numberOfGuests: numberOfGuests,
       specialRequests: specialRequest!.isEmpty ? null : specialRequest,
-      reservation_id: reservationId
+      reservationId: reservationId == 0 ? null : reservationId,
     );
 
     state = AsyncData(savedReservation);
 
     // mettre a jour directement la liste soit en ajoutant si nouvelle reseravation, soit en supprimant et en rajoutant la nouvelle
-    ref.read(reservationsProvider.notifier).updateListAfterEdit(savedReservation);
+    ref.read(reservationsProvider.notifier).addOrUpdateReservation(savedReservation);
 
     return savedReservation;
   }
 
 // on appelle getCompleted sûr la state, ensuite on update la page de reservations grâce a updateList
-Future<void> complete() async{
+  Future<void> complete() async{
     final completed = await state.value!.getCompleted();
     state = AsyncData(completed);
     ref.read(reservationsProvider.notifier).updateList(state.value!);
-}
+  }
 
   Future<void> confirmWithSelectedTables(Set<int> tableIds) async {
     if (tableIds.isEmpty) {

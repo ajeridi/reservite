@@ -16,13 +16,19 @@ final selectedReservationDateProvider = AsyncNotifierProvider(
 class SelectedReservationDateNotifier extends AsyncNotifier<DateTime> {
   @override
   FutureOr<DateTime> build() async {
+    // on regarde la date de l'application
     final applicationTime = ref.watch(applicationTimeProvider);
-    final currentReservation = await ref.watch(
-      currentReservationProvider(ref.watch(selectedReservationIdProvider)).future
-    );
-    // si la reservation courante existe deja, on peut deja prendre son date time
-    if (currentReservation != null && currentReservation.id != 0) {
-      return currentReservation.datetime;
+    // on regarde si une reservation est selectionnee (pour differencier add/edit)
+    final selectedReservationId = ref.watch(selectedReservationIdProvider);
+    if (selectedReservationId != 0) { // si reservation existante
+      final currentReservation = await ref.watch(
+          currentReservationProvider(ref.watch(selectedReservationIdProvider))
+              .future
+      );
+      // si la reservation courante existe, on peut deja prendre son date time
+      if (currentReservation != null && currentReservation.id != 0) {
+        return currentReservation.datetime;
+      }
     }
     // sinon on prends le date time de l'application
     try {
@@ -46,5 +52,12 @@ class SelectedReservationDateNotifier extends AsyncNotifier<DateTime> {
   void subtractDay() {
     state = AsyncLoading();
     state = AsyncData(state.value!.subtract(const Duration(days: 1)));
+  }
+
+  bool isFirstDate(DateTime firstDate){
+    final selectedDate = state.value;
+    if (state.value != null)
+      return selectedDate!.compareTo(firstDate) == 0;
+    return false;
   }
 }
