@@ -8,6 +8,7 @@ import 'package:prbd_2526_a07/providers/current_table_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 
+import '../widgets/table_capacity_chooser_widget.dart';
 import '../widgets/table_number_form_widget.dart';
 
 void main() async {
@@ -106,23 +107,7 @@ class EditTablePage extends ConsumerWidget {
               TableNumberFormWidget(),
               const SizedBox(height: 16),
               const Text('Capacité'),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    onPressed: () {
-                    },
-                  ),
-                  const Text(
-                    ' personnes',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
+              TableCapacityChooserWidget(),
             ],
           ),
         ),
@@ -131,3 +116,4 @@ class EditTablePage extends ConsumerWidget {
   );
   }
 }
+
