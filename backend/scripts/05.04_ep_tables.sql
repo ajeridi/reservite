@@ -48,14 +48,14 @@ end;
 grant execute on function get_tables(int) to manager;
 
 
-create or replace function get_table(reservation_id int) returns json as
+create or replace function get_table(table_id int, restaurant_id int) returns json as
 $$
 begin
     -- verification si utilisateur connecte
     perform auth.check_logged();
 
     -- si user est un manager, il faut qu'il soit manager dans le restaurant dans lequel se trouve la reservation
-    if (auth.role() = 'manager' AND not exists(select * from restaurant_managers where manager = auth.id() and restaurant = (select rsv.restaurant from reservations rsv where rsv.id = reservation_id))) then
+    if (auth.role() = 'manager' AND not exists(select * from restaurant_managers where manager = auth.id() and restaurant = restaurant_id)) then
         raise exception 'Manager cannot check a table inside a restaurant he is not working in';
     end if;
 
@@ -66,11 +66,11 @@ begin
                            'capacity', tbl.capacity
                    )
             from tables tbl
-            where tbl.id = reservation_id);
+            where tbl.id = table_id);
 end;
 $$ language plpgsql security definer;
 
-grant execute on function get_table(int) to manager;
+grant execute on function get_table(int, int) to manager;
 
 
 /*

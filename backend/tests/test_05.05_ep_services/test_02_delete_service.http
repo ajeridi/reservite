@@ -1,0 +1,21 @@
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "bepenelle@reservite.com",
+  "password" : "Password1,"
+}
+
+###
+# Remplacer SERVICE_ID par un id supprimable (can_delete_service = true)
+GET http://localhost:3000/rpc/can_delete_service?service_id=SERVICE_ID
+Authorization: Bearer {{token}}
+
+###
+POST http://localhost:3000/rpc/delete_service
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "service_id": SERVICE_ID
+}

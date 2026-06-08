@@ -56,9 +56,9 @@ class Table {
     }
   }
 
-  static Future<Table?> getTable(int idtable) async {
+  static Future<Table?> getTable(int idtable, int idrestaurant) async {
     try {
-      final response = await ApiClient.get("get_table?reservation_id=$idtable");
+      final response = await ApiClient.get("get_table?table_id=$idtable&restaurant_id=$idrestaurant");
       if (response.statusCode == 200){
         final body = json.decode(response.body);
         return Table.fromJson(body);

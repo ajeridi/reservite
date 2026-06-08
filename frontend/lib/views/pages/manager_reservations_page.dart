@@ -16,6 +16,7 @@ import '../../core/tools/pick_date_time.dart';
 import '../../models/reservation.dart';
 import '../../providers/application_time_provider.dart';
 import '../../providers/reservation_providers/reservations_provider.dart';
+import '../widgets/bottom_navigation_bar_widget.dart';
 import '../widgets/data_error_widget.dart';
 
 /*
@@ -239,6 +240,7 @@ class ManagerReservationsPage extends ConsumerWidget {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBarWidget(currentIndex: 0),
     );
   }
 }

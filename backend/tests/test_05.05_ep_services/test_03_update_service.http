@@ -1,0 +1,28 @@
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "bepenelle@reservite.com",
+  "password" : "Password1,"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+###
+# Nombre de reservations qui seraient en dehors des nouvelles heures du service
+# (remplacer SERVICE_ID, et adapter day/heures pour tester le warning)
+GET http://localhost:3000/rpc/count_reservations_outside_service?service_id=SERVICE_ID&day_of_week_=2&start_time_=18:00:00&end_time_=22:00:00
+Authorization: Bearer {{token}}
+
+###
+# Modification du service
+POST http://localhost:3000/rpc/update_service
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "service_id": SERVICE_ID,
+  "day_of_week_": 2,
+  "start_time_": "18:00:00",
+  "end_time_": "22:00:00"
+}

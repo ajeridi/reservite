@@ -1,0 +1,13 @@
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "bepenelle@reservite.com",
+  "password" : "Password1,"
+}
+
+###
+GET http://localhost:3000/rpc/isempty?day_of_weekk=2&restaurantid=3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJlcGVuZWxsZUBlcGZjLmV1IiwibmFtZSI6IkJlbm_DrnQiLCJ1c2VyX2lkIjoyLCJleHAiOjE3ODEwMzY4ODN9.BYbsk4k4eOIDFc3Sxfixw5XN2tbaozxgkuxgqOnGMTM
+
+###
