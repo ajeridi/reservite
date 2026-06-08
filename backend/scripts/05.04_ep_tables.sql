@@ -64,7 +64,7 @@ begin
                            'restaurant', tbl.restaurant,
                            'table_number', tbl.table_number,
                            'capacity', tbl.capacity,
-                            'hasReservations', (select count(*) from reservation_tables rt where rt."table" = table_id) > 0
+                            'has_reservations', (select count(*) from reservation_tables rt where rt."table" = table_id) > 0
                    )
             from tables tbl
             where tbl.id = table_id);
