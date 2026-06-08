@@ -50,6 +50,7 @@ class ReservationFormPage extends ConsumerWidget {
 
     // on va chercher la reservation courante (donc si elle est nouvelle elle aura un id de 0)
     final selectedReservationId = ref.watch(selectedReservationIdProvider);
+    final currentReservationState = ref.watch(currentReservationProvider(selectedReservationId));
     final currentReservationNotifier = ref.read(currentReservationProvider(selectedReservationId).notifier);
 
     final selectedReservationDateState = ref.watch(selectedReservationDateProvider);
@@ -70,11 +71,14 @@ class ReservationFormPage extends ConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // retour a search_restaurant
-            Navigator.pushReplacementNamed(context, '/search_restaurants_page');
+            // retour a search_restaurant si c'est une nouvelle reservation
+            if (selectedReservationId == 0)
+              Navigator.pushReplacementNamed(context, '/search_restaurants_page');
+            else // sinon on va vers le detail de la reservation
+              Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
           },
         ),
-        title: const Text('Nouvelle réservation'),
+        title: Text('${selectedReservationId == 0 ? 'Nouvelle' : 'Modifier une'} réservation'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -119,11 +123,17 @@ class ReservationFormPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                selectedReservationId == 0 ? // si nouvelle reservation, charger le nom du restaurant selectionnne, sinon charger le nom du restaurant de la reservation selectionnee
                 currentRestaurantState.whenData((resto) =>
                 Text(resto.name,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 )
-                ).value!,
+                ).value! : 
+                currentReservationState.when(
+                  data: (res) => Text(res!.restaurant!.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  error: (err, _) => Text("Error finding restaurant name"),
+                  loading: () => CircularProgressIndicator()
+                ),
                 const SizedBox(height: 24),
                 DatePickerReservation(),
                 const Divider(),
