@@ -65,7 +65,7 @@ class ReservationCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        (reservation.client.name == ''? reservation.restaurant!.name : reservation.client.name), // nous savons que le client_name ne sera jamais null donc on se permet de mettre de !
+                        (userRole == 'client'? reservation.restaurant!.name : reservation.client.name), // nous savons que le client_name ne sera jamais null donc on se permet de mettre de !
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -77,7 +77,7 @@ class ReservationCard extends ConsumerWidget {
                           const Icon(Icons.location_on, size: 14),
                           const SizedBox(width: 4),
                           Text(
-                            (reservation.client.name == '' ? reservation.restaurant!.city! : reservation.restaurant!.name),
+                            (userRole == 'client' ? reservation.restaurant!.city! : reservation.restaurant!.name),
                             style: TextStyle(fontSize: 12, color: Colors
                                 .grey[600]),
                           ),
