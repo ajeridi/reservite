@@ -37,7 +37,7 @@ class _SpecialRequestsWidgetState extends ConsumerState<SpecialRequestsWidget> {
 
   String getInitialSpecialRequests() {
       final specialRequest = ref.watch(specialRequestProvider);
-      return specialRequest;
+      return specialRequest.whenData((specialRequest) => specialRequest).value!;
   }
 
   void _setSpecialRequestsState(String newSpecialRequests){

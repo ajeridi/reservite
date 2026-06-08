@@ -167,20 +167,24 @@ class ReservationFormPage extends ConsumerWidget {
                 SpecialRequestsWidget(),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    final savedReseravation = await currentReservationNotifier.saveReservation(
-                        selectedDate: selectedReservationDateState.value!,
-                        selectedSlot: selectedSlot!,
-                        numberOfGuests: numberOfGuestsState,
-                        capacityCheck: capacityCheckState.value!,
-                        specialRequest: specialRequestsState);
-                    Navigator.pushReplacementNamed(context, '/home_client_page');
-                  },
+                  onPressed:
+                      !specialRequestsNotifier.isValid()
+                          ? null
+                          : () async {
+                            final savedReseravation = await currentReservationNotifier
+                                .saveReservation(
+                                selectedDate: selectedReservationDateState.value!,
+                                selectedSlot: selectedSlot!,
+                                numberOfGuests: numberOfGuestsState,
+                                capacityCheck: capacityCheckState.value!,
+                                specialRequest: specialRequestsState.value);
+                            Navigator.pushReplacementNamed(context, '/home_client_page');
+                          },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   icon: const Icon(Icons.add),
-                  label: const Text('Créer la réservation'),
+                  label: Text('${selectedReservationId == 0 ? "Créer" : "Modifier"} la réservation'),
                 ),
               ],
             ),
