@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:prbd_2526_a07/views/pages/assign_tables_page.dart';
+import 'package:prbd_2526_a07/views/pages/edit_table_page.dart';
 import 'package:prbd_2526_a07/views/pages/home_client_page.dart';
 import 'package:prbd_2526_a07/views/pages/login_page.dart';
 import 'package:prbd_2526_a07/views/pages/manager_reservations_page.dart';
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
         '/reservation_form_page' : (context) => ReservationFormPage(),
         '/assign_tables_page' : (context) => AssignTablesPage(),
         '/restaurant_management_tables_page' : (context) => RestaurantManagementTablesPage(),
+        '/edit_table_page' : (context) => EditTablePage(),
       },
     );
   }

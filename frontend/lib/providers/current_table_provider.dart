@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../core/tools/abstract_async_notifier.dart';
 import '../models/table.dart';
@@ -23,7 +24,8 @@ class CurrentTableNotifier extends AbstractAsyncNotifier<Table?> {
     state = AsyncData(null);
     state = AsyncLoading();
     try {
-      return id != 0 ? await Table.getTable(id) : null;
+      final restaurantId = ref.watch(selectedRestaurantProvider);
+      return id != 0 ? await Table.getTable(id, restaurantId) : null;
     } catch (e, st) {
       throw Exception("Something went wrong.\nPlease retry later.");
     }
@@ -33,7 +35,8 @@ class CurrentTableNotifier extends AbstractAsyncNotifier<Table?> {
   Future<void> refresh() async {
     state = AsyncLoading();
     try {
-      final reservation = await Table.getTable(id);
+      final restaurantId = ref.watch(selectedRestaurantProvider);
+      final reservation = await Table.getTable(id, restaurantId);
       state = AsyncData(reservation);
     } catch (e, st) {
       print('$e\n$st');

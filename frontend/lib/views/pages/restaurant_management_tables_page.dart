@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/table.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
 import 'package:prbd_2526_a07/providers/tables_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/manager_navigation_bar_widget.dart';
@@ -34,10 +35,11 @@ class RestaurantManagementTablesPage extends ConsumerWidget {
 
     final tablesState = ref.watch(tablesProvider);
     final tablesNotifier = ref.read(tablesProvider.notifier);
+    final selectedTableIdNotifier = ref.read(selectedTableIdProvider.notifier);
 
 
     return tablesState.when(
-        data: (tables) => data(context, theme, simulatedTime.value!, tables, tablesNotifier),
+        data: (tables) => data(context, theme, simulatedTime.value!, tables, tablesNotifier, selectedTableIdNotifier),
         error: (err, _) => DataErrorWidget(error: err, notifier: tablesNotifier),
         loading: () => Center(
           child: Column(
@@ -49,7 +51,7 @@ class RestaurantManagementTablesPage extends ConsumerWidget {
     );
   }
 
-  Scaffold data(BuildContext context, ThemeData theme, DateTime simulatedTime, List<Table> tables, TablesNotifier tablesNotifier) {
+  Scaffold data(BuildContext context, ThemeData theme, DateTime simulatedTime, List<Table> tables, TablesNotifier tablesNotifier, SelectedTableIdNotifier selectedTableIdNotifier) {
     return Scaffold(
     appBar: AppBar(
       leading: IconButton(
@@ -110,7 +112,10 @@ class RestaurantManagementTablesPage extends ConsumerWidget {
             right: 16,
             child: FloatingActionButton(
               heroTag: 'tables_fab',
-              onPressed: () {},
+              onPressed: () {
+                selectedTableIdNotifier.set(0);
+                Navigator.pushReplacementNamed(context, '/edit_table_page');
+              },
               child: const Icon(Icons.add),
             ),
           ),
