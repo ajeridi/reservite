@@ -18,6 +18,7 @@ import 'package:prbd_2526_a07/views/widgets/number_of_guests_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reservation_slot_widget.dart';
 import '../../providers/reservation_providers/capacity_check_provider.dart';
 import '../../providers/reservation_providers/selected_slot_provider.dart';
+import '../widgets/special_requests_widget.dart';
 import '../widgets/warning_widget.dart';
 
 void main() async {
@@ -163,16 +164,7 @@ class ReservationFormPage extends ConsumerWidget {
                   },
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Demandes spéciales (optionnel)',
-                    border: OutlineInputBorder(),
-                    hintText: 'Allergies, préférences...',
-                  ),
-                  validator: specialRequestsNotifier.validate,
-                  onChanged: specialRequestsNotifier.setSpecialRequest,
-                  maxLines: 3,
-                ),
+                SpecialRequestsWidget(),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
                   onPressed: () async {

@@ -267,4 +267,17 @@ class Reservation  implements Comparable<Reservation>{
     // TODO: implement compareTo
     return this.datetime.compareTo(other.datetime) == 0 ? other.id.compareTo(this.id) : other.datetime.compareTo(this.datetime);
   }
+
+  static String? validateSpecialRequests(String? newSpecialRequests){
+    final text = newSpecialRequests?.trim() ?? '';
+
+    if (text.isEmpty) {
+      return null;
+    }
+
+    if (text.length < 10) {
+      return 'La demande spéciale doit contenir au moins 10 caractères.';
+    }
+    return null;
+  }
 }
