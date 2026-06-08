@@ -1,7 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/table.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
+import 'package:prbd_2526_a07/providers/tables_provider.dart';
+import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/manager_navigation_bar_widget.dart';
+
+import '../widgets/table_card_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
@@ -17,208 +24,100 @@ void main() async {
   );
 }
 
-class RestaurantManagementTablesPage extends StatelessWidget {
+class RestaurantManagementTablesPage extends ConsumerWidget {
   const RestaurantManagementTablesPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+    final simulatedTime = ref.watch(applicationTimeProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+    final tablesState = ref.watch(tablesProvider);
+    final tablesNotifier = ref.read(tablesProvider.notifier);
+
+
+    return tablesState.when(
+        data: (tables) => data(context, theme, simulatedTime.value!, tables, tablesNotifier),
+        error: (err, _) => DataErrorWidget(error: err, notifier: tablesNotifier),
+        loading: () => Center(
+          child: Column(
+            children: [
+              CircularProgressIndicator(),
+            ],
+          ),
         ),
-        title: const Text('Le Gourmet'),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+    );
+  }
+
+  Scaffold data(BuildContext context, ThemeData theme, DateTime simulatedTime, List<Table> tables, TablesNotifier tablesNotifier) {
+    return Scaffold(
+    appBar: AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.pushReplacementNamed(context, '/my_restaurants_page');
+        },
+      ),
+      title: const Text('Le Gourmet'),
+      automaticallyImplyLeading: false,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          tooltip: 'Rafraîchir les données',
+          onPressed: () {
+            tablesNotifier.refresh();
+          },
+        ),
+      ],
+      elevation: 2,
+      backgroundColor: theme.colorScheme.primary,
+      foregroundColor: theme.colorScheme.onPrimary,
+      surfaceTintColor: Colors.transparent,
+      flexibleSpace: Align(
+        alignment: Alignment.topCenter,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: Tooltip(
+              message:
+                  'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+              child: Text(
+                DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
+                    .format(simulatedTime),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[400],
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+    body: SafeArea(
+      child: Stack(
+        children: [
+          ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              for (var table in tables)
+                TableCardWidget(table: table),
+            ],
+          ),
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              heroTag: 'tables_fab',
+              onPressed: () {},
+              child: const Icon(Icons.add),
+            ),
           ),
         ],
-        elevation: 2,
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        surfaceTintColor: Colors.transparent,
-        flexibleSpace: Align(
-          alignment: Alignment.topCenter,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: [
-                Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.table_restaurant, size: 40),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Table 1',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  const Icon(Icons.people, size: 16),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '2 personnes',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.table_restaurant, size: 40),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Table 2',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  const Icon(Icons.people, size: 16),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '4 personnes',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Card(
-                  margin: EdgeInsets.zero,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.table_restaurant, size: 40),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Table 3',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  const Icon(Icons.people, size: 16),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '6 personnes',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              bottom: 16,
-              right: 16,
-              child: FloatingActionButton(
-                heroTag: 'tables_fab',
-                onPressed: () {},
-                child: const Icon(Icons.add),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: ManagerNavigationBarWidget(selected: 2),
-    );
+    ),
+    bottomNavigationBar: ManagerNavigationBarWidget(selected: 2),
+  );
   }
 }
