@@ -1,9 +1,11 @@
 
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:ffi';
 
 
 
+import 'package:flutter/cupertino.dart' hide Table;
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
@@ -104,6 +106,8 @@ class Reservation  implements Comparable<Reservation>{
       throw Exception('Failed to confirm reservation: ${response.body}');
     }
   }
+
+
 
   // prends un status en string et le convertit en enum Status
   static Status toStatus(String statusString) {
@@ -210,7 +214,7 @@ class Reservation  implements Comparable<Reservation>{
   static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests}) async {
       final dateString = DateFormat('yyyy-MM-dd', 'fr_FR').format(date);
       try {
-        final response = await ApiClient.get('check_service_tables_capacity?number_of_guests=$numberOfGuests&date_of_reservation=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
+        final response = await ApiClient.get('check_capacity?number_of_guests=$numberOfGuests&date_of_reservation=$dateString&time_slot=$slot&restaurant_id=$restaurantId');
         if (response.statusCode != 200) {
           throw Exception('Failed to check capacity.\nStatus Code: ${response.statusCode}');
         }

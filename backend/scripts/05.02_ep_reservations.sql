@@ -448,6 +448,26 @@ create or replace function get_occupied_tables(date_of_reservation date, time_sl
           and r.status <> 'cancelled';
     $$ language sql security definer;
 
+create or replace  function check_capacity(id_restaurant int,date_simulee date, time_slot time,nb_convives int )
+returns bool as
+    $$
+    declare capacity_max int :=(select sum(capacity) from tables
+                                             where restaurant = id_restaurant);
+        begin
+        return ((select coalesce(sum(reservations.number_of_guests),0) from reservations
+        join public.restaurants r on r.id = reservations.restaurant
+        join get_service_by_datetime(datetime :: date,time_slot,id_restaurant ) s
+                                                          on reservations.datetime::time >= s.start_time
+                                                          and reservations.datetime::time <= s.end_time
+        where reservations.restaurant = id_restaurant
+        and (reservations.status = 'pending' or reservations.status = 'confirmed')
+        and reservations.datetime::date = date_simulee) + nb_convives) <= capacity_max;
+
+    end;
+    $$language plpgsql security definer ;
+
+
+
 create or replace function check_service_tables_capacity(number_of_guests int, date_of_reservation date, time_slot time, restaurant_id int)
     returns bool as
 $$
@@ -464,3 +484,4 @@ $$ language sql security definer;
 grant execute on function get_service_by_datetime(date, time, int) to client;
 grant execute on function get_occupied_tables(date, time, int) to client;
 grant execute on function check_service_tables_capacity(int, date, time, int) to client;
+grant execute on function check_capacity(int,date,time,int) to client;

@@ -1,0 +1,12 @@
+### connection d'un client
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "brlacroix@reservite.com",
+  "password" : "Password1,"
+}
+
+### check_capacity
+GET http://localhost:3000/rpc/check_capacity?id_restaurant=3&date_simulee=2024-12-04&time_slot=18:00:00&nb_convives=11
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoiYnJsYWNyb2l4QGVwZmMuZXUiLCJuYW1lIjoiQnJ1bm8iLCJ1c2VyX2lkIjo2LCJleHAiOjE3ODA5NTQ0NTB9.paZgGe0kovJBATTBB8oZhwPA3MxfOmB9ChYxZLrBnEg
