@@ -219,8 +219,7 @@ begin
         set datetime         = datetime_,
             number_of_guests = number_of_guests_,
             special_requests = special_requests_
-        WHERE client = auth.id()
-          AND restaurant = restaurant_id;
+        WHERE id = reservation_id;
     end if;
     return get_reservation(updated_reservation_id);
 end;
