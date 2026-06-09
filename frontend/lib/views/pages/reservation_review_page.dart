@@ -29,7 +29,9 @@ class ReservationReviewPage extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
+          },
         ),
         title: const Text('Avis'),
         automaticallyImplyLeading: false,
@@ -145,10 +147,16 @@ class ReservationReviewPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.send),
-                        label: const Text('Publier mon avis'),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {},
+                              icon: const Icon(Icons.send),
+                              label: const Text('Publier mon avis'),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
