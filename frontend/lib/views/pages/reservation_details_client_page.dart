@@ -156,6 +156,15 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                   btnaAnulationWidget(currentReservationNotifier : currentReservationNotifier),
                 ],
               ),
+            const SizedBox(height: 24,),
+            if(reservation!.status == Status.completed)
+              ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/reservation_review_page');
+                  },
+                  icon: const Icon(Icons.reviews),
+                  label: Text('${reservation!.review != null ? 'Modifier votre avis' : 'Ajouter un avis'}')
+              ),
           ],
         ),
       ),
