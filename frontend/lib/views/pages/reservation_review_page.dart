@@ -6,6 +6,7 @@ import 'package:prbd_2526_a07/models/reservation.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/review_providers/is_valid_comment_provider.dart';
 import 'package:prbd_2526_a07/providers/review_providers/new_rating_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reviews/star_selection_widget.dart';
@@ -39,8 +40,10 @@ class ReservationReviewPage extends ConsumerWidget {
     final currentReservation = ref.watch(currentReservationProvider(selectedReservationId));
     final currentReservationNotifier = ref.read(currentReservationProvider(selectedReservationId).notifier);
 
+    final isValidComment = ref.watch(isValidCommentProvider);
+
     return currentReservation.when(
-        data: (reservation) => data(context, theme, simulatedTime, reservation, ref),
+        data: (reservation) => data(context, theme, simulatedTime, reservation, ref, isValidComment, currentReservationNotifier),
         error: (err, st) => DataErrorWidget(error: err, notifier: currentReservationNotifier),
         loading: () => Center(
           child: Column(
@@ -54,7 +57,7 @@ class ReservationReviewPage extends ConsumerWidget {
 
   }
 
-  Scaffold data(BuildContext context, ThemeData theme, AsyncValue<DateTime> simulatedTime, Reservation? reservation, WidgetRef ref) {
+  Scaffold data(BuildContext context, ThemeData theme, AsyncValue<DateTime> simulatedTime, Reservation? reservation, WidgetRef ref, bool isValidComment, CurrentReservationNotifier currentReservationNotifier) {
     return Scaffold(
     appBar: AppBar(
       leading: IconButton(
@@ -176,7 +179,14 @@ class ReservationReviewPage extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed:  !isValidComment
+                                ? null
+                                : () {
+                              currentReservationNotifier.saveReview(
+                                newRating: ref.read(newRatingProvider),
+                                newComment: ref.read(newCommentProvider)
+                              );
+                            },
                             icon: const Icon(Icons.send),
                             label: const Text('Publier mon avis'),
                           ),
