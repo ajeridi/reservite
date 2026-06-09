@@ -302,6 +302,11 @@ returns trigger as
                 raise exception 'Cannot update composed key of table %', tg_table_name;
             end if;
         end if;
+        if(tg_table_name = 'reviews')then
+            if (old.reservation <> new.reservation OR old.table <> new.table) then
+                raise exception 'Cannot update composed key of table %', tg_table_name;
+            end if;
+        end if;
         return new;
     end;
     $$ language plpgsql;
@@ -317,3 +322,9 @@ create or replace trigger prevent_update_reservation_tables_trigger
     on reservation_tables
     for each row
 execute function prevent_update_fct();
+
+create or replace trigger prevent_update_reviews_trigger
+    before update
+    on reviews
+    for each row
+    execute function prevent_update_fct();
