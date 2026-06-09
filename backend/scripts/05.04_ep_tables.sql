@@ -133,7 +133,8 @@ create or replace function save_table(table_id int, new_table_number int, new_ca
         perform auth.check_logged();
         if (auth.role() = 'manager' and check_manager_works_in_restaurant(auth.id(), restaurant_id)) then
             if (table_id = 0) then
-                INSERT INTO tables(restaurant, table_number, capacity) VALUES (restaurant_id, new_table_number, new_capacity) into updated_id;
+                INSERT INTO tables(restaurant, table_number, capacity) VALUES (restaurant_id, new_table_number, new_capacity)
+                returning id into updated_id;
             else
                 UPDATE tables set table_number = new_table_number, capacity = new_capacity where id = table_id;
             end if;
