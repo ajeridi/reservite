@@ -34,4 +34,10 @@ class Review {
   String toString() {
     return 'Review: {id: $id, client: $client, restaurant: $restaurant, reservation: $reservation, rating: $rating, comment: $comment, createdAt: $createdAt';
   }
+
+  static String? validateComment(String newComment) {
+    final toCheck = newComment.trim();
+    if (toCheck.length < 10) return 'Votre commentaire doit avoir une longueur de 10 characteres.';
+    return null;
+  }
 }

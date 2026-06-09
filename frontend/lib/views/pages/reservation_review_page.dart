@@ -10,6 +10,9 @@ import 'package:prbd_2526_a07/providers/review_providers/new_rating_provider.dar
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reviews/star_selection_widget.dart';
 
+import '../../providers/review_providers/new_comment_provider.dart';
+import '../widgets/reviews/review_comment_widget.dart';
+
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
@@ -58,6 +61,7 @@ class ReservationReviewPage extends ConsumerWidget {
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
           //ref.read(newRatingProvider.notifier).clear();
+          ref.read(newCommentProvider.notifier).clear();
           Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
         },
       ),
@@ -166,14 +170,7 @@ class ReservationReviewPage extends ConsumerWidget {
                     StarSelectionWidget(),
                     const SizedBox(height: 8),
                     const SizedBox(height: 12),
-                    const TextField(
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        labelText: 'Commentaire (optionnel)',
-                        border: OutlineInputBorder(),
-                        hintText: 'Très bonne expérience, je reviendrai !',
-                      ),
-                    ),
+                    ReviewCommentWidget(),
                     const SizedBox(height: 12),
                     Row(
                       children: [
