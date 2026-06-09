@@ -154,8 +154,6 @@ class ReservationReviewPage extends StatelessWidget {
                   ),
                 ),
               ),
-
-
             ],
           ),
         ),

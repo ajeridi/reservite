@@ -77,7 +77,7 @@ create table reviews
     rating      int not null check (rating between 1 and 5),
     comment     text default null,
     created_at  timestamp not null default now(),
-    unique (client, reservation)
+    unique (client, restaurant, reservation)
 );
 
 /*
@@ -323,6 +323,8 @@ begin
         (4, 6, 3, 9,  4, 'Bonne expérience, je reviendrai.', '2024-11-24 20:00:00'),
         (5, 4, 2, 11, 3, 'Correct mais pas exceptionnel.', '2024-11-26 21:00:00');
 
+    perform setval('reviews_id_seq', (select max(id) from reviews));
+
 
     -- Réactiver tous les triggers sur toutes les tables
     alter table reservations enable trigger all;
@@ -331,6 +333,7 @@ begin
     alter table restaurants enable trigger all;
     alter table services enable trigger all;
     alter table restaurant_managers enable trigger all;
+    alter table reviews enable trigger all;
 
 end;
 $$ language plpgsql security definer;
