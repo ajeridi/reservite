@@ -1,8 +1,12 @@
+import 'dart:ffi';
+
 import 'package:easy_stars/easy_stars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/review_providers/new_rating_provider.dart';
 
-class StarSelectionWidget extends StatefulWidget {
+class StarSelectionWidget extends ConsumerStatefulWidget {
   const StarSelectionWidget({super.key});
 
   @override
@@ -10,7 +14,7 @@ class StarSelectionWidget extends StatefulWidget {
   _StarSelectionWidget createState() => _StarSelectionWidget();
 }
 
-class _StarSelectionWidget extends State<StarSelectionWidget> {
+class _StarSelectionWidget extends ConsumerState<StarSelectionWidget> {
   double _basicRating = 3.0;
   double _halfRating = 2.5;
   double _animatedRating = 4.0;
@@ -29,6 +33,9 @@ class _StarSelectionWidget extends State<StarSelectionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final newRatingState = ref.watch(newRatingProvider);
+    final newRatingNotifier = ref.read(newRatingProvider.notifier);
+    _basicRating = newRatingState.toDouble();
     return _buildExample(
       'Votre Avis ',
       EasyStarsRating(
@@ -39,6 +46,7 @@ class _StarSelectionWidget extends State<StarSelectionWidget> {
         starSize: 30,
         onRatingChanged: (rating) {
           setState(() {
+            newRatingNotifier.setRating(rating.toInt());
             _basicRating = rating;
           });
         },
