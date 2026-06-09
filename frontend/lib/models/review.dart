@@ -34,5 +34,12 @@ class Review {
         'comment : $comment, createdAt : $createdAt}';
   }
 
+  static String? validateComment(String newComm){
+    final toCheck = newComm.trim();
+    if(toCheck.length < 10)
+      return "Votre commentaire doit avoir une longueur de minimun 10 caracteres";
+    return null;
+  }
+
 
 }

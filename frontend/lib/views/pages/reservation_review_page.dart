@@ -9,6 +9,8 @@ import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservati
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reviews/star_selection_widget.dart';
 
+import '../widgets/reviews/review_comment_widget.dart';
+
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
@@ -163,17 +165,12 @@ class ReservationReviewPage extends ConsumerWidget {
                     StarSelectionWidget(),
                     const SizedBox(height: 8),
                     const SizedBox(height: 12),
-                    const TextField(
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        labelText: 'Commentaire (optionnel)',
-                        border: OutlineInputBorder(),
-                        hintText: 'Très bonne expérience, je reviendrai !',
-                      ),
-                    ),
+                    ReviewCommentWidget(),
                     const SizedBox(height: 12),
                     ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+
+                      },
                       icon: const Icon(Icons.send),
                       label: const Text('Publier mon avis'),
                     ),
@@ -206,3 +203,4 @@ class ReservationReviewPage extends ConsumerWidget {
     );
   }
 }
+
