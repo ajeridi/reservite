@@ -186,6 +186,8 @@ class ReservationReviewPage extends ConsumerWidget {
                                 newRating: ref.read(newRatingProvider),
                                 newComment: ref.read(newCommentProvider)
                               );
+                              ref.read(newCommentProvider.notifier).clear();
+                              Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
                             },
                             icon: const Icon(Icons.send),
                             label: const Text('Publier mon avis'),

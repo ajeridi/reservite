@@ -128,7 +128,8 @@ class Reservation  implements Comparable<Reservation>{
    int? numberOfGuests,
    Status? status,
     String? specialRequests,
-   List<Table>? tables}){
+   List<Table>? tables,
+    Review? review}){
     return Reservation(
         id: id ?? this.id,
         client: client ?? this.client,
@@ -136,7 +137,8 @@ class Reservation  implements Comparable<Reservation>{
         datetime: datetime ?? this.datetime,
         numberOfGuests: numberOfGuests ?? this.numberOfGuests,
         status: status ?? this.status,
-        tables: tables ?? this.tables);
+        tables: tables ?? this.tables,
+        review: review ?? this.review);
  }
 
 

@@ -24,6 +24,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/special_request_pr
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../../models/reservation.dart';
+import '../../models/review.dart';
 import '../selected_tables_provider.dart';
 import 'capacity_check_provider.dart';
 import 'number_of_guests_provider.dart';
@@ -132,6 +133,31 @@ Future<void> complete() async{
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<void> saveReview({required int newRating, String? newComment}) async {
+    final reservation = state.value!;
+    final reservationId = reservation.id;
+    final restaurantId = reservation.restaurant!.id;
+    final clientId = reservation.client.id;
+    final reviewId = reservation.review == null ? 0 : reservation.review!.id;
+    final updateDate = ref.read(applicationTimeProvider);
+
+    final newReview = await Review.save(
+        reviewId: reviewId,
+        clientId: clientId,
+        restaurantId: restaurantId,
+        reservationId: reservationId,
+        newRating: newRating,
+        newComment: newComment,
+        updateDate: updateDate.value!);
+
+    state = AsyncLoading();
+    final newReservation = reservation.copyWith(review: newReview);
+    state = AsyncData(newReservation);
+
+  }
+
+
 
 }
 
