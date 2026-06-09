@@ -90,7 +90,8 @@ begin
                                                               t.capacity))
                             from reservation_tables rt
                                      join tables t on rt."table" = t.id
-                            where rt.reservation = reservation_id)
+                            where rt.reservation = reservation_id),
+                            'review', (select json_build_object('id', rws.id, 'client', rws.client, 'restaurant', rws.restaurant, 'reservation', rws.reservation, 'rating', rws.rating, 'comment', rws.comment, 'created_at', rws.created_at ) from reviews rws where rws.reservation = reservation_id)
                    )
             from reservations rsv
             where rsv.id = reservation_id);

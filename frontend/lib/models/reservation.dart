@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
+import 'package:prbd_2526_a07/models/review.dart';
 import 'package:prbd_2526_a07/models/table.dart';
 
 import 'client.dart';
@@ -28,6 +29,7 @@ class Reservation  implements Comparable<Reservation>{
   final Status status;
   final String? specialRequests;
   final List<Table> tables;
+  final Review? review;
 
 // constructeur
   const Reservation({
@@ -39,6 +41,7 @@ class Reservation  implements Comparable<Reservation>{
     this.status = Status.pending,
     this.specialRequests = null,
     required this.tables,
+    this.review = null,
 });
 
   //constructeur from Json
@@ -52,6 +55,7 @@ class Reservation  implements Comparable<Reservation>{
         status: toStatus(json['status']),
         specialRequests: json['special_requests'],
         tables: Table.tablesFromJson(json['tables']),
+        review: json['review'] == null ? null : Review.fromJson(json['review']),
     );
   }
 
@@ -204,7 +208,7 @@ class Reservation  implements Comparable<Reservation>{
 
   @override
   String toString() {
-    return'$id $client $restaurant $datetime $numberOfGuests $status $tables';
+    return'id: $id ,client: $client, restaurant: $restaurant, datetime: $datetime, numberOfGuests: $numberOfGuests, status: $status, tables: $tables, review: $review';
   }
 
   static Future<bool> checkCapacity({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, required int reservation_id}) async {
