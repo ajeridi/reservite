@@ -127,8 +127,8 @@ class Table {
       })
     );
 
+    print('${response.body}');
     if (response.statusCode == 200 ){
-      print('${response.body}');
       final body = json.decode(response.body);
       return Table.fromJson(body);
     }
