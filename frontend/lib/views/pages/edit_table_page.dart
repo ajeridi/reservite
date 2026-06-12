@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/table.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
+import 'package:prbd_2526_a07/providers/crudl_table_providers/is_valid_table_number_provider.dart';
 import 'package:prbd_2526_a07/providers/current_table_provider.dart';
 import 'package:prbd_2526_a07/providers/crudl_table_providers/new_table_capacity_provider.dart';
 import 'package:prbd_2526_a07/providers/crudl_table_providers/new_table_number_provider.dart';
@@ -44,8 +45,11 @@ class EditTablePage extends ConsumerWidget {
     final newTableNumber = ref.watch(newTableNumberProvider);
     final newCapacity = ref.watch(newTableCapacityProvider);
 
+    // on va regarder l'etat de validation du numero de table car c'est ce qui va deteriminer si oui ou non le bouton save est actif
+    final  isValidTableNumberState = ref.watch(isValidTableNumberProvider);
+
     return currentTable.when(
-        data: (table) => data(selectedTableIdNotifier, context, theme, simulatedTime, table, currentTableNotifier, newTableNumber, newCapacity),
+        data: (table) => data(selectedTableIdNotifier, context, theme, simulatedTime, table, currentTableNotifier, newTableNumber, newCapacity, isValidTableNumberState),
         error: (err, st) => DataErrorWidget(error: err, notifier: currentTableNotifier),
         loading: () => Center(
           child: Column(
@@ -57,7 +61,7 @@ class EditTablePage extends ConsumerWidget {
     );
   }
 
-  Scaffold data(SelectedTableIdNotifier selectedTableIdNotifier, BuildContext context, ThemeData theme, AsyncValue<DateTime> simulatedTime, Table? table, CurrentTableNotifier currentTableNotifier, int? newTableNumber, int newCapacity) {
+  Scaffold data(SelectedTableIdNotifier selectedTableIdNotifier, BuildContext context, ThemeData theme, AsyncValue<DateTime> simulatedTime, Table? table, CurrentTableNotifier currentTableNotifier, int? newTableNumber, int newCapacity, bool isValidTableNumberState) {
     return Scaffold(
     appBar: AppBar(
       leading: IconButton(
@@ -72,12 +76,12 @@ class EditTablePage extends ConsumerWidget {
       actions: [
         IconButton(
           tooltip: 'Enregistrer',
-          onPressed: () async {
-            if (await currentTableNotifier.validateAll(newTableNumber)){
-              await currentTableNotifier.saveTable(newTableNumber, newCapacity);
-              Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
-            }
-            return null;
+          onPressed:
+              !isValidTableNumberState
+                  ? null
+                  : () async {
+            await currentTableNotifier.saveTable(newTableNumber, newCapacity);
+            Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
           },
           icon: const Icon(Icons.save),
         ),
