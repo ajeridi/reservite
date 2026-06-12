@@ -1,10 +1,11 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
 import '../core/services/api_client.dart';
 
-class Table {
+class Table  implements Comparable<Table>{
   final int id;
   final int ?restaurant;
   final int tableNumber;
@@ -44,15 +45,15 @@ class Table {
   }
 
   // methode qui va rechercher les tables d'un restaurant (Future, car on va chercher dans la DB)
-  static Future<List<Table>> getTables({int? selectedRestaurant = null}) async{
+  static Future<SplayTreeSet<Table>> getTables({int? selectedRestaurant = null}) async{
     String enpoint = 'get_tables';
     if (selectedRestaurant != null) enpoint += '?restaurant_id=$selectedRestaurant';
     final response = await ApiClient.get(enpoint);
     if (response.statusCode == 200){
       // un user qui n'a pas de tables, a un response.body == 'null'
-      if (response.body == 'null') return <Table>[]; // on retourne liste vide si null
+      if (response.body == 'null') return SplayTreeSet<Table>(); // on retourne liste vide si null
       final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
-      return body.map((dynamic table) => Table.fromJson(table)).toList(); // mappage de chaque element de la liste d'objets Json en objet Table
+      return SplayTreeSet.of(body.map((dynamic table) => Table.fromJson(table)).toList()); // mappage de chaque element de la liste d'objets Json en objet Table
     }
     else {
       throw Exception("Failed to fetch tables from the database.\nResponse body: ${response.body}");
@@ -135,6 +136,12 @@ class Table {
     else{
       throw Exception("Failed to save table");
     }
+  }
+
+  @override
+  int compareTo(Table other) {
+    if (capacity == other.capacity) return id - other.id;
+    return capacity - other.capacity;
   }
 
 }
