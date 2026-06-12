@@ -9,7 +9,7 @@ import 'package:prbd_2526_a07/providers/tables_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/manager_navigation_bar_widget.dart';
 
-import '../widgets/table_card_widget.dart';
+import '../widgets/table_widgets/table_card_widget.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);

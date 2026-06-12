@@ -1,10 +1,8 @@
-
-
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prbd_2526_a07/providers/new_table_number_provider.dart';
+import 'package:prbd_2526_a07/providers/crudl_table_providers/new_table_number_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
 import 'package:prbd_2526_a07/providers/tables_provider.dart';

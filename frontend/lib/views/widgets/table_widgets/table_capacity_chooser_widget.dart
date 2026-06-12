@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../providers/new_table_capacity_provider.dart';
+import '../../../providers/crudl_table_providers/new_table_capacity_provider.dart';
 
 class TableCapacityChooserWidget extends ConsumerWidget {
   const TableCapacityChooserWidget({
