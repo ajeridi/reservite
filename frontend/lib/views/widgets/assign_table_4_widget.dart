@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/cupertino.dart' hide Table;
 import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +11,7 @@ import '../../providers/selected_tables_provider.dart';
 class assign_table_4_widget extends ConsumerWidget {
 
   final Reservation reservation;
-  final List<Table> tables;
+  final SplayTreeSet<Table> tables;
 
   const assign_table_4_widget({
     super.key,

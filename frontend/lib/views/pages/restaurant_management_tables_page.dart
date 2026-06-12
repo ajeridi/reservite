@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -51,7 +53,7 @@ class RestaurantManagementTablesPage extends ConsumerWidget {
     );
   }
 
-  Scaffold data(BuildContext context, ThemeData theme, DateTime simulatedTime, List<Table> tables, TablesNotifier tablesNotifier, SelectedTableIdNotifier selectedTableIdNotifier) {
+  Scaffold data(BuildContext context, ThemeData theme, DateTime simulatedTime, SplayTreeSet<Table> tables, TablesNotifier tablesNotifier, SelectedTableIdNotifier selectedTableIdNotifier) {
     return Scaffold(
     appBar: AppBar(
       leading: IconButton(
