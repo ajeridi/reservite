@@ -39,92 +39,111 @@ class RestaurantManagementTablesPage extends ConsumerWidget {
     final tablesNotifier = ref.read(tablesProvider.notifier);
     final selectedTableIdNotifier = ref.read(selectedTableIdProvider.notifier);
 
-
     return tablesState.when(
-        data: (tables) => data(context, theme, simulatedTime.value!, tables, tablesNotifier, selectedTableIdNotifier),
-        error: (err, _) => DataErrorWidget(error: err, notifier: tablesNotifier),
-        loading: () => Center(
-          child: Column(
-            children: [
-              CircularProgressIndicator(),
-            ],
-          ),
-        ),
+      data: (tables) => data(
+        context,
+        theme,
+        simulatedTime.value!,
+        tables,
+        tablesNotifier,
+        selectedTableIdNotifier,
+      ),
+      error: (err, _) => DataErrorWidget(error: err, notifier: tablesNotifier),
+      loading: () =>
+          Center(child: Column(children: [CircularProgressIndicator()])),
     );
   }
 
-  Scaffold data(BuildContext context, ThemeData theme, DateTime simulatedTime, SplayTreeSet<Table> tables, TablesNotifier tablesNotifier, SelectedTableIdNotifier selectedTableIdNotifier) {
+  Scaffold data(
+    BuildContext context,
+    ThemeData theme,
+    DateTime simulatedTime,
+    SplayTreeSet<Table> tables,
+    TablesNotifier tablesNotifier,
+    SelectedTableIdNotifier selectedTableIdNotifier,
+  ) {
     return Scaffold(
-    appBar: AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, '/my_restaurants_page');
-        },
-      ),
-      title: const Text('Le Gourmet'),
-      automaticallyImplyLeading: false,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.refresh),
-          tooltip: 'Rafraîchir les données',
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            tablesNotifier.refresh();
+            Navigator.pushReplacementNamed(context, '/my_restaurants_page');
           },
         ),
-      ],
-      elevation: 2,
-      backgroundColor: theme.colorScheme.primary,
-      foregroundColor: theme.colorScheme.onPrimary,
-      surfaceTintColor: Colors.transparent,
-      flexibleSpace: Align(
-        alignment: Alignment.topCenter,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 2.0),
-            child: Tooltip(
-              message:
-                  'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-              child: Text(
-                DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                    .format(simulatedTime),
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.grey[400],
-                  fontWeight: FontWeight.normal,
+        title: const Text('Le Gourmet'),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Rafraîchir les données',
+            onPressed: () {
+              tablesNotifier.refresh();
+            },
+          ),
+        ],
+        elevation: 2,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        surfaceTintColor: Colors.transparent,
+        flexibleSpace: Align(
+          alignment: Alignment.topCenter,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2.0),
+              child: Tooltip(
+                message:
+                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                child: Text(
+                  DateFormat(
+                    'EEEE dd/MM/yyyy HH:mm',
+                    'fr_FR',
+                  ).format(simulatedTime),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey[400],
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
               ),
             ),
           ),
         ),
       ),
-    ),
-    body: SafeArea(
-      child: Stack(
-        children: [
-          ListView(
-            padding: const EdgeInsets.all(16.0),
-            children: [
-              for (var table in tables)
-                TableCardWidget(table: table),
-            ],
-          ),
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton(
-              heroTag: 'tables_fab',
-              onPressed: () {
-                selectedTableIdNotifier.set(0);
-                Navigator.pushReplacementNamed(context, '/edit_table_page');
-              },
-              child: const Icon(Icons.add),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            tables.isEmpty
+                ? Center( // https://www.geeksforgeeks.org/flutter/center-widget-in-flutter/
+                    child: Container(
+                      color: Colors.transparent,
+                      child: Text(
+                        "Aucune table configuree.\nVeuillez Cliquer sur le bouton '+' pour en ajouter",
+                        style: TextStyle(color: Colors.black, fontSize: 15),
+                      ),
+                    ),
+                  )
+                : ListView(
+                    padding: const EdgeInsets.all(16.0),
+                    children: [
+                      for (var table in tables) TableCardWidget(table: table),
+                    ],
+                  ),
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: FloatingActionButton(
+                heroTag: 'tables_fab',
+                onPressed: () {
+                  selectedTableIdNotifier.set(0);
+                  Navigator.pushReplacementNamed(context, '/edit_table_page');
+                },
+                child: const Icon(Icons.add),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-    bottomNavigationBar: ManagerNavigationBarWidget(selected: 2),
-  );
+      bottomNavigationBar: ManagerNavigationBarWidget(selected: 2),
+    );
   }
 }
