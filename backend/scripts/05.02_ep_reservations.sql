@@ -266,7 +266,7 @@ grant execute on function save_reservation(int, timestamp, int, text, int) to cl
                 end if;
                 --verifier que la reservation est en pending ou confirmed
                 select status from reservations where id = reservation_id into rsv_status;
-                if(rsv_status != 'pending' or rsv_status != 'confirmed')then
+                if(rsv_status != 'pending' and rsv_status != 'confirmed')then
                     raise exception 'La réservation doit avoir le status pending or confirmed';
                 end if;
                 if((select datetime from reservations where  id = reservation_id) < v_current_time)then
@@ -274,13 +274,14 @@ grant execute on function save_reservation(int, timestamp, int, text, int) to cl
                 end if;
 
                 -- toggle is_vip
-                update reservations set is_vip = -(is_vip) where id = reservation_id;
+                update reservations set is_vip = not(is_vip) where id = reservation_id;
 
                 -- retourner la reservation avec is_vip modifié
                 return get_reservation(reservation_id);
             end;
         $$language plpgsql security definer ;
 
+grant execute on function toggle_is_vip(int) to authenticated;
     -- =============================================================================
 /*
 Confirmation d'une reservation et assignation des tables pour cette reservation

@@ -167,6 +167,7 @@ class Reservation  implements Comparable<Reservation>{
           'toggle_is_vip',
           body:json.encode({'reservation_id' : id})
       );
+      print(response.body);
       if(response.statusCode == 200){
         return Reservation.fromJson(json.decode(response.body));
       }else{

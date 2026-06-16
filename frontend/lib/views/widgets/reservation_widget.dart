@@ -112,6 +112,7 @@ class ReservationCard extends ConsumerWidget {
                     ],
                   ),
                 ),
+                //si il y a une reservation et que isVIP = true
                 if(watchCurrentRes.value != null && watchCurrentRes.value!.isVip )
                   IconButton(
                   padding: EdgeInsets.zero,
@@ -119,7 +120,7 @@ class ReservationCard extends ConsumerWidget {
                   icon: Icon(Icons.star, size: 28, color: Colors.amber),
                   onPressed: () async {  await ref.watch(currentReservationProvider(reservation.id).notifier).toggle(); },
                   )
-                else
+                else //si isVip = true
                 IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
