@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/providers/review_providers/new_comment_provider.dart';
 
-final IsValidCommentProvider = NotifierProvider.autoDispose<IsValidCommentNotifier,bool>(
+final isValidCommentProvider = NotifierProvider.autoDispose<IsValidCommentNotifier,bool>(
     () => IsValidCommentNotifier()
 );
 

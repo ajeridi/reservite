@@ -1,3 +1,9 @@
+import 'dart:convert';
+
+import 'package:intl/intl.dart';
+
+import '../core/services/api_client.dart';
+
 class Review {
   final int id;
   final int client;
@@ -39,6 +45,43 @@ class Review {
     if(toCheck.length < 10)
       return "Votre commentaire doit avoir une longueur de minimun 10 caracteres";
     return null;
+  }
+
+  static Future<Review> save({
+    required int reviewId,
+    required int clientId,
+    required int restaurantId,
+    required int reservationId,
+    required int newRating,
+    String? newComment,
+    required DateTime updateDate}) async {
+    try {
+
+
+      final response = await ApiClient.post(
+        'save_review',
+        body: json.encode({
+          'review_id' : reviewId,
+          'client_id' : clientId,
+          'restaurant_id': restaurantId,
+          'reservation_id' : reservationId,
+          'rating' : newRating,
+          'comment' : newComment,
+          'date' : DateFormat('yyyy-MM-dd HH:mm:ss').format(updateDate)
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Review.fromJson(body);
+      }
+      throw Exception(
+        'Failed to save review. Status code: ${response.statusCode}\nBody: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to save review.');
+    }
   }
 
 

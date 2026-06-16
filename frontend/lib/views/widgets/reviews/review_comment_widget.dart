@@ -45,15 +45,19 @@ class ReviewCommentWidget extends ConsumerStatefulWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedReservationId = ref.watch(selectedReservationIdProvider);
-    final  currentReservationState = ref.watch(currentReservationProvider(selectedReservationId));
+    final newCommentNotifier = ref.read(newCommenrProvider.notifier);
     return TextField(
       maxLines: 3,
       decoration: InputDecoration(
           labelText: 'Commentaire (optionnel)',
           border: const OutlineInputBorder(),
-          hintText: 'Votre commentaire ...'
+          hintText: 'Votre commentaire ...',
+        errorText: _commentController.errorText,
       ),
+      onChanged: (s) {
+        newCommentNotifier.setComment(s);
+        _commentController.validate();
+      },
     );
   }
 }

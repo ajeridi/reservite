@@ -6,6 +6,9 @@ import 'package:prbd_2526_a07/models/reservation.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/review_providers/is_valid_comment_provider.dart';
+import 'package:prbd_2526_a07/providers/review_providers/new_comment_provider.dart';
+import 'package:prbd_2526_a07/providers/review_providers/new_rating_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/reviews/star_selection_widget.dart';
 
@@ -37,10 +40,11 @@ class ReservationReviewPage extends ConsumerWidget {
     final currentReservation = ref.watch(currentReservationProvider(selectedReservationId));
     final currentReservationNotifier= ref.watch(currentReservationProvider(selectedReservationId).notifier);
 
+    final isValidComm = ref.watch(isValidCommentProvider);
 
     return currentReservation.when(data: (reservation) => Data(context,
     theme,
-    simulatedTime, reservation),
+    simulatedTime, reservation, isValidComm,ref,currentReservationNotifier ),
         error: (err, st) => DataErrorWidget(error: err, notifier: currentReservationNotifier),
         loading: () => Center(
           child: Column(
@@ -51,7 +55,17 @@ class ReservationReviewPage extends ConsumerWidget {
         )) ;
   }
 
-  Scaffold Data(BuildContext context, ThemeData theme, AsyncValue<DateTime> simulatedTime, Reservation? reservation) {
+  Scaffold Data(BuildContext context,
+      ThemeData theme,
+      AsyncValue<DateTime> simulatedTime,
+      Reservation? reservation ,
+      isValidComm,
+      ref,
+      CurrentReservationNotifier currentReservationNotifier,) {
+
+    final isCompleted = reservation?.status == Status.completed;
+    final hasReview = reservation?.review != null;
+
     return Scaffold(
     appBar: AppBar(
       leading: IconButton(
@@ -66,7 +80,7 @@ class ReservationReviewPage extends ConsumerWidget {
         IconButton(
           icon: const Icon(Icons.refresh),
           tooltip: 'Rafraîchir les données',
-          onPressed: () {},
+          onPressed: () => currentReservationNotifier.refresh(),
         ),
       ],
       elevation: 2,
@@ -169,7 +183,13 @@ class ReservationReviewPage extends ConsumerWidget {
                     const SizedBox(height: 12),
                     ElevatedButton.icon(
                       onPressed: () {
-
+                        !isValidComm ? null : () {
+                          currentReservationProvider.saveReview(
+                            newRating : ref.read(newRatingProvider),
+                            newComment : ref.read(newCommenrProvider)
+                          );
+                          Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
+                        };
                       },
                       icon: const Icon(Icons.send),
                       label: const Text('Publier mon avis'),
