@@ -68,6 +68,18 @@ create table system_time
     simulated_time timestamp default null
 );
 
+create table reviews
+(
+    id          serial primary key,
+    client      int not null references users (id) on delete cascade,
+    restaurant  int not null references restaurants (id) on delete cascade,
+    reservation int not null references reservations (id) on delete cascade,
+    rating      int not null check (rating between 1 and 5),
+    comment     text default null,
+    created_at  timestamp not null default now(),
+    unique (client, restaurant, reservation)
+);
+
 /*
  ==========================================
  FONCTION RESET_DATABASE
@@ -88,6 +100,7 @@ begin
     alter table restaurants disable trigger all;
     alter table services disable trigger all;
     alter table restaurant_managers disable trigger all;
+    alter table reviews disable trigger all;
 
     truncate table reservations cascade;
     truncate table restaurant_managers cascade;
@@ -95,6 +108,7 @@ begin
     truncate table tables cascade;
     truncate table restaurants cascade;
     truncate table system_time cascade;
+    truncate table reviews cascade;
 
     perform reset_users();
 
@@ -301,6 +315,17 @@ begin
             (19, 24),
             (20, 1);
 
+    insert into reviews (id, client, restaurant, reservation, rating, comment, created_at)
+    values
+        (1, 6, 3, 12, 5, 'Excellent service, sushis frais et délicieux !', '2024-11-27 20:00:00'),
+        (2, 3, 1, 1,  4, 'Très bonne cuisine, cadre élégant.', '2024-11-16 21:00:00'),
+        (3, 3, 1, 4,  5, 'Parfait pour un déjeuner d''affaires.', '2024-11-19 14:00:00'),
+        (4, 6, 3, 9,  4, 'Bonne expérience, je reviendrai.', '2024-11-24 20:00:00'),
+        (5, 4, 2, 11, 3, 'Correct mais pas exceptionnel.', '2024-11-26 21:00:00');
+
+    perform setval('reviews_id_seq', (select max(id) from reviews));
+
+
     -- Réactiver tous les triggers sur toutes les tables
     alter table reservations enable trigger all;
     alter table reservation_tables enable trigger all;
@@ -308,6 +333,7 @@ begin
     alter table restaurants enable trigger all;
     alter table services enable trigger all;
     alter table restaurant_managers enable trigger all;
+    alter table reviews enable trigger all;
 
 end;
 $$ language plpgsql security definer;

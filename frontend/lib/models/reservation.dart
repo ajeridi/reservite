@@ -188,6 +188,10 @@ class Reservation  implements Comparable<Reservation>{
     return this.status != Status.completed && this.status != Status.cancelled;
   }
 
+  bool canReview() {
+    return this.status == Status.completed;
+  }
+
 
   static Future<DateTime> getFirstAvailableReservationDateTime() async {
     try {

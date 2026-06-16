@@ -1,0 +1,11 @@
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "brlacroix@reservite.com",
+  "password" : "Password1,"
+}
+
+### (c'est occupé, donc true)
+GET http://localhost:3000/rpc/deja_review?idclient=5&reservationid=12
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoiYnJsYWNyb2l4QGVwZmMuZXUiLCJuYW1lIjoiQnJ1bm8iLCJ1c2VyX2lkIjo2LCJleHAiOjE3ODExMjQ1NzN9.6ia321toT_f6Tk63s51JXGgI1XecZXYxgtWeDAZsr3Y

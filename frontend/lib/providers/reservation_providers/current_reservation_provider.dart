@@ -21,9 +21,11 @@ import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservati
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/special_request_provider.dart';
+import 'package:prbd_2526_a07/providers/reviews_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 
 import '../../models/reservation.dart';
+import '../../models/review.dart';
 import '../selected_tables_provider.dart';
 import 'capacity_check_provider.dart';
 import 'number_of_guests_provider.dart';
@@ -132,6 +134,32 @@ Future<void> complete() async{
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<Review> publier_avis({
+    required int restaurantId,
+    required int reservationId,
+    required int ratingg,
+    required String commentt,
+    required DateTime date,
+    required int? reviews_id,
+  }) async {
+    final effectiveReviewsId =
+    (reviews_id == null || reviews_id == 0) ? null : reviews_id;
+
+    final savedReview = await Review.publier_avis(
+      restaurantId: restaurantId,
+      reservationId: reservationId,
+      ratingg: ratingg,
+      commentt: commentt,
+      date: date,
+      reviews_id: effectiveReviewsId,
+    );
+
+    ref.read(reviewsProvider.notifier).updateReview(savedReview);
+    return savedReview;
+  }
+
+
 
 }
 

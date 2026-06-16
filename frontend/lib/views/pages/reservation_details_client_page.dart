@@ -156,6 +156,24 @@ class ReservationDetailsClientPage extends ConsumerWidget {
                   btnaAnulationWidget(currentReservationNotifier : currentReservationNotifier),
                 ],
               ),
+            if (reservation != null && reservation.canReview())
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed:
+                      simulatedTime.isBefore(reservation.datetime)
+                          ? null
+                          : () {
+                        Navigator.pushReplacementNamed(context, '/reservation_review_page');
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Modifier'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              ),
           ],
         ),
       ),
