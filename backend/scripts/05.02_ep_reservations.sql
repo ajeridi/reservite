@@ -85,9 +85,11 @@ begin
                            'number_of_guests', rsv.number_of_guests,
                            'status', rsv.status,
                            'special_requests', rsv.special_requests,
-                           'tables',
+                           'is_vip' , rsv.is_vip,
+                            'tables',
                            (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number, 'capacity',
                                                               t.capacity))
+
                             from reservation_tables rt
                                      join tables t on rt."table" = t.id
                             where rt.reservation = reservation_id)
@@ -142,7 +144,8 @@ begin
                                        'datetime', rsv.datetime,
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
-                                       'special_requests', rsv.special_requests
+                                       'special_requests', rsv.special_requests,
+                                       'is_vip' , rsv.is_vip
                                )
                                ORDER BY rsv.datetime DESC, rsv.id DESC
                        )
@@ -170,7 +173,8 @@ begin
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
                                        'special_requests', rsv.special_requests,
-                                       'tables',
+                                       'is_vip' , rsv.is_vip,
+                                           'tables',
                                        (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number,
                                                                           'capacity', t.capacity))
                                         from reservation_tables rt
@@ -232,7 +236,52 @@ $$ language plpgsql security definer;
 grant execute on function save_reservation(int, timestamp, int, text, int) to client;
 
 -- =====================================================================================================================
+/* Methode qui update is_vip true/false*/
 
+    create or replace function toggle_is_vip(reservation_id int) returns json as
+        $$
+        declare
+            v_current_time timestamp;
+            restaurant_id int;
+            rsv_status text;
+            begin
+                -- récupère le temps simulé. s'il n'existe pas (null) -> on prend le temps réel (c'est à ca que ca sert coalesce)
+                v_current_time := coalesce((select simulated_time from system_time limit 1), current_timestamp);
+                -- verifier si user connecte
+                perform auth.check_logged();
+                -- user doit etre un manager
+                if (auth.role() <> 'manager') then
+                    raise exception 'Operation prohibited for non managers';
+                end if;
+                -- on recupere l'id du restaurant
+                select rsv.restaurant from reservations rsv where rsv.id = reservation_id into restaurant_id;
+                -- on regarde si le manager travaille dans le restaurant de la reservation a confirmer
+                if (auth.id() not in
+                    (select rm.manager from restaurant_managers rm where manager = auth.id() and restaurant = restaurant_id)) then
+                    raise exception 'User is not manager at the reservation''s restaurant';
+                end if;
+                --verif que la reservation existe
+                if not exists(Select 1 from reservations where id = restaurant)then
+                    raise exception 'La reservation n''existe pas';
+                end if;
+                --verifier que la reservation est en pending ou confirmed
+                select status from reservations where id = reservation_id into rsv_status;
+                if(rsv_status != 'pending' or rsv_status != 'confirmed')then
+                    raise exception 'La réservation doit avoir le status pending or confirmed';
+                end if;
+                if((select datetime from reservations where  id = reservation_id) < v_current_time)then
+                    raise exception 'La date/heure de la réservation doit être dans le futur';
+                end if;
+
+                -- toggle is_vip
+                update reservations set is_vip = -(is_vip) where id = reservation_id;
+
+                -- retourner la reservation avec is_vip modifié
+                return get_reservation(reservation_id);
+            end;
+        $$language plpgsql security definer ;
+
+    -- =============================================================================
 /*
 Confirmation d'une reservation et assignation des tables pour cette reservation
     recoit un id de reservation et un liste d'id de tables

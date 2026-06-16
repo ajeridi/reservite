@@ -95,6 +95,7 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
       numberOfGuests: numberOfGuests,
       specialRequests: specialRequest!.isEmpty ? null : specialRequest,
       reservationId: reservationId == 0 ? null : reservationId,
+
     );
 
     state = AsyncData(savedReservation);

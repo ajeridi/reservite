@@ -28,6 +28,7 @@ class Reservation  implements Comparable<Reservation>{
   final Status status;
   final String? specialRequests;
   final List<Table> tables;
+  final bool isVip;
 
 // constructeur
   const Reservation({
@@ -39,6 +40,7 @@ class Reservation  implements Comparable<Reservation>{
     this.status = Status.pending,
     this.specialRequests = null,
     required this.tables,
+    required this.isVip,
 });
 
   //constructeur from Json
@@ -52,6 +54,7 @@ class Reservation  implements Comparable<Reservation>{
         status: toStatus(json['status']),
         specialRequests: json['special_requests'],
         tables: Table.tablesFromJson(json['tables']),
+        isVip: json['is_vip'],
     );
   }
 
@@ -132,7 +135,8 @@ class Reservation  implements Comparable<Reservation>{
         datetime: datetime ?? this.datetime,
         numberOfGuests: numberOfGuests ?? this.numberOfGuests,
         status: status ?? this.status,
-        tables: tables ?? this.tables);
+        tables: tables ?? this.tables,
+        isVip : isVip);
  }
 
 
@@ -154,6 +158,24 @@ class Reservation  implements Comparable<Reservation>{
       throw Exception('Failed to change reservation status to Canceled');
     }
 
+  }
+  // recup reservation pour complete reservation
+
+  Future<Reservation> toggleIsVip() async{
+    try{
+      final response = await ApiClient.post(
+          'toggle_is_vip',
+          body:json.encode({'reservation_id' : id})
+      );
+      if(response.statusCode == 200){
+        return Reservation.fromJson(json.decode(response.body));
+      }else{
+        throw Exception('Failed to toggle reservation VIP status');
+      }
+    }catch(e){
+      print(e);
+      throw Exception('Failed to change reservation VIP ');
+    }
   }
 
   // recup reservation pour complete reservation
@@ -223,7 +245,7 @@ class Reservation  implements Comparable<Reservation>{
       }
     }
 
-  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int? reservationId}) async {
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int? reservationId,bool? isVip}) async {
     try {
       final dateString = DateFormat('yyyy-MM-dd').format(date);
 
@@ -247,6 +269,7 @@ class Reservation  implements Comparable<Reservation>{
           'number_of_guests_': numberOfGuests,
           'special_requests_': specialRequests,
           'reservation_id' : reservationId,
+          'is_vip' : isVip,
         }),
       );
 

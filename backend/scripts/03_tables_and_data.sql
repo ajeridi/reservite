@@ -53,7 +53,8 @@ create table reservations
     datetime         timestamp   not null,
     number_of_guests int         not null,
     status           status_type not null default 'pending'::status_type,
-    special_requests text                 default null
+    special_requests text                 default null,
+    is_vip           bool       not null  default false
 );
 
 create table reservation_tables
@@ -300,6 +301,19 @@ begin
             (17, 17),
             (19, 24),
             (20, 1);
+
+    insert into public.reservations (id, client, restaurant, datetime, number_of_guests, status, special_requests)
+    values (23, 3, 1, '2024-12-04 19:00', 2, 'pending', null),
+           (24, 4, 1, '2024-12-04 20:00', 2, 'pending', null),
+           (25, 6, 1, '2024-12-04 20:00', 2, 'pending', null),
+           (26, 6, 1, '2024-12-04 20:30', 4, 'cancelled', null),
+           (27, 7, 1, '2024-12-04 19:30', 2, 'confirmed', null);
+
+    insert into public.reservation_tables (reservation, "table")
+    values (27, 1);
+
+    perform setval('reservations_id_seq', (select max(id) from reservations));
+
 
     -- Réactiver tous les triggers sur toutes les tables
     alter table reservations enable trigger all;
