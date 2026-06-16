@@ -41,7 +41,7 @@ class ReservationCard extends ConsumerWidget {
     final userRole = ref.watch(userRoleProvider).value;
     final isVip = ref.watch(isVipProvider);
 
-    final watchCurrentRes = ref.watch(currentRestaurantProvider(reservation.id));
+    final watchCurrentRes = ref.watch(currentReservationProvider(reservation.id));
     return
       Card(
         margin: const EdgeInsets.only(bottom: 16),
@@ -112,21 +112,20 @@ class ReservationCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                if(watchCurrentRes.value != null && watchCurrentRes.value.)
-                    IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-                    icon: Icon(Icons.star_border, size: 28, color: Colors.grey),
-                    onPressed: () async {  await ref.watch(currentRestaurantProvider(reservation.id).notifier). },
-                  ),
-
-                if(isVip.value == true)
+                if(watchCurrentRes.value != null && watchCurrentRes.value!.isVip )
                   IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                   icon: Icon(Icons.star, size: 28, color: Colors.amber),
-                  onPressed: () { /* ... */ },
-                  ),
+                  onPressed: () async {  await ref.watch(currentReservationProvider(reservation.id).notifier).toggle(); },
+                  )
+                else
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  icon: Icon(Icons.star_border, size: 28, color: Colors.grey),
+                  onPressed: () async {  await ref.watch(currentReservationProvider(reservation.id).notifier).toggle(); },
+                ),
 
 
     const Icon(Icons.chevron_right),
