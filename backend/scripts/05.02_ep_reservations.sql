@@ -261,7 +261,7 @@ grant execute on function save_reservation(int, timestamp, int, text, int) to cl
                     raise exception 'User is not manager at the reservation''s restaurant';
                 end if;
                 --verif que la reservation existe
-                if not exists(Select 1 from reservations where id = restaurant)then
+                if not exists(Select 1 from reservations where id = reservation_id)then
                     raise exception 'La reservation n''existe pas';
                 end if;
                 --verifier que la reservation est en pending ou confirmed
@@ -271,6 +271,10 @@ grant execute on function save_reservation(int, timestamp, int, text, int) to cl
                 end if;
                 if((select datetime from reservations where  id = reservation_id) < v_current_time)then
                     raise exception 'La date/heure de la réservation doit être dans le futur';
+                end if;
+
+                if((select count(*) from reservations where restaurant = reservation_id and (status = 'pending' or status = 'confirmed') and datetime >= v_current_time)  >= 3)then
+                    return json_build_object('error', 'Max 3 reservations VIP par restaurant');
                 end if;
 
                 -- toggle is_vip

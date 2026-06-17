@@ -28,17 +28,17 @@ returns trigger as
                                 where (status='pending' or status='confirmed')
                                 and restaurant = resto_id
                                 and datetime >= v_current_time
-                                and is_vip = true) >= 3 ) then
+                                and is_vip = true) > 3 ) then
             raise exception 'Un restaurant ne peut pas avoir plus de 3 réservations VIP actives.';
 
         end if;
-        return new;
+        return null;
 
         end;
     $$language plpgsql security definer ;
 
 create trigger check_vip_reservation
-    before update
+    after update
     on reservations
     for each row
     execute function check_vip_reservation_fct();
