@@ -40,6 +40,9 @@ class ManagerNavigationBarWidget extends StatelessWidget {
       case 0:
         if (selected != 0) Navigator.pushReplacementNamed(context, '/manager_reservations_page');
         break;
+      case 1:
+        if (selected != 1) Navigator.pushReplacementNamed(context, '/restaurant_management_services_page');
+        break;
       case 2 :
         if (selected != 2) Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
         break;

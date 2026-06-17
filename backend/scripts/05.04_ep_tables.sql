@@ -16,7 +16,7 @@ set search_path to public, auth;
 
 /*
 ENDPOINT QUI VA RETOURNER UNE LISTE DE TABLES
- on retourne une liste d'objets reservations donc json_agg(json_build_object)
+ on retourne une liste d'objets tables donc json_agg(json_build_object)
 */
 
     create or replace function get_tables(restaurant_id int default NULL) returns json as
