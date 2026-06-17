@@ -1,0 +1,12 @@
+### connection d'un manager
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "boverhaegen@epfc.eu",
+  "password" : "Password1,"
+}
+
+### recuperation des services d'un restaurant (ok)
+GET http://localhost:3000/rpc/get_services_par_restaurant?restaurant_id=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODE4MTI3MDF9.JECw40rAdn3b8Q0aoC4ufqjmpFoF0EMC-DWzinLK8z0
