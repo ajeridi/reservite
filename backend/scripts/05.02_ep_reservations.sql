@@ -85,6 +85,7 @@ begin
                            'number_of_guests', rsv.number_of_guests,
                            'status', rsv.status,
                            'special_requests', rsv.special_requests,
+                           'is_vip', rsv.is_vip,
                            'tables',
                            (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number, 'capacity',
                                                               t.capacity))
@@ -142,7 +143,8 @@ begin
                                        'datetime', rsv.datetime,
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
-                                       'special_requests', rsv.special_requests
+                                       'special_requests', rsv.special_requests,
+                                       'is_vip', rsv.is_vip
                                )
                                ORDER BY rsv.datetime DESC, rsv.id DESC
                        )
@@ -170,6 +172,7 @@ begin
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
                                        'special_requests', rsv.special_requests,
+                                       'is_vip', rsv.is_vip,
                                        'tables',
                                        (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number,
                                                                           'capacity', t.capacity))
@@ -503,3 +506,102 @@ $$ language sql security definer;
 grant execute on function get_service_by_datetime(date, time, int) to client;
 grant execute on function get_occupied_tables(date, time, int) to client;
 grant execute on function check_service_tables_capacity(int, date, time, int) to client;
+
+create or replace function check_is_reservation_active(reservation_id int) returns boolean as
+$$
+declare
+    v_current_time timestamp;
+begin
+
+    -- récupère le temps simulé. s'il n'existe pas (null) -> on prend le temps réel (c'est à ca que ca sert coalesce)
+    v_current_time := coalesce((select simulated_time from system_time limit 1), current_timestamp);
+
+    if not exists(select rsv.id
+                  from reservations rsv
+                  where (rsv.status = 'pending' OR rsv.status = 'confirmed') -- si reservation active (pending ou confirmed)
+                    AND rsv.datetime > v_current_time -- ET que la réservation est dans le futur
+                    AND rsv.id = reservation_id) then
+        raise exception 'Cette réservation n''est pas active';
+    end if;
+    return true;
+end;
+$$ language plpgsql security definer;
+
+grant execute on function check_is_reservation_active(int) to manager;
+
+------------------------
+
+create or replace function vip_true(reservation_id int) returns json as
+$$
+declare
+    updated_reservation_id int := reservation_id;
+    v_current_time timestamp;
+begin
+    -- verification si utilisateur connecte
+    perform auth.check_logged();
+    if (auth.role() <> 'manager') then
+        raise exception 'Cannot toggle a vip reservation if you are not a manager';
+    end if;
+
+    -- récupère le temps simulé. s'il n'existe pas (null) -> on prend le temps réel (c'est à ca que ca sert coalesce)
+    v_current_time := coalesce((select simulated_time from system_time limit 1), current_timestamp);
+
+    if (check_is_reservation_active(reservation_id)) then
+
+    UPDATE reservations
+    set is_vip         = true
+        WHERE id = reservation_id;
+    return get_reservation(updated_reservation_id);
+
+    end if;
+end;
+$$ language plpgsql security definer;
+
+grant execute on function vip_true(int) to manager;
+
+--------------------------
+
+create or replace function vip_false(reservation_id int) returns json as
+$$
+declare
+    updated_reservation_id int := reservation_id;
+    v_current_time timestamp;
+begin
+    -- verification si utilisateur connecte
+    perform auth.check_logged();
+    if (auth.role() <> 'manager') then
+        raise exception 'Cannot toggle a vip reservation if you are not a manager';
+    end if;
+
+    -- récupère le temps simulé. s'il n'existe pas (null) -> on prend le temps réel (c'est à ca que ca sert coalesce)
+    v_current_time := coalesce((select simulated_time from system_time limit 1), current_timestamp);
+
+    if (check_is_reservation_active(reservation_id)) then
+
+    UPDATE reservations
+    set is_vip         = false
+    WHERE id = reservation_id;
+    return get_reservation(updated_reservation_id);
+
+    end if;
+end;
+$$ language plpgsql security definer;
+
+grant execute on function vip_false(int) to manager;
+
+-----------------
+
+/*
+Retourne le nombre de reservations en vip true
+*/
+create or replace function get_vip_reservation_count(restaurant_id int) returns integer as
+$$
+begin
+    return (select count(*)
+            from reservations r
+            where r.is_vip = true and r.restaurant = restaurant_id
+            and check_is_reservation_active(r.id));
+end;
+$$ language plpgsql security definer;
+
+grant execute on function get_vip_reservation_count(int) to manager;

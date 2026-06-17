@@ -27,6 +27,7 @@ class Reservation  implements Comparable<Reservation>{
   final int numberOfGuests;
   final Status status;
   final String? specialRequests;
+  final bool is_vip;
   final List<Table> tables;
 
 // constructeur
@@ -38,6 +39,7 @@ class Reservation  implements Comparable<Reservation>{
     this.numberOfGuests = 0,
     this.status = Status.pending,
     this.specialRequests = null,
+    this.is_vip = false,
     required this.tables,
 });
 
@@ -51,6 +53,7 @@ class Reservation  implements Comparable<Reservation>{
         numberOfGuests: json['number_of_guests'],
         status: toStatus(json['status']),
         specialRequests: json['special_requests'],
+        is_vip: json['is_vip'],
         tables: Table.tablesFromJson(json['tables']),
     );
   }
@@ -124,6 +127,7 @@ class Reservation  implements Comparable<Reservation>{
    int? numberOfGuests,
    Status? status,
     String? specialRequests,
+   bool? is_vip,
    List<Table>? tables}){
     return Reservation(
         id: id ?? this.id,
@@ -132,6 +136,7 @@ class Reservation  implements Comparable<Reservation>{
         datetime: datetime ?? this.datetime,
         numberOfGuests: numberOfGuests ?? this.numberOfGuests,
         status: status ?? this.status,
+        is_vip: is_vip ?? this.is_vip,
         tables: tables ?? this.tables);
  }
 
@@ -260,6 +265,68 @@ class Reservation  implements Comparable<Reservation>{
     } catch (e, st) {
       print('$e\n$st');
       throw Exception('Failed to save reservation.');
+    }
+  }
+
+  static Future<Reservation> vip_true({required int? reservationId}) async {
+    try {
+      final response = await ApiClient.post(
+        'vip_true',
+        body: json.encode({
+          'reservation_id' : reservationId,
+        }),
+      );
+
+      print(response.body);
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Reservation.fromJson(body);
+      }
+      throw Exception(
+        'Failed to update vip reservation. Status code: ${response.statusCode}\nBody: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to update vip reservation.');
+    }
+  }
+
+  static Future<Reservation> vip_false({required int? reservationId}) async {
+    try {
+      final response = await ApiClient.post(
+        'vip_false',
+        body: json.encode({
+          'reservation_id' : reservationId,
+        }),
+      );
+
+      print(response.body);
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Reservation.fromJson(body);
+      }
+      throw Exception(
+        'Failed to update vip reservation. Status code: ${response.statusCode}\nBody: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to update vip reservation.');
+    }
+  }
+
+  static Future<int> get_vip_reservation_count({required int restaurantId}) async {
+
+    try {
+      final response = await ApiClient.get('get_vip_reservation_count?restaurant_id=$restaurantId');
+      if (response.statusCode != 200) {
+        throw Exception('Failed to check get_vip count.\nStatus Code: ${response.statusCode}');
+      }
+      final body = json.decode(response.body);
+      return body;
+
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to check get_vip count.');
     }
   }
 

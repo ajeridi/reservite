@@ -2,10 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/current_vips_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
 import '../../models/reservation.dart';
+import '../../providers/application_time_provider.dart';
 import '../../providers/reservation_providers/current_reservation_provider.dart';
 
 class ReservationCard extends ConsumerWidget {
@@ -37,6 +42,14 @@ class ReservationCard extends ConsumerWidget {
     final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
     // on doit voir le notifier de l'utilisateur connecte, pour connaitre son role et rediriger vers la bonne page de details
     final userRole = ref.watch(userRoleProvider).value;
+
+    final watchCurrentReservation = ref.watch(currentReservationProvider(reservation.id));
+
+    final simulatedTime = ref.watch(applicationTimeProvider).value;
+
+    final selectedRestaurant = ref.read(selectedRestaurantProvider);
+    final currentCountVips = ref.watch(currentVipsProvider(selectedRestaurant));
+
     return
       Card(
         margin: const EdgeInsets.only(bottom: 16),
@@ -107,7 +120,49 @@ class ReservationCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right),
+                if (watchCurrentReservation.value != null && watchCurrentReservation.value!.is_vip && userRole == 'manager')
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                    icon: Icon(Icons.star, size: 28, color: Colors.amber),
+                    onPressed: () async {
+                        await ref.watch(currentReservationProvider(reservation.id).notifier).vip_false(reservation.id);
+                    },
+                  ),
+                if (watchCurrentReservation.value != null && !watchCurrentReservation.value!.is_vip && userRole == 'manager')
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                    icon: Icon(Icons.star_border, size: 28, color: Colors.grey),
+                    onPressed: () async {
+                      if (simulatedTime!.isAfter(watchCurrentReservation.value!.datetime)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text(
+                                'Mode VIP modifiable uniquement pour les réservations futures.'))
+                        );
+                        return;
+                      }
+
+                      if (watchCurrentReservation.value!.status != Status.confirmed && watchCurrentReservation.value!.status != Status.pending) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text(
+                                'Mode VIP modifiable uniquement pour les réservations actives.'))
+                        );
+                        return;
+                      }
+
+                      if(currentCountVips.value! >= 3) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text(
+                                'Plafond de 3 réservations VIP actives atteint pour ce restaurant.'))
+                        );
+                        return;
+                      }
+
+                      await ref.watch(currentReservationProvider(reservation.id).notifier).vip_true(reservation.id);
+                      }
+                  ),
+    const Icon(Icons.chevron_right),
               ],
             ),
           ),

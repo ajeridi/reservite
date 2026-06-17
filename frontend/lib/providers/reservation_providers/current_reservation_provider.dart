@@ -16,6 +16,7 @@ import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/client_provider.dart';
 import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/current_vips_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
@@ -127,6 +128,38 @@ Future<void> complete() async{
 
       ref.read(selectedTableProvider.notifier).clear();
       await ref.read(reservationsProvider.notifier).refresh();
+    } catch (e, st) {
+      print('$e\n$st');
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> vip_true(int reservationId) async {
+    state = AsyncLoading();
+    try {
+      final mettreTrue = await Reservation.vip_true(
+          reservationId: id
+      );
+      state = AsyncData(mettreTrue);
+      final selectedRestaurant = ref.read(selectedRestaurantProvider);
+      await ref.read(currentVipsProvider(selectedRestaurant).notifier).get_vip_reservation_count(selectedRestaurant);
+
+    } catch (e, st) {
+      print('$e\n$st');
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> vip_false(int reservationId) async {
+    state = AsyncLoading();
+    try {
+      final mettreFalse = await Reservation.vip_false(
+          reservationId: id
+      );
+      state = AsyncData(mettreFalse);
+      final selectedRestaurant = ref.read(selectedRestaurantProvider);
+
+      await ref.read(currentVipsProvider(selectedRestaurant).notifier).get_vip_reservation_count(selectedRestaurant);
     } catch (e, st) {
       print('$e\n$st');
       state = AsyncValue.error(e, st);

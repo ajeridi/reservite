@@ -3,18 +3,17 @@ POST http://localhost:3000/rpc/login
 Content-Type: application/json
 
 {
-  "email" : "boverhaegen@reservite.com",
+  "email" : "bepenelle@reservite.com",
   "password" : "Password1,"
 }
 
 ### confirmation de reservation en utilisant le token du login
-POST http://localhost:3000/rpc/confirm_reservation
+POST http://localhost:3000/rpc/vip_true
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJlcGVuZWxsZUBlcGZjLmV1IiwibmFtZSI6IkJlbm_DrnQiLCJ1c2VyX2lkIjoyLCJleHAiOjE3NzkwMjY2NDZ9.tjAl0ej1dOHplDehx2YK4nFTJLlrImXIapM5HIEyCmM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJlcGVuZWxsZUBlcGZjLmV1IiwibmFtZSI6IkJlbm_DrnQiLCJ1c2VyX2lkIjoyLCJleHAiOjE3ODE3MjQ0MTV9.8ykPJesiUlQKo8dq3iTjSBllJgtvzS-D0u0glqTC-70
 
 {
-  "reservation_id" : 23,
-  "tables_id" : [7]
+  "reservation_id" : 22
 }
 
 

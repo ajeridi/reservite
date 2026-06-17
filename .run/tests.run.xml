@@ -17,6 +17,7 @@
     <script-file value="$PROJECT_DIR$/backend/tests/test_04.12_br_no_reservation_pen_canc_in_reservation_tables.sql" />
     <script-file value="$PROJECT_DIR$/backend/tests/test_04.13_br_check_res_count_per_day_and_service.sql" />
     <script-file value="$PROJECT_DIR$/backend/tests/test_04.14_br_no_past_reservation.sql" />
+    <script-file value="$PROJECT_DIR$/backend/tests/test_04.15_br_reservations_vip.sql" />
     <script-mode>FILE</script-mode>
     <data-source id="6d275bb5-c69c-4f95-bc29-f6a29631655b" namespace="database/&quot;prbd-2526-a07&quot;" />
     <method v="2" />
