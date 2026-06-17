@@ -161,15 +161,20 @@ class Reservation  implements Comparable<Reservation>{
   }
   // recup reservation pour complete reservation
 
-  Future<Reservation> toggleIsVip() async{
+  Future<dynamic> toggleIsVip() async{
     try{
       final response = await ApiClient.post(
           'toggle_is_vip',
           body:json.encode({'reservation_id' : id})
       );
       print(response.body);
+      final body = json.decode(response.body);
       if(response.statusCode == 200){
-        return Reservation.fromJson(json.decode(response.body));
+        if(body['error'] != null) {
+          return body['error'];
+        }else {
+          return Reservation.fromJson(json.decode(response.body));
+        }
       }else{
         throw Exception('Failed to toggle reservation VIP status');
       }

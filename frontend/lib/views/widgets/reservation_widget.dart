@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
-import 'package:prbd_2526_a07/providers/reservation_providers/is_vip_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
@@ -39,7 +37,7 @@ class ReservationCard extends ConsumerWidget {
     final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
     // on doit voir le notifier de l'utilisateur connecte, pour connaitre son role et rediriger vers la bonne page de details
     final userRole = ref.watch(userRoleProvider).value;
-    final isVip = ref.watch(isVipProvider);
+
 
     final watchCurrentRes = ref.watch(currentReservationProvider(reservation.id));
     return
@@ -118,14 +116,31 @@ class ReservationCard extends ConsumerWidget {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                   icon: Icon(Icons.star, size: 28, color: Colors.amber),
-                  onPressed: () async {  await ref.watch(currentReservationProvider(reservation.id).notifier).toggle(); },
+                  onPressed: () async {
+                    final error = await ref
+                        .watch(
+                        currentReservationProvider(reservation.id).notifier)
+                        .toggle();
+                      if (context.mounted){
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error is String ?  error : 'Succés')   )
+                             );
+                      }
+                    },
+
                   )
                 else //si isVip = true
                 IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                   icon: Icon(Icons.star_border, size: 28, color: Colors.grey),
-                  onPressed: () async {  await ref.watch(currentReservationProvider(reservation.id).notifier).toggle(); },
+                  onPressed: () async {  final error = await ref
+                      .watch(
+                      currentReservationProvider(reservation.id).notifier)
+                      .toggle();
+                  if (context.mounted){
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error is String ?  error : 'Succés')   )
+                    );
+                  }},
                 ),
 
 

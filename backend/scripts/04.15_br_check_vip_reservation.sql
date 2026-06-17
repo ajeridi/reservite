@@ -32,7 +32,7 @@ returns trigger as
             raise exception 'Un restaurant ne peut pas avoir plus de 3 réservations VIP actives.';
 
         end if;
-        return null;
+        return new;
 
         end;
     $$language plpgsql security definer ;

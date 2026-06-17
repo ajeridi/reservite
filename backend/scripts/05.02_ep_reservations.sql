@@ -262,18 +262,20 @@ grant execute on function save_reservation(int, timestamp, int, text, int) to cl
                 end if;
                 --verif que la reservation existe
                 if not exists(Select 1 from reservations where id = reservation_id)then
-                    raise exception 'La reservation n''existe pas';
+                    return json_build_object('error', 'La reservation n''existe pas');
                 end if;
                 --verifier que la reservation est en pending ou confirmed
                 select status from reservations where id = reservation_id into rsv_status;
                 if(rsv_status != 'pending' and rsv_status != 'confirmed')then
-                    raise exception 'La réservation doit avoir le status pending or confirmed';
+                    return json_build_object('error', 'La réservation doit avoir le status pending or confirmed');
                 end if;
                 if((select datetime from reservations where  id = reservation_id) < v_current_time)then
-                    raise exception 'La date/heure de la réservation doit être dans le futur';
+                    return json_build_object('error', 'La date/heure de la réservation doit être dans le futur');
                 end if;
 
-                if((select count(*) from reservations where restaurant = reservation_id and (status = 'pending' or status = 'confirmed') and datetime >= v_current_time)  >= 3)then
+                if((select is_vip from reservations where id = reservation_id) is false and (select count(*) from reservations where restaurant = restaurant_id and (status = 'pending' or status = 'confirmed')
+                                                        and datetime >= v_current_time
+                                                      and is_vip is true)  >= 3)then
                     return json_build_object('error', 'Max 3 reservations VIP par restaurant');
                 end if;
 

@@ -106,10 +106,14 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
     return savedReservation;
   }
   // appel de toggleIsVip sur state , et update page grace a updateList
-  Future<void> toggle() async{
+  Future<dynamic> toggle() async{
     final toggleVip = await state.value!.toggleIsVip();
-    state = AsyncData(toggleVip);
-    ref.read(reservationsProvider.notifier).updateList(state.value!);
+    if(toggleVip is Reservation) {
+      state = AsyncData(toggleVip);
+      ref.read(reservationsProvider.notifier).updateList(state.value!);
+    }
+
+    return toggleVip;
   }
 
 // on appelle getCompleted sûr la state, ensuite on update la page de reservations grâce a updateList
