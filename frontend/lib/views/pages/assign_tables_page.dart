@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -74,7 +76,7 @@ class AssignTablesPage extends ConsumerWidget {
   Widget data(
       BuildContext context,
       WidgetRef ref,
-      List<Table> tables,
+      SplayTreeSet<Table> tables,
       TablesNotifier tableNotifier,
       ThemeData theme,
       AuthNotifier authNotifier,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
@@ -9,18 +10,18 @@ import '../models/table.dart';
 import 'auth_provider.dart';
 
 final tablesProvider =
-AsyncNotifierProvider<TablesNotifier, List<Table>>(
+AsyncNotifierProvider<TablesNotifier, SplayTreeSet<Table>>(
       () => TablesNotifier(),
 );
 
-class TablesNotifier extends AbstractAsyncNotifier<List<Table>> {
+class TablesNotifier extends AbstractAsyncNotifier<SplayTreeSet<Table>> {
   @override
-  FutureOr<List<Table>> build() async {
+  FutureOr<SplayTreeSet<Table>> build() async {
     // on doit regarder l'etat de connexion (si connecté en tant que manager ou non)
     ref.watch(authProvider);
     final authNotifier = ref.read(authProvider.notifier);
 
-    state = AsyncData(<Table>[]);
+    state = AsyncData(SplayTreeSet<Table>());
     state = AsyncLoading();
 
     final selectedRestaurant = ref.watch(selectedRestaurantProvider);
@@ -30,7 +31,7 @@ class TablesNotifier extends AbstractAsyncNotifier<List<Table>> {
         if (isManager) // si on est un manager on va rechercher toutes les tables de la réservation
           return await Table.getTables(selectedRestaurant: selectedRestaurant);
       }
-      return <Table>[];
+      return SplayTreeSet<Table>();
     }catch (e){
       throw "Something went wrong!\nPlease try again later.";
     }
@@ -46,7 +47,7 @@ class TablesNotifier extends AbstractAsyncNotifier<List<Table>> {
     try {
       final selectedTable = ref.read(selectedTableProvider);
       print('selected table is $selectedTable');
-      final List<Table> tables;
+      final SplayTreeSet<Table> tables;
 
       final selectedRestaurant = ref.read(selectedRestaurantProvider);
 
@@ -75,5 +76,13 @@ class TablesNotifier extends AbstractAsyncNotifier<List<Table>> {
           StackTrace.current
       );
     }
+  }
+
+  updateList(Table newTable) {
+    state = AsyncLoading();
+    final tables = state.value!;
+    tables.removeWhere((table) => table.id == newTable.id);
+    tables.add(newTable);
+    state = AsyncData(tables);
   }
 }
