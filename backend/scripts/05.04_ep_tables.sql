@@ -35,7 +35,7 @@ return (select json_agg(
                                'restaurant', tbl.restaurant,
                                'table_number', tbl.table_number,
                                'capacity', tbl.capacity
-                       )
+                       ) ORDER BY capacity ASC, table_number ASC
                )
         from tables tbl
         where tbl.restaurant = restaurant_id);
@@ -48,14 +48,14 @@ end;
 grant execute on function get_tables(int) to manager;
 
 
-create or replace function get_table(reservation_id int) returns json as
+create or replace function get_table(table_id int, restaurant_id int) returns json as
 $$
 begin
     -- verification si utilisateur connecte
     perform auth.check_logged();
 
     -- si user est un manager, il faut qu'il soit manager dans le restaurant dans lequel se trouve la reservation
-    if (auth.role() = 'manager' AND not exists(select * from restaurant_managers where manager = auth.id() and restaurant = (select rsv.restaurant from reservations rsv where rsv.id = reservation_id))) then
+    if (auth.role() = 'manager' AND not exists(select * from restaurant_managers where manager = auth.id() and restaurant = restaurant_id)) then
         raise exception 'Manager cannot check a table inside a restaurant he is not working in';
     end if;
 
@@ -63,14 +63,15 @@ begin
                            'id', tbl.id,
                            'restaurant', tbl.restaurant,
                            'table_number', tbl.table_number,
-                           'capacity', tbl.capacity
+                           'capacity', tbl.capacity,
+                            'has_reservations', (select count(*) from reservation_tables rt where rt."table" = table_id) > 0
                    )
             from tables tbl
-            where tbl.id = reservation_id);
+            where tbl.id = table_id);
 end;
 $$ language plpgsql security definer;
 
-grant execute on function get_table(int) to manager;
+grant execute on function get_table(int, int) to manager;
 
 
 /*
@@ -100,3 +101,47 @@ end;
 $$ language plpgsql security definer;
 
 grant execute on function is_occupee(int, timestamp) to manager;
+
+create or replace function check_table_number_unicity(_table_number int, table_id int, restaurant_id int) returns json as
+    $$
+    declare result bool;
+    begin
+        perform auth.check_logged();
+        if (auth.role() = 'manager' and check_manager_works_in_restaurant(auth.id(), restaurant_id )) then
+            -- nouvelle table, on on regarde si le non est unique dans toute la table
+            if (table_id = 0) then
+                select (not exists((select t.id from tables t where t.restaurant = restaurant_id and t.table_number = _table_number))) into result;
+            else
+                -- si c'est une table existante, on regarde si d'abord le table_number number est le table_number existant sinon on regarde s'il est unique
+                select( ((select t.table_number from tables t where t.id = table_id) = _table_number) OR (not exists(select t.id from tables t where t.table_number = _table_number and t.restaurant = restaurant_id))) into result;
+            end if;
+        return json_build_object('is_unique', result);
+        end if;
+        raise exception 'Not allowed';
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function check_table_number_unicity(int, int, int) to manager;
+
+-- tests
+--select ((select t.table_number from tables t where t.id = 11) = 4) OR (not exists(select t.id from tables t where t.table_number = 4 and t.restaurant = 4));
+
+create or replace function save_table(table_id int, new_table_number int, new_capacity int, restaurant_id int) returns json as
+    $$
+    declare updated_id int := table_id;
+    begin
+        perform auth.check_logged();
+        if (auth.role() = 'manager' and check_manager_works_in_restaurant(auth.id(), restaurant_id)) then
+            if (table_id = 0) then
+                INSERT INTO tables(restaurant, table_number, capacity) VALUES (restaurant_id, new_table_number, new_capacity)
+                returning id into updated_id;
+            else
+                UPDATE tables set table_number = new_table_number, capacity = new_capacity where id = table_id;
+            end if;
+        return get_table(updated_id, restaurant_id);
+        end if;
+        raise exception 'Not allowed';
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function save_table(int, int, int, int) to manager;
