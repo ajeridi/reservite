@@ -6,8 +6,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/table.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
-import 'package:prbd_2526_a07/providers/tables_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/selected_table_id_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/tables_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 import 'package:prbd_2526_a07/views/widgets/manager_navigation_bar_widget.dart';
 

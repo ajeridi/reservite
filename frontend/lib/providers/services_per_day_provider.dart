@@ -3,7 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/services.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_services_provider.dart';
 
 import '../core/tools/abstract_async_notifier.dart';

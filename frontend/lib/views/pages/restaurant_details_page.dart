@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 
 import '../../core/tools/pick_date_time.dart';
 import '../../providers/application_time_provider.dart';
-import '../../providers/current_restaurant_provider.dart';
+import '../../providers/restaurant_providers/current_restaurant_provider.dart';
 import '../widgets/restaurant_details_widget.dart';
 
 void main() async {

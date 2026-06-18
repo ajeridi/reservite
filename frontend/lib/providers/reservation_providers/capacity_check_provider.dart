@@ -5,7 +5,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservati
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_provider.dart';
 
 import '../../models/reservation.dart';
-import '../selected_restaurant_provider.dart';
+import '../restaurant_providers/selected_restaurant_provider.dart';
 import 'number_of_guests_provider.dart';
 
 final capacityCheckProvider =

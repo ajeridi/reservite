@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prbd_2526_a07/providers/current_table_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/current_table_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/selected_table_id_provider.dart';
 
 final newTableNumberProvider = NotifierProvider<NewTableNumberNotifier, int?>(
     () => NewTableNumberNotifier(),
