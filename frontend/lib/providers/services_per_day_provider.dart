@@ -6,22 +6,22 @@ import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_services_provider.dart';
 
 import '../core/tools/abstract_async_notifier.dart';
-import '../models/services.dart';
+import '../models/service.dart';
 import 'auth_provider.dart';
 
-final servicesProvider =
-AsyncNotifierProvider<ServicesNotifier, Map<String, SplayTreeSet<Services>>>(
-      () => ServicesNotifier(),
+final servicesPerDayProvider =
+AsyncNotifierProvider<ServicesPerDayNotifier, Map<int, SplayTreeSet<Service>>>(
+      () => ServicesPerDayNotifier(),
 );
 
-class ServicesNotifier extends AbstractAsyncNotifier<Map<String, SplayTreeSet<Services>>> {
+class ServicesPerDayNotifier extends AbstractAsyncNotifier<Map<int, SplayTreeSet<Service>>> {
   @override
-  FutureOr<Map<String, SplayTreeSet<Services>>> build() async {
+  FutureOr<Map<int, SplayTreeSet<Service>>> build() async {
     // on doit regarder l'etat de connexion (si connecté en tant que manager ou non)
     ref.watch(authProvider);
     final authNotifier = ref.read(authProvider.notifier);
 
-    state = AsyncData(<String, SplayTreeSet<Services>>{});
+    state = AsyncData(HashMap());
     state = AsyncLoading();
 
     final selectedRestaurant = ref.watch(selectedRestaurantProvider);
@@ -29,9 +29,9 @@ class ServicesNotifier extends AbstractAsyncNotifier<Map<String, SplayTreeSet<Se
       if (authNotifier.isLoggedIn){
         final isManager = await authNotifier.isManager();
         if (isManager) // si on est un manager on va rechercher toutes les services du restaurant
-          return await Services.getServices(selectedRestaurant: selectedRestaurant);
+          return await Service.getServices(selectedRestaurant: selectedRestaurant);
       }
-      return SplayTreeSet<Services>();
+      return HashMap();
     }catch (e){
       throw "Something went wrong!\nPlease try again later.";
     }
@@ -39,19 +39,20 @@ class ServicesNotifier extends AbstractAsyncNotifier<Map<String, SplayTreeSet<Se
 
   @override
   Future<void> refresh() async{
-    await getAll();
+    //await getAll();
   }
 
+/*
   Future<void> getAll() async {
     state = AsyncLoading();
     try {
       final selectedService = ref.read(selectedServiceIdProvider);
       print('selected service is $selectedService');
-      final SplayTreeSet<Services> services;
+      final SplayTreeSet<Service> services;
 
       final selectedRestaurant = ref.read(selectedRestaurantProvider);
 
-      services = await Services.getServices(selectedRestaurant: selectedRestaurant);
+      services = await Service.getServices(selectedRestaurant: selectedRestaurant);
       state = AsyncData(services);
     }
     catch (e){
@@ -62,14 +63,17 @@ class ServicesNotifier extends AbstractAsyncNotifier<Map<String, SplayTreeSet<Se
       );
     }
   }
+*/
 
-  updateList(Services newService) {
+/*
+  updateList(Service newService) {
     state = AsyncLoading();
     final services = state.value!;
     services.removeWhere((table) => table.id == newService.id);
     services.add(newService);
     state = AsyncData(services);
   }
+*/
 
   String getJour(int day_of_week) {
     if (day_of_week == 1)

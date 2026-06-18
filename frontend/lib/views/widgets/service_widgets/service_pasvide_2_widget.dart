@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../models/services.dart';
+import '../../../models/service.dart';
 
 class service_pasvide_2_widget extends ConsumerWidget {
 
-  final Services service;
+  final Service service;
 
   const service_pasvide_2_widget({
     super.key,
