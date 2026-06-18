@@ -11,18 +11,18 @@ import '../models/service.dart';
 import 'auth_provider.dart';
 
 final servicesPerDayProvider =
-AsyncNotifierProvider<ServicesPerDayNotifier, Map<int, Services>>(
+AsyncNotifierProvider<ServicesPerDayNotifier, SplayTreeMap<int, Services>>(
       () => ServicesPerDayNotifier(),
 );
 
-class ServicesPerDayNotifier extends AbstractAsyncNotifier<Map<int, Services>> {
+class ServicesPerDayNotifier extends AbstractAsyncNotifier<SplayTreeMap<int, Services>> {
   @override
-  FutureOr<Map<int, Services>> build() async {
+  FutureOr<SplayTreeMap<int, Services>> build() async {
     // on doit regarder l'etat de connexion (si connecté en tant que manager ou non)
     ref.watch(authProvider);
     final authNotifier = ref.read(authProvider.notifier);
 
-    state = AsyncData(HashMap());
+    state = AsyncData(SplayTreeMap());
     state = AsyncLoading();
 
     final selectedRestaurant = ref.watch(selectedRestaurantProvider);
@@ -32,7 +32,7 @@ class ServicesPerDayNotifier extends AbstractAsyncNotifier<Map<int, Services>> {
         if (isManager) // si on est un manager on va rechercher toutes les services du restaurant
           return await Service.getServices(selectedRestaurant: selectedRestaurant);
       }
-      return HashMap();
+      return SplayTreeMap();
     }catch (e){
       throw "Something went wrong!\nPlease try again later.";
     }

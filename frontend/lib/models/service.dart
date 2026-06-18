@@ -44,16 +44,16 @@ const Service({
   }
 
   // methode qui va rechercher les tables d'un restaurant (Future, car on va chercher dans la DB)
-  static Future<Map<int, Services>> getServices({int? selectedRestaurant = null}) async{
+  static Future<SplayTreeMap<int, Services>> getServices({int? selectedRestaurant = null}) async{
     String enpoint = 'get_services';
     
-    Map<int, Services> servicesByDayOfWeek = new HashMap();
+    SplayTreeMap<int, Services> servicesByDayOfWeek = new SplayTreeMap();
     if (selectedRestaurant != null) enpoint += '?restaurant_id=$selectedRestaurant';
     final response = await ApiClient.get(enpoint);
     if (response.statusCode == 200){
       // un user qui n'a pas de services, a un response.body == 'null'
       if (response.body == 'null') {
-        return HashMap(); // on retourne map vide si null
+        return SplayTreeMap(); // on retourne map vide si null
       }
       final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
       createServicesPerDayOfWeek(body, servicesByDayOfWeek);
