@@ -5,7 +5,7 @@ import 'dart:convert';
 
 import '../core/services/api_client.dart';
 
-class Services implements Comparable<Services>{
+class Service implements Comparable<Service>{
 
 final int id;
 final int resto;
@@ -13,7 +13,7 @@ final int dayOfWeek;
 final DateTime startTime;
 final DateTime endTime;
 
-const Services({
+const Service({
   required this.id,
   required this.resto,
   required this.dayOfWeek,
@@ -22,8 +22,8 @@ const Services({
 });
 
 //constructeur Json , on fait un parse du string reçu en json en DateTime
-  factory Services.fromJson(Map<String, dynamic> json){
-    return Services(id: json['id'],
+  factory Service.fromJson(Map<String, dynamic> json){
+    return Service(id: json['id'],
         resto: json['restaurant'],
         dayOfWeek: json['day_of_week'],
         
@@ -32,50 +32,54 @@ const Services({
   }
 
   //
-  static SplayTreeSet<Services> servicesFromJson (List<dynamic> json){
-    var services= SplayTreeSet<Services>();
+  static SplayTreeSet<Service> servicesFromJson (List<dynamic> json){
+    var services= SplayTreeSet<Service>();
     for(var serv in json){
-      services.add(Services.fromJson(serv));
+      services.add(Service.fromJson(serv));
     }
     return services;
   }
 
   // methode qui va rechercher les tables d'un restaurant (Future, car on va chercher dans la DB)
-  static Future<Map<String, SplayTreeSet<Services>>> getServices({int? selectedRestaurant = null}) async{
+  static Future<Map<int, SplayTreeSet<Service>>> getServices({int? selectedRestaurant = null}) async{
     String enpoint = 'get_services';
     
-    Map<String, SplayTreeSet<Services>> services = new HashMap();
+    Map<int, SplayTreeSet<Service>> servicesByDayOfWeek = new HashMap();
     if (selectedRestaurant != null) enpoint += '?restaurant_id=$selectedRestaurant';
     final response = await ApiClient.get(enpoint);
     if (response.statusCode == 200){
       // un user qui n'a pas de services, a un response.body == 'null'
       if (response.body == 'null') {
-        return <String, SplayTreeSet<Services>>{}; // on retourne map vide si null
-
-      }final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
-      
-      for(var serviceJson in body) {
-        String jour = getJour(serviceJson['day_of_week']);
-        services.putIfAbsent(jour, SplayTreeSet<Services>());
-
-        DateTime debut = serviceJson['start_time'];
-        DateTime fin = serviceJson['end_time'];
-
-        services[jour]?.add(new Services(id: serviceJson['id'], resto: serviceJson['restaurant'], dayOfWeek: serviceJson['day_of_week'], startTime: serviceJson['start_time'], endTime: serviceJson['end_time']));
-
+        return <int, SplayTreeSet<Service>>{}; // on retourne map vide si null
       }
+      final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
+      createServicesPerDayOfWeek(body, servicesByDayOfWeek);
+      return servicesByDayOfWeek;
     }
     else {
       throw Exception("Failed to fetch services from the database.\nResponse body: ${response.body}");
     }
   }
 
-  static Future<Services?> getService(int serviceId, int restaurantId) async {
+  static void createServicesPerDayOfWeek(List<dynamic> body, Map<int, SplayTreeSet<Service>> servicesByDayOfWeek) {
+    for(var serviceJson in body) {
+      int dow = serviceJson['day_of_week'];
+      Service newService = Service.fromJson(serviceJson);
+      // avant d'ajouter le service dans le TreeSet au jour, on doit verifier si le tree set existe, sinon on ajoute un TreeSet vide
+      if (servicesByDayOfWeek[dow] == null) {servicesByDayOfWeek[dow] = SplayTreeSet.of([newService]);}
+      // sinon on ajoute simplement le service dans le tree set
+      else {servicesByDayOfWeek[dow]!.add(newService);}
+    }
+    // ensuite il faut rajouer les jours sans services, car getServices ne retourne que les jours contenant un ou plusieurs services
+    addDaysWithoutServices(servicesByDayOfWeek);
+  }
+
+  static Future<Service?> getService(int serviceId, int restaurantId) async {
     try {
       final response = await ApiClient.get("get_service?service_id=$serviceId&restaurant_id=$restaurantId");
       if (response.statusCode == 200){
         final body = json.decode(response.body);
-        return Services.fromJson(body);
+        return Service.fromJson(body);
       }
     } catch (e, st){
       print('$e\n$st');
@@ -84,7 +88,7 @@ const Services({
 
   }
 
-  static Future<Services> save_service(int? newServiceDay, int newHeureDebut, int newHeureFin, int serviceId, int restaurantId) async {
+  static Future<Service> save_service(int? newServiceDay, int newHeureDebut, int newHeureFin, int serviceId, int restaurantId) async {
     final response = await ApiClient.post('save_service',
         body: json.encode({
           'service_id' : serviceId,
@@ -98,7 +102,7 @@ const Services({
     print('${response.body}');
     if (response.statusCode == 200 ){
       final body = json.decode(response.body);
-      return Services.fromJson(body);
+      return Service.fromJson(body);
     }
     else{
       throw Exception("Failed to save service");
@@ -126,10 +130,19 @@ const Services({
 
   // on compare en fonction du jour de la semaine
   @override
-  int compareTo(Services other) {
+  int compareTo(Service other) {
     // TODO: implement compareTo
     if(this.dayOfWeek - other.dayOfWeek == 0)
       return this.startTime.hour - other.startTime.hour;
     return this.dayOfWeek - other.dayOfWeek;
+  }
+
+  static void addDaysWithoutServices(Map<int, SplayTreeSet<Service>> servicesByDayOfWeek) {
+    //  pour chaque jour de la semaine, on regarde s'il existe dans la map de services, sinon on ajoute le jour avec un set vide de services
+    for (int dow = 1; dow <= 7; ++dow){
+      if (!servicesByDayOfWeek.containsKey(dow)){
+        servicesByDayOfWeek[dow] = SplayTreeSet.of([]);
+      }
+    }
   }
 }

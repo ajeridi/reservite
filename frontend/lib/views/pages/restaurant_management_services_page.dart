@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/selected_services_provider.dart';
-import 'package:prbd_2526_a07/providers/services_provider.dart';
+import 'package:prbd_2526_a07/providers/services_per_day_provider.dart';
 
-import '../../models/services.dart';
+import '../../models/service.dart';
 import '../../providers/application_time_provider.dart';
 import '../widgets/data_error_widget.dart';
 import '../widgets/service_widgets/service_pasvide_1_widget.dart';
@@ -36,17 +36,17 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
     final theme = Theme.of(context);
     final simulatedTime = ref.watch(applicationTimeProvider);
 
-    final servicesState = ref.watch(servicesProvider);
-    final servicesNotifier = ref.read(servicesProvider.notifier);
+    final servicesPerDayState = ref.watch(servicesPerDayProvider);
+    final servicesNotifier = ref.read(servicesPerDayProvider.notifier);
     final selectedServiceIdNotifier = ref.read(
         selectedServiceIdProvider.notifier);
 
-    return servicesState.when(
-      data: (services) => data(
+    return servicesPerDayState.when(
+      data: (servicesPerDay) => data(
             context,
             theme,
             simulatedTime.value!,
-            services,
+            servicesPerDay,
             servicesNotifier,
             selectedServiceIdNotifier,
           ),
@@ -60,8 +60,8 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
       BuildContext context,
       ThemeData theme,
       DateTime simulatedTime,
-      SplayTreeSet<Services> services,
-      ServicesNotifier servicesNotifier,
+      Map<int, SplayTreeSet<Service>>servicesPerDay,
+      ServicesPerDayNotifier servicesNotifier,
       SelectedServiceIdNotifier selectedTableIdNotifier,
       ) {
         return Scaffold(
@@ -115,8 +115,7 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
                 ListView(
                   padding: const EdgeInsets.all(16.0),
                   children: [
-                    for (var service in services)
-                      if (service)
+                    for (var day in servicesPerDay.keys)
                     service_vide_widget(service: null,),
                     service_pasvide_1_widget(service: null,),
                     service_pasvide_2_widget(service: null,),
