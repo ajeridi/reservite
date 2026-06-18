@@ -15,7 +15,7 @@ final int resto;
 final int dayOfWeek;
 final DateTime startTime;
 final DateTime endTime;
-final bool isUsed;
+final bool? isUsed;
 
 const Service({
   required this.id,

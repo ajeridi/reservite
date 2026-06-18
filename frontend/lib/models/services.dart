@@ -45,4 +45,7 @@ class Services {
     return services.length;
   }
 
+  Service getFirst() {
+    return services.elementAt(0);
+  }
 }

@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/views/widgets/service_widgets/management_services_buttons.dart';
 import 'package:prbd_2526_a07/views/widgets/service_widgets/service_list_tile.dart';
 import 'package:prbd_2526_a07/views/widgets/service_widgets/service_vide_widget.dart';
 
@@ -46,17 +47,7 @@ class ServiceDayCard extends StatelessWidget {
               leading: const Icon(Icons.schedule),
               title: Text(DatetimeUtils.dayOfWeekToString(dayOfWeek)),
               subtitle: Text(services.toString()),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(icon: const Icon(Icons.edit), onPressed: () {}),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {},
-                    tooltip: 'Supprimer le service',
-                  ),
-                ],
-              ),
+              trailing: ManagementServicesButtons(service: services.getFirst(),)
             ),
     );
   }
