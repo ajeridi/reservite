@@ -15,13 +15,15 @@ final int resto;
 final int dayOfWeek;
 final DateTime startTime;
 final DateTime endTime;
+final bool isUsed;
 
 const Service({
   required this.id,
   required this.resto,
   required this.dayOfWeek,
   required this.startTime,
-  required this.endTime
+  required this.endTime,
+  this.isUsed = false
 });
 
 //constructeur Json , on fait un parse du string reçu en json en DateTime
@@ -29,9 +31,10 @@ const Service({
     return Service(id: json['id'],
         resto: json['restaurant'],
         dayOfWeek: json['day_of_week'],
-        
         startTime:DateTime.parse('2012-02-27 ${json['start_time']}'),
-        endTime: DateTime.parse('2012-02-27 ${json['end_time']}'));
+        endTime: DateTime.parse('2012-02-27 ${json['end_time']}'),
+        isUsed: json['is_used']
+    );
   }
 
   //
@@ -155,5 +158,4 @@ const Service({
     String endTimeFormatted = DateFormat("HH:mm", "fr_FR").format(endTime);
     return '$startTimeFormatted - $endTimeFormatted';
   }
-
 }

@@ -1,5 +1,26 @@
 set search_path to public, auth;
 
+
+/*
+    fonction qui va retourner si oui ou non des reservations utilisent le service entre en parametre
+*/
+create or replace function is_service_used(service_id int) returns bool as
+    $$
+    declare
+        -- on declare une variable service qui sera la ligne de la query qui retourne un service avec id = service_id
+        service services%ROWTYPE; -- https://www.postgresql.org/docs/current/plpgsql-declarations.html#PLPGSQL-DECLARATION-ROWTYPES (section 41.3.4) pour voir comment on cree une variable de type ROW
+    begin
+        select * into service from services where id = service_id;
+
+        -- on va regarder s'il existe des reservations non annulee au sein de ce service
+        return exists (select * from reservations
+                        WHERE restaurant = service.restaurant
+                        AND extract(isodow from datetime::date) = service.day_of_week
+                        AND datetime::time between service.start_time AND service.end_time
+                        AND status <> 'cancelled');
+    end;
+    $$ language plpgsql security definer;
+
 /*
 ENDPOINT QUI VA RETOURNER UNE LISTE DE SERVICES
  on retourne une liste d'objets services donc json_agg(json_build_object)
@@ -21,7 +42,8 @@ begin
                                        'restaurant', srv.restaurant,
                                        'day_of_week', srv.day_of_week,
                                        'start_time', srv.start_time,
-                                       'end_time', srv.end_time
+                                       'end_time', srv.end_time,
+                                        'is_used', is_service_used(srv.id)
                                ) ORDER BY day_of_week ASC
                        )
                 from services srv
