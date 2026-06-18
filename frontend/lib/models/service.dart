@@ -3,6 +3,9 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/services.dart';
+
 import '../core/services/api_client.dart';
 
 class Service implements Comparable<Service>{
@@ -41,16 +44,16 @@ const Service({
   }
 
   // methode qui va rechercher les tables d'un restaurant (Future, car on va chercher dans la DB)
-  static Future<Map<int, SplayTreeSet<Service>>> getServices({int? selectedRestaurant = null}) async{
+  static Future<Map<int, Services>> getServices({int? selectedRestaurant = null}) async{
     String enpoint = 'get_services';
     
-    Map<int, SplayTreeSet<Service>> servicesByDayOfWeek = new HashMap();
+    Map<int, Services> servicesByDayOfWeek = new HashMap();
     if (selectedRestaurant != null) enpoint += '?restaurant_id=$selectedRestaurant';
     final response = await ApiClient.get(enpoint);
     if (response.statusCode == 200){
       // un user qui n'a pas de services, a un response.body == 'null'
       if (response.body == 'null') {
-        return <int, SplayTreeSet<Service>>{}; // on retourne map vide si null
+        return HashMap(); // on retourne map vide si null
       }
       final List<dynamic> body = json.decode(response.body); // decodage de la reponse en liste d'objet JSON [[id: 1, name:],[id: 2, name: ..]]
       createServicesPerDayOfWeek(body, servicesByDayOfWeek);
@@ -61,12 +64,12 @@ const Service({
     }
   }
 
-  static void createServicesPerDayOfWeek(List<dynamic> body, Map<int, SplayTreeSet<Service>> servicesByDayOfWeek) {
+  static void createServicesPerDayOfWeek(List<dynamic> body, Map<int, Services> servicesByDayOfWeek) {
     for(var serviceJson in body) {
       int dow = serviceJson['day_of_week'];
       Service newService = Service.fromJson(serviceJson);
       // avant d'ajouter le service dans le TreeSet au jour, on doit verifier si le tree set existe, sinon on ajoute un TreeSet vide
-      if (servicesByDayOfWeek[dow] == null) {servicesByDayOfWeek[dow] = SplayTreeSet.of([newService]);}
+      if (servicesByDayOfWeek[dow] == null) {servicesByDayOfWeek[dow] = Services([newService]);}
       // sinon on ajoute simplement le service dans le tree set
       else {servicesByDayOfWeek[dow]!.add(newService);}
     }
@@ -137,12 +140,20 @@ const Service({
     return this.dayOfWeek - other.dayOfWeek;
   }
 
-  static void addDaysWithoutServices(Map<int, SplayTreeSet<Service>> servicesByDayOfWeek) {
+  static void addDaysWithoutServices(Map<int, Services> servicesByDayOfWeek) {
     //  pour chaque jour de la semaine, on regarde s'il existe dans la map de services, sinon on ajoute le jour avec un set vide de services
     for (int dow = 1; dow <= 7; ++dow){
       if (!servicesByDayOfWeek.containsKey(dow)){
-        servicesByDayOfWeek[dow] = SplayTreeSet.of([]);
+        servicesByDayOfWeek[dow] = Services([]);
       }
     }
   }
+
+  // retourne un string avec start et end time sous format "HH:mm - HH:mm"
+  startEndTimeString() {
+    String startTimeFormatted = DateFormat("HH:mm", "fr_FR").format(startTime);
+    String endTimeFormatted = DateFormat("HH:mm", "fr_FR").format(endTime);
+    return '$startTimeFormatted - $endTimeFormatted';
+  }
+
 }
