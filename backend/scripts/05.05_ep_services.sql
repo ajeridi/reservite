@@ -47,3 +47,27 @@ end;
 $$language plpgsql security definer ;
 
 grant execute  on function get_service_par_restaurant(int,int) to manager;
+
+create or replace function is_not_empty(id_service int, reservation_datetime timestamp) returns boolean as
+$$
+declare
+    restaurant_id int;
+begin
+    -- on récupère le restaurant de la table
+    select serv.restaurant into restaurant_id
+    from services serv
+    where serv.id = id_service;
+
+    return exists(select serv.id
+                  from services serv,
+                       get_service_by_datetime(reservation_datetime::date, reservation_datetime::time, restaurant_id) s,
+                       reservations rsv
+                  where rsv_tbl.table = idtable AND rsv.id = rsv_tbl.reservation
+                    AND (rsv.datetime::time >= s.start_time AND rsv.datetime::time <= s.end_time) /* ::time donne l'h/min/sec (ex: 18:00:00) */
+                    AND rsv.datetime::date = reservation_datetime::date /* ::date donne le jour */
+                    AND rsv.status <> 'cancelled'
+    );
+end;
+$$ language plpgsql security definer;
+
+grant execute on function is_occupee(int, timestamp) to manager;
