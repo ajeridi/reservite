@@ -137,25 +137,6 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
               ],
             ),
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: 1,
-            onTap: (_) {},
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.book),
-                label: 'Réservations',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.schedule),
-                label: 'Services',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.table_restaurant),
-                label: 'Tables',
-              ),
-            ],
-          ),
         );
       }
     }

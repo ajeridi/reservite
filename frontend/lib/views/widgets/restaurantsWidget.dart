@@ -84,7 +84,7 @@ class RestaurantCard extends ConsumerWidget {
           Navigator.pushReplacementNamed(
             context,
             (userRole.value == 'manager'
-                ? '/manager_reservations_page'
+                ? '/manager_home_page'
                 : '/restaurant_details_page'),
           );
         },

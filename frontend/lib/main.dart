@@ -6,6 +6,7 @@ import 'package:prbd_2526_a07/views/pages/edit_service_page.dart';
 import 'package:prbd_2526_a07/views/pages/edit_table_page.dart';
 import 'package:prbd_2526_a07/views/pages/home_client_page.dart';
 import 'package:prbd_2526_a07/views/pages/login_page.dart';
+import 'package:prbd_2526_a07/views/pages/manager_home_page.dart';
 import 'package:prbd_2526_a07/views/pages/manager_reservations_page.dart';
 import 'package:prbd_2526_a07/views/pages/my_restaurants_page.dart';
 import 'package:prbd_2526_a07/views/pages/reservation_details_client_page.dart';
@@ -61,7 +62,8 @@ class MyApp extends StatelessWidget {
         '/restaurant_management_tables_page' : (context) => RestaurantManagementTablesPage(),
         '/edit_table_page' : (context) => EditTablePage(),
         '/restaurant_management_services_page' : (context) => RestaurantManagementServicesPage(),
-        '/edit_service_page' : (context) => EditServicePage()
+        '/edit_service_page' : (context) => EditServicePage(),
+        '/manager_home_page' : (context) => ManagerHomePage(),
       },
     );
   }
