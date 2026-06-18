@@ -11,7 +11,11 @@ import '../../../../models/service.dart';
 import '../../../core/tools/datetime_utils.dart';
 
 class ServiceDayCard extends StatelessWidget {
-  const ServiceDayCard({super.key, required this.services, required this.dayOfWeek});
+  const ServiceDayCard({
+    super.key,
+    required this.services,
+    required this.dayOfWeek,
+  });
 
   // Set de tous les services du jour de la carte
   final Services services;
@@ -27,17 +31,33 @@ class ServiceDayCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      child: ExpansionTile(
-        leading: const Icon(Icons.schedule),
-        title:  Text(DatetimeUtils.dayOfWeekToString(dayOfWeek)),
-        subtitle: Text(services.toString()),
-        children: [
-          for (Service service in services.getAll())
-            ServiceListTile(service: service,),
-        ],
-      ),
+      // si on a plus d'une reservation on afficher un expansion tile, sinon on affiche un simple list tile avec une seule reservation
+      child: services.length() > 1
+          ? ExpansionTile(
+              leading: const Icon(Icons.schedule),
+              title: Text(DatetimeUtils.dayOfWeekToString(dayOfWeek)),
+              subtitle: Text(services.toString()),
+              children: [
+                for (Service service in services.getAll())
+                  ServiceListTile(service: service),
+              ],
+            )
+          : ListTile(
+              leading: const Icon(Icons.schedule),
+              title: Text(DatetimeUtils.dayOfWeekToString(dayOfWeek)),
+              subtitle: Text(services.toString()),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(icon: const Icon(Icons.edit), onPressed: () {}),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {},
+                    tooltip: 'Supprimer le service',
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
-
-

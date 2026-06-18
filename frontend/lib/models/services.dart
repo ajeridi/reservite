@@ -40,4 +40,9 @@ class Services {
   bool isEmpty() {
     return services.isEmpty;
   }
+
+  int length() {
+    return services.length;
+  }
+
 }
