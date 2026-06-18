@@ -77,7 +77,7 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
                 Navigator.pushReplacementNamed(context, '/my_restaurants_page');
               },
             ),
-            title: Text(currentRestaurant!.name), // on sait que le restaurant ne sera jamais null, car nous avions du cliquer sur un restaurant pour afficher les services
+            title: Text(currentRestaurant!= null ? currentRestaurant!.name : ''), // on sait que le restaurant ne sera jamais null, car nous avions du cliquer sur un restaurant pour afficher les services
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
