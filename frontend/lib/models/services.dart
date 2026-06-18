@@ -12,6 +12,10 @@ class Services {
     return services.add(service);
   }
 
+  SplayTreeSet<Service> getAll() {
+    return services;
+  }
+
 
   @override
   String toString() {
@@ -19,15 +23,21 @@ class Services {
   }
 
   String _printServicesStartEndTimes() {
+    if (services.isEmpty) return '';
+
     int i = 0;
     String startEndTImes = '';
     while (i < services.length - 1){
-      Service service = services.elementAt(i++);
-      startEndTImes += service.startEndTimeString() + ",";
+      Service service = services.elementAt(i);
+      ++i;
+      startEndTImes += service.startEndTimeString() + ", ";
     }
     Service lastService = services.elementAt(i);
     startEndTImes += lastService.startEndTimeString();
     return startEndTImes;
   }
 
+  bool isEmpty() {
+    return services.isEmpty;
+  }
 }

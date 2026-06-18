@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/services.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_services_provider.dart';
 import 'package:prbd_2526_a07/providers/services_per_day_provider.dart';
-
 import '../../models/service.dart';
 import '../../providers/application_time_provider.dart';
 import '../widgets/data_error_widget.dart';
-import '../widgets/service_widgets/service_pasvide_1_widget.dart';
-import '../widgets/service_widgets/service_pasvide_2_widget.dart';
+import '../widgets/service_widgets/service_day_card.dart';
 import '../widgets/service_widgets/service_vide_widget.dart';
 
 void main() async {
@@ -42,6 +43,8 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
     final selectedServiceIdNotifier = ref.read(
         selectedServiceIdProvider.notifier);
 
+    final currentRestaurant = ref.watch(currentRestaurantProvider(ref.read(selectedRestaurantProvider))).value;
+
     return servicesPerDayState.when(
       data: (servicesPerDay) => data(
             context,
@@ -50,6 +53,7 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
             servicesPerDay,
             servicesNotifier,
             selectedServiceIdNotifier,
+            currentRestaurant,
           ),
       error: (err, _) => DataErrorWidget(error: err, notifier: servicesNotifier),
       loading: () =>
@@ -63,7 +67,7 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
       DateTime simulatedTime,
       Map<int, Services>servicesPerDay,
       ServicesPerDayNotifier servicesNotifier,
-      SelectedServiceIdNotifier selectedTableIdNotifier,
+      SelectedServiceIdNotifier selectedTableIdNotifier, Restaurant? currentRestaurant,
       ) {
         return Scaffold(
           appBar: AppBar(
@@ -73,7 +77,7 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
                 Navigator.pushReplacementNamed(context, '/my_restaurants_page');
               },
             ),
-            title: const Text('Le Gourmet'),
+            title: Text(currentRestaurant!.name), // on sait que le restaurant ne sera jamais null, car nous avions du cliquer sur un restaurant pour afficher les services
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
@@ -116,12 +120,9 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
                 ListView(
                   padding: const EdgeInsets.all(16.0),
                   children: [
-/*
-                    for (var day in servicesPerDay.keys)
-                    service_vide_widget(service: null,),
-                    service_pasvide_1_widget(service: null,),
-                    service_pasvide_2_widget(service: null,),
-*/
+                    // iteration et ajout des cartes de services
+                    for (int day in servicesPerDay.keys) // pour chaque jour du map de services
+                      ServiceDayCard(services: servicesPerDay[day]!, dayOfWeek: day,), // on cree la carte du jour avec les services
                   ],
                 ),
                 Positioned(
