@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/providers/crudl_table_providers/new_table_number_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
-import 'package:prbd_2526_a07/providers/tables_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/selected_table_id_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/tables_provider.dart';
 
-import '../core/tools/abstract_async_notifier.dart';
-import '../models/table.dart';
+import '../../core/tools/abstract_async_notifier.dart';
+import '../../models/table.dart';
 
 final currentTableProvider = AsyncNotifierProvider.autoDispose
     .family<CurrentTableNotifier, Table?, int>(

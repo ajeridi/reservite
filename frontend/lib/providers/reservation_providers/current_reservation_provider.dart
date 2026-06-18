@@ -15,16 +15,16 @@ import 'package:prbd_2526_a07/core/tools/abstract_async_notifier.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import 'package:prbd_2526_a07/providers/client_provider.dart';
-import 'package:prbd_2526_a07/providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/special_request_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 
 import '../../models/reservation.dart';
-import '../selected_tables_provider.dart';
+import '../table_providers/selected_tables_provider.dart';
 import 'capacity_check_provider.dart';
 import 'number_of_guests_provider.dart';
 

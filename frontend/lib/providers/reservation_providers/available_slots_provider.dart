@@ -8,7 +8,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/current_reservatio
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 
 final availableSlotsProvider =
     AsyncNotifierProvider<AvailableSlotsNotifier, AvailableSlots>(
