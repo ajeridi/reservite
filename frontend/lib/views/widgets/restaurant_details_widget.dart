@@ -283,7 +283,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
   }
 }
 
-String getServiceOfDay (int dayOfWeek, SplayTreeSet<Services>? services){
+String getServiceOfDay (int dayOfWeek, SplayTreeSet<Service>? services){
   String times ='';
   if(services != null) {
     for (var service in services) {

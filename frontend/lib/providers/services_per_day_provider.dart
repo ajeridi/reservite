@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/models/services.dart';
 import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/selected_services_provider.dart';
 
@@ -10,13 +11,13 @@ import '../models/service.dart';
 import 'auth_provider.dart';
 
 final servicesPerDayProvider =
-AsyncNotifierProvider<ServicesPerDayNotifier, Map<int, SplayTreeSet<Service>>>(
+AsyncNotifierProvider<ServicesPerDayNotifier, Map<int, Services>>(
       () => ServicesPerDayNotifier(),
 );
 
-class ServicesPerDayNotifier extends AbstractAsyncNotifier<Map<int, SplayTreeSet<Service>>> {
+class ServicesPerDayNotifier extends AbstractAsyncNotifier<Map<int, Services>> {
   @override
-  FutureOr<Map<int, SplayTreeSet<Service>>> build() async {
+  FutureOr<Map<int, Services>> build() async {
     // on doit regarder l'etat de connexion (si connecté en tant que manager ou non)
     ref.watch(authProvider);
     final authNotifier = ref.read(authProvider.notifier);

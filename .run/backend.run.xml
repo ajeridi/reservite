@@ -24,6 +24,7 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/05.03._ep_system_time.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/05.04_ep_tables.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/05.00_ep_custom_types.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/05.05_ep_services.sql" />
     <script-mode>FILE</script-mode>
     <data-source id="6d275bb5-c69c-4f95-bc29-f6a29631655b" namespace="database/&quot;prbd-2526-a07&quot;" />
     <method v="2" />
