@@ -240,7 +240,6 @@ class ManagerReservationsPage extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: ManagerNavigationBarWidget(selected: 0,),
     );
   }
 }

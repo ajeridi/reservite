@@ -135,7 +135,7 @@ class RestaurantManagementTablesPage extends ConsumerWidget {
                 heroTag: 'tables_fab',
                 onPressed: () {
                   selectedTableIdNotifier.set(0);
-                  Navigator.pushReplacementNamed(context, '/edit_table_page');
+                  Navigator.pushNamed(context, '/edit_table_page');
                 },
                 child: const Icon(Icons.add),
               ),
@@ -143,7 +143,6 @@ class RestaurantManagementTablesPage extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: ManagerNavigationBarWidget(selected: 2),
     );
   }
 }

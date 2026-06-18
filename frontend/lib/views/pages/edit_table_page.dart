@@ -68,7 +68,7 @@ class EditTablePage extends ConsumerWidget {
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
           selectedTableIdNotifier.clear();
-          Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
+          Navigator.pop(context);
         },
       ),
       title: table != null ? const Text('Modifier la table') : const Text('Nouvelle table'),
@@ -81,7 +81,7 @@ class EditTablePage extends ConsumerWidget {
                   ? null
                   : () async {
             await currentTableNotifier.saveTable(newTableNumber, newCapacity);
-            Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.save),
         ),

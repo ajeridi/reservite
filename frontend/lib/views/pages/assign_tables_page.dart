@@ -220,7 +220,7 @@ class AssignTablesPage extends ConsumerWidget {
 
                     Navigator.pushReplacementNamed(
                       context,
-                      '/manager_reservations_page',
+                      '/manager_home_page',
                     );
                   },
                   style: ElevatedButton.styleFrom(

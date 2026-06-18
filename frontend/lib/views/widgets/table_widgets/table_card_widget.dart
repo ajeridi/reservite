@@ -58,7 +58,7 @@ class TableCardWidget extends ConsumerWidget {
               icon: const Icon(Icons.edit),
               onPressed: () {
                 selectedTableNotifier.set(table.id);
-                Navigator.pushReplacementNamed(context, '/edit_table_page');
+                Navigator.pushNamed(context, '/edit_table_page');
               },
             ),
           ],
