@@ -1,17 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/tools/datetime_utils.dart';
 
-import '../../../models/service.dart';
-import '../../../providers/selected_services_provider.dart';
+class EmptyServiceWidget extends ConsumerWidget {
 
-class service_vide_widget extends ConsumerWidget {
+  final int dayOfWeek;
 
-  final Service service;
-  const service_vide_widget({
+  const EmptyServiceWidget({
     super.key,
-    required this.service,
+    required this.dayOfWeek,
   });
+
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,7 +23,7 @@ class service_vide_widget extends ConsumerWidget {
       child: ListTile(
         leading: const Icon(Icons.schedule, color: Colors.grey),
         title: Text(
-          getJour(service.dayOfWeek),
+          DatetimeUtils.dayOfWeekToString(dayOfWeek),
           style: TextStyle(color: Colors.grey[600]),
         ),
         subtitle: const Text(
@@ -31,25 +32,5 @@ class service_vide_widget extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-
-  String getJour(int day_of_week) {
-    if (day_of_week == 1)
-      return 'Lundi';
-    if (day_of_week == 2)
-      return 'Mardi';
-    if (day_of_week == 3)
-      return 'Mercredi';
-    if (day_of_week == 4)
-      return 'Jeudi';
-    if (day_of_week == 5)
-      return 'Vendredi';
-    if (day_of_week == 6)
-      return 'Samedi';
-    if (day_of_week == 7)
-      return 'Dimanche';
-
-    return '';
   }
 }
