@@ -40,31 +40,31 @@ class ServicesPerDayNotifier extends AbstractAsyncNotifier<SplayTreeMap<int, Ser
 
   @override
   Future<void> refresh() async{
-    //await getAll();
+    await getAll();
   }
 
-/*
+
   Future<void> getAll() async {
     state = AsyncLoading();
+    // on doit regarder l'etat de connexion (si connecté en tant que manager ou non)
+    ref.watch(authProvider);
+    final authNotifier = ref.read(authProvider.notifier);
+    final selectedRestaurant = ref.watch(selectedRestaurantProvider);
     try {
-      final selectedService = ref.read(selectedServiceIdProvider);
-      print('selected service is $selectedService');
-      final SplayTreeSet<Service> services;
-
-      final selectedRestaurant = ref.read(selectedRestaurantProvider);
-
-      services = await Service.getServices(selectedRestaurant: selectedRestaurant);
-      state = AsyncData(services);
-    }
-    catch (e){
-      print(e);
-      state = AsyncValue.error(
-          'Something went wrong\nPlease try again later.',
-          StackTrace.current
-      );
+      if (authNotifier.isLoggedIn){
+        final isManager = await authNotifier.isManager();
+        if (isManager) { // si on est un manager on va rechercher toutes les services du restaurant
+          final services = await Service.getServices(
+              selectedRestaurant: selectedRestaurant);
+          state = AsyncData(services);
+        }
+      }
+      else {state = AsyncData(SplayTreeMap());}
+    }catch (e){
+      throw "Something went wrong!\nPlease try again later.";
     }
   }
-*/
+
 
 /*
   updateList(Service newService) {
