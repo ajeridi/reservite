@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart' hide Table;
 import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/table.dart';
-import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/selected_table_id_provider.dart';
 
 class TableCardWidget extends ConsumerWidget {
 
@@ -58,7 +58,7 @@ class TableCardWidget extends ConsumerWidget {
               icon: const Icon(Icons.edit),
               onPressed: () {
                 selectedTableNotifier.set(table.id);
-                Navigator.pushReplacementNamed(context, '/edit_table_page');
+                Navigator.pushNamed(context, '/edit_table_page');
               },
             ),
           ],

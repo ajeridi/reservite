@@ -3,7 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
-import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/restaurants_provider.dart';
 
 final filteredRestaurantsProvider =
   NotifierProvider<FilteredRestaurantsNotifier, SplayTreeSet<Restaurant>>(() => FilteredRestaurantsNotifier(),);

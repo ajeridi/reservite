@@ -3,12 +3,12 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a07/models/services.dart';
-import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
+import 'package:prbd_2526_a07/models/service.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/restaurants_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 
-import '../../providers/current_restaurant_provider.dart';
+import '../../providers/restaurant_providers/current_restaurant_provider.dart';
 import 'data_error_widget.dart';
 
 class RestaurantDetailsWidget extends ConsumerWidget {
@@ -283,7 +283,7 @@ class RestaurantDetailsWidget extends ConsumerWidget {
   }
 }
 
-String getServiceOfDay (int dayOfWeek, SplayTreeSet<Services>? services){
+String getServiceOfDay (int dayOfWeek, SplayTreeSet<Service>? services){
   String times ='';
   if(services != null) {
     for (var service in services) {

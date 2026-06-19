@@ -1,48 +1,55 @@
-
-
 import 'dart:collection';
+import 'package:prbd_2526_a07/models/service.dart';
 
-class Services implements Comparable<Services>{
+class Services {
+  final SplayTreeSet<Service> services = SplayTreeSet.of([]);
 
-final int id;
-final int resto;
-final int dayOfWeek;
-final DateTime startTime;
-final DateTime endTime;
-
-const Services({
-  required this.id,
-  required this.resto,
-  required this.dayOfWeek,
-  required this.startTime,
-  required this.endTime
-});
-
-//constructeur Json , on fait un parse du string reçu en json en DateTime
-  factory Services.fromJson(Map<String, dynamic> json){
-    return Services(id: json['id'],
-        resto: json['restaurant'],
-        dayOfWeek: json['day_of_week'],
-        
-        startTime:DateTime.parse('2012-02-27 ${json['start_time']}'),
-        endTime: DateTime.parse('2012-02-27 ${json['end_time']}'));
+  Services(Iterable<Service> s) {
+    this.services.addAll(s);
   }
 
-  //
-  static SplayTreeSet<Services> servicesFromJson (List<dynamic> json){
-    var services= SplayTreeSet<Services>();
-    for(var serv in json){
-      services.add(Services.fromJson(serv));
-    }
+  bool add(Service service){
+    return services.add(service);
+  }
+
+  SplayTreeSet<Service> getAll() {
     return services;
   }
 
-  // on compare en fonction du jour de la semaine
+
   @override
-  int compareTo(Services other) {
-    // TODO: implement compareTo
-    if(this.dayOfWeek - other.dayOfWeek == 0)
-      return this.startTime.hour - other.startTime.hour;
-    return this.dayOfWeek - other.dayOfWeek;
+  String toString() {
+    return _printServicesStartEndTimes();
+  }
+
+  String _printServicesStartEndTimes() {
+    if (services.isEmpty) return '';
+
+    int i = 0;
+    String startEndTImes = '';
+    while (i < services.length - 1){
+      Service service = services.elementAt(i);
+      ++i;
+      startEndTImes += service.startEndTimeString() + ", ";
+    }
+    Service lastService = services.elementAt(i);
+    startEndTImes += lastService.startEndTimeString();
+    return startEndTImes;
+  }
+
+  bool isEmpty() {
+    return services.isEmpty;
+  }
+
+  int length() {
+    return services.length;
+  }
+
+  Service getFirst() {
+    return services.elementAt(0);
+  }
+
+  void remove(Service service) {
+    services.removeWhere((serviceToDelete) => serviceToDelete.id == service.id);
   }
 }

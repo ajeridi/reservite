@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
-import 'package:prbd_2526_a07/providers/restaurants_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/restaurants_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/restaurantsWidget.dart';
 
 import '../../core/tools/my_provider_observer.dart';

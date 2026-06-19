@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/reservation_providers/number_of_guests_provider.dart';
-import '../../providers/restaurant_capacity_provider.dart';
+import '../../providers/restaurant_providers/restaurant_capacity_provider.dart';
 
 class NumberOfGuestsWidget extends ConsumerWidget {
   const NumberOfGuestsWidget({super.key});

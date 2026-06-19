@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/table.dart';
 
 import '../../models/reservation.dart';
-import '../../providers/selected_tables_provider.dart';
+import '../../providers/table_providers/selected_tables_provider.dart';
 
 class assign_table_4_widget extends ConsumerWidget {
 
