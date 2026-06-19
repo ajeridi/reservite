@@ -49,7 +49,7 @@ class ReservationCard extends ConsumerWidget {
             if (userRole == 'client')
               Navigator.pushReplacementNamed(context, '/reservation_details_client_page');
             if (userRole == 'manager')
-              Navigator.pushReplacementNamed(context, '/reservation_details_manager_page');
+              Navigator.pushNamed(context, '/reservation_details_manager_page');
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),

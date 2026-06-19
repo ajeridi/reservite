@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/core/tools/abstract_async_notifier.dart';
 import 'package:prbd_2526_a07/models/reservation.dart';
 import 'package:prbd_2526_a07/providers/auth_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 
 final reservationsProvider =
     AsyncNotifierProvider<ReservationsNotifier, SplayTreeSet<Reservation>>(
