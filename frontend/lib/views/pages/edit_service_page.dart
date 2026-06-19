@@ -7,6 +7,7 @@ import 'package:prbd_2526_a07/models/service.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/current_service_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 
 import '../../core/tools/datetime_utils.dart';
@@ -38,7 +39,7 @@ class EditServicePage extends ConsumerWidget {
     final serviceId = ModalRoute.of(context)?.settings.arguments as int;
     final service = ref.watch(currentServiceProvider(serviceId));
     final currentServiceNotifier = ref.read(currentServiceProvider(serviceId).notifier);
-    final restaurantProvider = ref.watch(currentRestaurantProvider(service.value!.resto));
+    final restaurantProvider = ref.watch(currentRestaurantProvider(ref.read(selectedRestaurantProvider)));
 
 
 
