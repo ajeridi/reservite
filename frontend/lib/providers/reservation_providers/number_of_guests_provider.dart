@@ -3,7 +3,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/current_reservatio
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 
 final numberOfGuestsProvider =
-NotifierProvider<NumberOfGuestsNotifier, int>(
+NotifierProvider.autoDispose<NumberOfGuestsNotifier, int>(
   NumberOfGuestsNotifier.new,
 );
 

@@ -9,7 +9,7 @@ import '../restaurant_providers/selected_restaurant_provider.dart';
 import 'number_of_guests_provider.dart';
 
 final capacityCheckProvider =
-AsyncNotifierProvider<CapacityCheckNotifier, bool>(
+AsyncNotifierProvider.autoDispose<CapacityCheckNotifier, bool>(
   () => CapacityCheckNotifier(),
 );
 

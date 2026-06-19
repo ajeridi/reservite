@@ -6,7 +6,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservati
 
 import '../../models/reservation.dart';
 
-final specialRequestProvider = AsyncNotifierProvider<SpecialRequestNotifier, String>(
+final specialRequestProvider = AsyncNotifierProvider.autoDispose<SpecialRequestNotifier, String>(
   SpecialRequestNotifier.new,
 );
 

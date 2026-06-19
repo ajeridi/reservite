@@ -8,7 +8,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservati
 
 import '../../models/reservation.dart';
 
-final selectedReservationDateProvider = AsyncNotifierProvider(
+final selectedReservationDateProvider = AsyncNotifierProvider.autoDispose(
   () => SelectedReservationDateNotifier(),
 );
 

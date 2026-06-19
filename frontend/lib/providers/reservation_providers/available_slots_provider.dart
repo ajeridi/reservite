@@ -11,7 +11,7 @@ import 'package:prbd_2526_a07/providers/reservation_providers/selected_slot_prov
 import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 
 final availableSlotsProvider =
-    AsyncNotifierProvider<AvailableSlotsNotifier, AvailableSlots>(
+    AsyncNotifierProvider.autoDispose<AvailableSlotsNotifier, AvailableSlots>(
       () => AvailableSlotsNotifier(),
     );
 
