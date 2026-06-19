@@ -50,7 +50,7 @@ class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
         if (token != null) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Connecté !')));
+          ).showSnackBar(const SnackBar(content: Text('Connecté !'), duration: Duration(milliseconds: 800),));
 
           if (await authNotifier.isClient()) {
             Navigator.pushReplacementNamed(context, '/home_client_page');

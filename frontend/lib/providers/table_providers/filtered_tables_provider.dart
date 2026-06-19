@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/table.dart';
+import '../../models/table.dart';
 
 /*
 final filteredTablesProvider =

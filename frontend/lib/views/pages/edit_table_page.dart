@@ -5,10 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/models/table.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/crudl_table_providers/is_valid_table_number_provider.dart';
-import 'package:prbd_2526_a07/providers/current_table_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/current_table_provider.dart';
 import 'package:prbd_2526_a07/providers/crudl_table_providers/new_table_capacity_provider.dart';
 import 'package:prbd_2526_a07/providers/crudl_table_providers/new_table_number_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_table_id_provider.dart';
+import 'package:prbd_2526_a07/providers/table_providers/selected_table_id_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 
 import '../widgets/table_widgets/table_capacity_chooser_widget.dart';
@@ -68,7 +68,7 @@ class EditTablePage extends ConsumerWidget {
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
           selectedTableIdNotifier.clear();
-          Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
+          Navigator.pop(context);
         },
       ),
       title: table != null ? const Text('Modifier la table') : const Text('Nouvelle table'),
@@ -81,7 +81,7 @@ class EditTablePage extends ConsumerWidget {
                   ? null
                   : () async {
             await currentTableNotifier.saveTable(newTableNumber, newCapacity);
-            Navigator.pushReplacementNamed(context, '/restaurant_management_tables_page');
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.save),
         ),

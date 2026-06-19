@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
-import 'package:prbd_2526_a07/providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
 class RestaurantCard extends ConsumerWidget {
@@ -84,7 +84,7 @@ class RestaurantCard extends ConsumerWidget {
           Navigator.pushReplacementNamed(
             context,
             (userRole.value == 'manager'
-                ? '/manager_reservations_page'
+                ? '/manager_home_page'
                 : '/restaurant_details_page'),
           );
         },
