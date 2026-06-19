@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/services.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 
 import '../core/tools/abstract_async_notifier.dart';
@@ -100,6 +101,8 @@ class ServicesPerDayNotifier extends AbstractAsyncNotifier<SplayTreeMap<int, Ser
       state = AsyncLoading();
       // on va supprimer le service dans le treeset
       final newServicesPerDay = removeServiceFromDay(service);
+      // on force la mise a jour du currentRestaurantProvider
+      ref.read(currentRestaurantProvider(ref.read(selectedRestaurantProvider)).notifier).deleteService(service);
       // on actualise l'etat avec la nouvelle map contenant le treeset sans le service supprime
       state = AsyncData(newServicesPerDay);
     }

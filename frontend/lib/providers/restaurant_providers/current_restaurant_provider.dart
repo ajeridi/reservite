@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
+import 'package:prbd_2526_a07/models/service.dart';
 
 final currentRestaurantProvider = AsyncNotifierProvider.autoDispose.family<CurrentRestaurantNotifier, Restaurant , int>(
   CurrentRestaurantNotifier.new,
@@ -21,5 +22,12 @@ class CurrentRestaurantNotifier extends AsyncNotifier<Restaurant> {
       AsyncError("Erreur ", st);
       throw Exception(e);
     }
+  }
+
+  deleteService(Service service) {
+      state = AsyncLoading();
+      final restaurant = state.value!;
+      restaurant.deleteService(service);
+      state = AsyncData(restaurant);
   }
 }
