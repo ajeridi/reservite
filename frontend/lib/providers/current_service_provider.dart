@@ -5,6 +5,9 @@ import 'package:prbd_2526_a07/core/tools/abstract_async_notifier.dart';
 import 'package:prbd_2526_a07/models/service.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
+final currentServiceProvider = AsyncNotifierProvider.autoDispose.family<CurrentServiceNotifier, Service?,int>(
+  CurrentServiceNotifier.new,
+);
 
 class CurrentServiceNotifier extends AbstractAsyncNotifier<Service?> {
   CurrentServiceNotifier(this.id);
@@ -16,7 +19,7 @@ class CurrentServiceNotifier extends AbstractAsyncNotifier<Service?> {
     state = AsyncData(null);
     state = AsyncLoading();
     try {
-      final restaurantId = ref.watch(selectedReservationIdProvider);
+      final restaurantId = ref.watch(selectedRestaurantProvider);
       return id != 0 ? await Service.getService(id, restaurantId) : null;
     } catch (e, st) {
       throw Exception("Something went wrong.\nPlease retry later.");
@@ -37,9 +40,6 @@ class CurrentServiceNotifier extends AbstractAsyncNotifier<Service?> {
     }
   }
 
-  Future<bool> validateAlll(int? newServiceNumber)  async{
-    final String newServiceNumberString = (newServiceNumber != null ? '${newServiceNumber}' : '');
-    if(Service.)
-  }
+
 
 }
