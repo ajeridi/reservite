@@ -4,7 +4,6 @@ import 'dart:collection';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/services.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
-import 'package:prbd_2526_a07/providers/selected_services_provider.dart';
 
 import '../core/tools/abstract_async_notifier.dart';
 import '../models/service.dart';
@@ -93,5 +92,25 @@ class ServicesPerDayNotifier extends AbstractAsyncNotifier<SplayTreeMap<int, Ser
       return 'Dimanche';
 
     return '';
+  }
+
+  Future<void> deleteService(Service service) async {
+    final deleted = await service.delete();
+    if (deleted){
+      state = AsyncLoading();
+      // on va supprimer le service dans le treeset
+      final newServicesPerDay = removeServiceFromDay(service);
+      // on actualise l'etat avec la nouvelle map contenant le treeset sans le service supprime
+      state = AsyncData(newServicesPerDay);
+    }
+  }
+
+  SplayTreeMap<int, Services> removeServiceFromDay(Service service){
+    final servicesPerDay = state.value;
+    final servicesOfTheDay = servicesPerDay![service.dayOfWeek];
+    servicesOfTheDay!.remove(service);
+    // on remplace l'ancien treeset avec le nouveau qui ne contient plus le servcice
+    servicesPerDay[service.dayOfWeek] = servicesOfTheDay!;
+    return servicesPerDay;
   }
 }

@@ -48,4 +48,8 @@ class Services {
   Service getFirst() {
     return services.elementAt(0);
   }
+
+  void remove(Service service) {
+    services.removeWhere((serviceToDelete) => serviceToDelete.id == service.id);
+  }
 }
