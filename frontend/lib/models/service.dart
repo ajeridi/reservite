@@ -158,4 +158,21 @@ const Service({
     String endTimeFormatted = DateFormat("HH:mm", "fr_FR").format(endTime);
     return '$startTimeFormatted - $endTimeFormatted';
   }
+
+  Future<bool> delete() async {
+    try {
+      final response = await ApiClient.post(
+        'delete_service',
+        body: json.encode({
+          'service_id': this.id
+        }),
+      );
+      if (response.statusCode == 204) {
+        return true;
+      }
+      throw Exception('Service deletion unsuccessful. \nBody: ${response.body}');
+    } catch (e, st) {
+      throw Exception('$e\n$st');
+    }
+  }
 }
