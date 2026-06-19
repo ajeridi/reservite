@@ -5,7 +5,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final selectedReservationIdProvider =
-    NotifierProvider<SelectedReservationIdNotifier, int>(
+    NotifierProvider.autoDispose<SelectedReservationIdNotifier, int>(
       () => SelectedReservationIdNotifier(),
     );
 
