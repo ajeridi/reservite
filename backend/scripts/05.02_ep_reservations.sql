@@ -362,12 +362,13 @@ create or replace function get_available_slots(restaurant_id int, date_of_reserv
 $$
 declare
     service                 RECORD;
-    declare hours           time[];
-    declare first_slot      time;
-    declare slot            int := (select slot_duration
+    hours           time[];
+    first_slot      time;
+    slot            int := (select slot_duration
                                     from restaurants
                                     where id = restaurant_id);
-    declare reservation_dow int := extract(isodow from date_of_reservation);
+    reservation_dow int := extract(isodow from date_of_reservation);
+    simulated_time timestamp := (select system_time.simulated_time from system_time);
 begin
     -- check si utilisateur est connecte
     perform auth.check_logged();
@@ -387,7 +388,9 @@ begin
                 first_slot = service.start_time;
                 WHILE first_slot < service.end_time
                     LOOP
-                        hours := array_append(hours, first_slot);
+                        if (simulated_time::date != date_of_reservation or  first_slot >= simulated_time::time) then
+                            hours := array_append(hours, first_slot);
+                        end if;
                         first_slot := first_slot + slot * INTERVAL '1 minutes'; -- ajouter slot_duration
                     END LOOP;
             END LOOP;
