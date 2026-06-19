@@ -127,4 +127,8 @@ class Restaurant implements Comparable<Restaurant>{
       throw Exception('Failed to get restaurant capacity.');
     }
   }
+
+  void deleteService(Service service) {
+   services!.removeWhere((serviceToDelete) => serviceToDelete.id == service.id);
+  }
 }
