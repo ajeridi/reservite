@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/service.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/current_service_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 
 import '../../core/tools/datetime_utils.dart';
@@ -36,17 +38,18 @@ class EditServicePage extends ConsumerWidget {
     final serviceId = ModalRoute.of(context)?.settings.arguments as int;
     final service = ref.watch(currentServiceProvider(serviceId));
     final currentServiceNotifier = ref.read(currentServiceProvider(serviceId).notifier);
+    final restaurantProvider = ref.watch(currentRestaurantProvider(service.value!.resto));
 
 
 
-    return service.when(data: (s ) => data(theme, simulatedTime.value!, s!,context) ,
+    return service.when(data: (s ) => data(theme, simulatedTime.value!, s!,context, restaurantProvider) ,
         error: (e,st) =>DataErrorWidget(error: e, notifier: currentServiceNotifier),
         loading: () => CircularProgressIndicator());
 
 
   }
 
-  Scaffold data(ThemeData theme, DateTime simulatedTime, Service s, BuildContext context
+  Scaffold data(ThemeData theme, DateTime simulatedTime, Service s, BuildContext context, AsyncValue<Restaurant> restaurantProvider
       ) {
     return Scaffold(
     appBar: AppBar(
@@ -144,11 +147,15 @@ class EditServicePage extends ConsumerWidget {
                         labelText: 'Minutes',
                         border: OutlineInputBorder(),
                       ),
+
                       items: [
-                        DropdownMenuItem<int?>(value: 0, child: const Text('00 min')),
-                        DropdownMenuItem<int?>(value: 15, child: const Text('15 min')),
-                        DropdownMenuItem<int?>(value: 30, child: const Text('30 min')),
-                        DropdownMenuItem<int?>(value: 45, child: const Text('45 min')),
+
+                          DropdownMenuItem<int?>(value: 0, child: const Text('00 min')),
+                        if(restaurantProvider.value!.slotDuration == 15)
+                          DropdownMenuItem<int?>(value: 15, child: const Text('15 min')),
+                          DropdownMenuItem<int?>(value: 30, child: const Text('30 min')),
+                        if(restaurantProvider.value!.slotDuration == 15)
+                          DropdownMenuItem<int?>(value: 45, child: const Text('45 min')),
                       ],
                       onChanged: (_) {},
                     ),
@@ -186,9 +193,11 @@ class EditServicePage extends ConsumerWidget {
                       ),
                       items: [
                         DropdownMenuItem<int?>(value: 0, child: const Text('00 min')),
-                        DropdownMenuItem<int?>(value: 15, child: const Text('15 min')),
+                        if(restaurantProvider.value!.slotDuration == 15)
+                          DropdownMenuItem<int?>(value: 15, child: const Text('15 min')),
                         DropdownMenuItem<int?>(value: 30, child: const Text('30 min')),
-                        DropdownMenuItem<int?>(value: 45, child: const Text('45 min')),
+                        if(restaurantProvider.value!.slotDuration == 15)
+                          DropdownMenuItem<int?>(value: 45, child: const Text('45 min')),
                       ],
                       onChanged: (_) {},
                     ),
