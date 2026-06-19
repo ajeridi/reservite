@@ -104,3 +104,24 @@ end;
 $$ language plpgsql security definer;
 
 grant execute on function save_service(int, int, int, int, int) to manager;
+
+create or replace function delete_service(service_id int) returns void as
+    $$
+    declare restaurant_id int;
+    begin
+        -- verifier si l'utilisateur est connecte
+        perform auth.check_logged();
+        -- verifier si c'est un manager et qu'il travaille dans le restaurant
+        if (auth.role() = 'manager') then
+            select restaurant from restaurant_managers where manager = auth.id() into restaurant_id;
+            if (check_manager_works_in_restaurant(auth.id(), restaurant_id)) then
+                -- suppression du service
+                DELETE FROM services WHERE id = service_id;
+                return;
+            end if;
+        end if;
+        raise exception 'Not allowed';
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function delete_service(int) to manager;
