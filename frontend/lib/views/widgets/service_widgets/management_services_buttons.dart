@@ -15,7 +15,9 @@ class ManagementServicesButtons extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(icon: const Icon(Icons.edit), onPressed: () {}),
+        IconButton(icon: const Icon(Icons.edit), onPressed: () {
+          Navigator.pushNamed(context, '/edit_service_page', arguments: service.id);
+        }),
         IconButton(
           icon: Icon(
             Icons.delete,

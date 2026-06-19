@@ -130,7 +130,9 @@ class RestaurantManagementServicesPage extends ConsumerWidget {
                   right: 16,
                   child: FloatingActionButton(
                     heroTag: 'services_fab',
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/edit_service_page', arguments: 0);
+                    },
                     child: const Icon(Icons.add),
                   ),
                 ),
