@@ -12,7 +12,7 @@ import 'reservation_details_mockup.dart';
 import 'reservation_form_mockup.dart';
 import '../pages/restaurant_details_page.dart';
 import 'restaurant_management_reservations_mockup.dart';
-import 'restaurant_management_services_mockup.dart';
+import '../pages/restaurant_management_services_page.dart';
 import 'restaurant_management_tables_mockup.dart';
 import '../pages/search_restaurants_page.dart';
 
