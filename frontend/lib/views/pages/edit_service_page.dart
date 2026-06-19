@@ -2,7 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/models/restaurant.dart';
+import 'package:prbd_2526_a07/models/service.dart';
+import 'package:prbd_2526_a07/providers/crudl_service_providers/current_service_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
+import 'package:prbd_2526_a07/providers/selected_services_provider.dart';
 
+import '../../providers/application_time_provider.dart';
+import '../widgets/data_error_widget.dart';
+
+
+/*
+Faire passer l'argument dans un pushNamed
+https://stackoverflow.com/questions/53304340/navigator-pass-arguments-with-pushnamed
+ */
 void main() async {
   await initializeDateFormatting('fr_FR', null);
   runApp(
@@ -23,13 +37,58 @@ class EditServicePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+    final simulatedTime = ref
+        .watch(applicationTimeProvider)
+        .value;
+
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    final selectedServiceId = arguments['serviceId'];
+
+    final serviceState = ref.watch(currentServiceProvider(selectedServiceId));
+    final serviceStateNotifier = ref.watch(currentServiceProvider(selectedServiceId).notifier);
+
+    final selectedIdRestaurant = ref.read(selectedRestaurantProvider);
+    final currentRestaurant = ref.watch(currentRestaurantProvider(selectedIdRestaurant));
+
+    return serviceState.when(
+      data: (state) => data(
+              context,
+              ref,
+              theme,
+              simulatedTime,
+              state,
+              serviceStateNotifier,
+              selectedIdRestaurant,
+              currentRestaurant
+          ),
+      error: (err, _) =>
+          DataErrorWidget(
+            error: err,
+            stackTrace: StackTrace.current,
+            notifier: serviceStateNotifier,
+          ),
+      loading: () => loading(),
+    );
+  }
+
+  Widget data(
+      BuildContext context,
+      WidgetRef ref,
+      ThemeData theme,
+      DateTime? simulatedTime,
+      Service? state,
+      CurrentServiceNotifier serviceStateNotifier,
+      int selectedIdRestaurant,
+      AsyncValue<Restaurant> currentRestaurant,
+      ) {
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop((context));
+          },
         ),
         title: const Text('Modifier le service'),
         automaticallyImplyLeading: false,
@@ -54,7 +113,7 @@ class EditServicePage extends ConsumerWidget {
                 'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
                   DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
+                      .format(simulatedTime!),
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
@@ -74,7 +133,7 @@ class EditServicePage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 DropdownButtonFormField<String>(
-                  initialValue: 'Mercredi',
+                  initialValue: serviceStateNotifier.getDays(state!.dayOfWeek) ,
                   decoration: const InputDecoration(
                     labelText: 'Jour',
                     border: OutlineInputBorder(),
@@ -96,7 +155,7 @@ class EditServicePage extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: 19,
+                        initialValue: state.startTime.hour,
                         decoration: const InputDecoration(
                           labelText: 'Heure de début (heure)',
                           border: OutlineInputBorder(),
@@ -114,15 +173,17 @@ class EditServicePage extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: 0,
+                        initialValue: state.startTime.minute,
                         decoration: const InputDecoration(
                           labelText: 'Minutes',
                           border: OutlineInputBorder(),
                         ),
                         items: [
                           DropdownMenuItem<int?>(value: 0, child: const Text('00 min')),
+                          if (currentRestaurant.value!.slotDuration == 15)
                           DropdownMenuItem<int?>(value: 15, child: const Text('15 min')),
                           DropdownMenuItem<int?>(value: 30, child: const Text('30 min')),
+                          if (currentRestaurant.value!.slotDuration == 15)
                           DropdownMenuItem<int?>(value: 45, child: const Text('45 min')),
                         ],
                         onChanged: (_) {},
@@ -136,7 +197,7 @@ class EditServicePage extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: 22,
+                        initialValue: state.endTime.hour,
                         decoration: const InputDecoration(
                           labelText: 'Heure de fin (heure)',
                           border: OutlineInputBorder(),
@@ -154,16 +215,18 @@ class EditServicePage extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: 0,
+                        initialValue: state.endTime.minute,
                         decoration: const InputDecoration(
                           labelText: 'Minutes',
                           border: OutlineInputBorder(),
                         ),
                         items: [
                           DropdownMenuItem<int?>(value: 0, child: const Text('00 min')),
-                          DropdownMenuItem<int?>(value: 15, child: const Text('15 min')),
+                          if (currentRestaurant.value!.slotDuration == 15)
+                            DropdownMenuItem<int?>(value: 15, child: const Text('15 min')),
                           DropdownMenuItem<int?>(value: 30, child: const Text('30 min')),
-                          DropdownMenuItem<int?>(value: 45, child: const Text('45 min')),
+                          if (currentRestaurant.value!.slotDuration == 15)
+                            DropdownMenuItem<int?>(value: 45, child: const Text('45 min')),
                         ],
                         onChanged: (_) {},
                       ),
@@ -177,4 +240,8 @@ class EditServicePage extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget loading() {
+  return Center(child: CircularProgressIndicator(color: Colors.black));
 }

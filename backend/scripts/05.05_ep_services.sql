@@ -125,3 +125,48 @@ create or replace function delete_service(service_id int) returns void as
     $$ language plpgsql security definer;
 
 grant execute on function delete_service(int) to manager;
+
+
+/*
+    Compte les reservations confirmées ou en attente actuellement dans le service
+    qui seraient en dehors des nouveaux horaires proposes.
+    Utilise par le frontend pour afficher le message d'erreur avant save.
+*/
+create or replace function check_service_reservations(
+    service_id int,
+    restaurant_id int,
+    new_service_day int,
+    new_start_time time,
+    new_end_time time
+) returns int as
+$$
+begin
+    perform auth.check_logged();
+
+    if (auth.role() = 'manager'
+        and check_manager_works_in_restaurant(auth.id(), restaurant_id)) then
+
+        return (
+            select count(*)::int
+            from reservations r
+                     join services s on s.id = service_id
+            where r.restaurant = restaurant_id
+              and r.status in ('pending'::status_type, 'confirmed'::status_type)
+              -- reservation actuellement dans CE service
+              and extract(isodow from r.datetime::date) = s.day_of_week
+              and r.datetime::time >= s.start_time
+              and r.datetime::time <= s.end_time
+              -- mais plus dans les NOUVEAUX horaires proposes
+              and not (
+                extract(isodow from r.datetime::date) = new_service_day
+                    and r.datetime::time >= new_start_time
+                    and r.datetime::time <= new_end_time
+                )
+        );
+    end if;
+
+    raise exception 'Not allowed';
+end;
+$$ language plpgsql security definer;
+
+grant execute on function check_service_reservations(int, int, int, time, time) to manager;

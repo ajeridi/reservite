@@ -116,4 +116,12 @@ class ServicesPerDayNotifier extends AbstractAsyncNotifier<SplayTreeMap<int, Ser
     servicesPerDay[service.dayOfWeek] = servicesOfTheDay!;
     return servicesPerDay;
   }
+
+  updateList(Service newService) {
+    state = AsyncLoading();
+    var services = state.value!;
+    services = removeServiceFromDay(newService);
+    services[newService.dayOfWeek]!.add(newService);
+    state = AsyncData(services);
+  }
 }

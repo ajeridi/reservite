@@ -175,4 +175,35 @@ const Service({
       throw Exception('$e\n$st');
     }
   }
+
+  static Future<int> checkServiceReservations({
+    required int serviceId,
+    required int restaurantId,
+    required int newServiceDay,
+    required DateTime newStartTime,
+    required DateTime newEndTime,
+  }) async {
+    final newStartTimeString = DateFormat('HH:mm:ss', 'fr_FR').format(newStartTime);
+    final newEndTimeString = DateFormat('HH:mm:ss', 'fr_FR').format(newEndTime);
+
+    try {
+      final response = await ApiClient.get(
+        'check_service_reservations?service_id=$serviceId'
+            '&restaurant_id=$restaurantId'
+            '&new_service_day=$newServiceDay'
+            '&new_start_time=$newStartTimeString'
+            '&new_end_time=$newEndTimeString',
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as int;
+      }
+      throw Exception(
+        'Failed to check service reservations.\nResponse: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to check service reservations.');
+    }
+  }
 }
