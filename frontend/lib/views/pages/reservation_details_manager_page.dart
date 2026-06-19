@@ -106,10 +106,7 @@ class ReservationDetailsManagerPage extends ConsumerWidget {
             // nettoyage du selectedId provider (retour a 0)
             ref.invalidate(selectedReservationIdProvider);
             // redirection vers la page des reservations pour le manager
-            Navigator.pushReplacementNamed(
-              context,
-              '/manager_reservations_page',
-            );
+            Navigator.pop(context);
           },
         ),
         title: const Text('Détails de la réservation'),

@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a07/providers/filtered_restaurants_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/filtered_restaurants_provider.dart';
 import 'package:prbd_2526_a07/providers/search_bar_provider.dart';
 
 import '../../core/tools/my_provider_observer.dart';
 import '../../core/tools/pick_date_time.dart';
 import '../../models/restaurant.dart';
 import '../../providers/application_time_provider.dart';
-import '../../providers/restaurants_provider.dart';
+import '../../providers/restaurant_providers/restaurants_provider.dart';
 import '../widgets/data_error_widget.dart';
 import '../widgets/restaurantsWidget.dart';
 

@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/services/api_client.dart';
-import 'package:prbd_2526_a07/models/services.dart';
+import 'package:prbd_2526_a07/models/service.dart';
 
 
 class Restaurant implements Comparable<Restaurant>{
@@ -18,7 +18,7 @@ class Restaurant implements Comparable<Restaurant>{
   final int? slotDuration;
   final DateTime? date;
   final int? reservPending;
-  final SplayTreeSet<Services>? services;
+  final SplayTreeSet<Service>? services;
 
   // constructeur
   const Restaurant({
@@ -77,7 +77,7 @@ class Restaurant implements Comparable<Restaurant>{
       slotDuration: json['slot_duration'],
       date: json['last_reservation_date'] != null ? DateTime.parse(json['last_reservation_date']) : null,
       reservPending: json['reservations_pending'] as int?,
-      services:  json['services'] == null ? null : Services.servicesFromJson (json ['services' ]),
+      services:  json['services'] == null ? null : Service.servicesFromJson (json ['services' ]),
     );
   }
 
@@ -126,5 +126,9 @@ class Restaurant implements Comparable<Restaurant>{
       print('$e\n$st');
       throw Exception('Failed to get restaurant capacity.');
     }
+  }
+
+  void deleteService(Service service) {
+   services!.removeWhere((serviceToDelete) => serviceToDelete.id == service.id);
   }
 }
