@@ -125,3 +125,47 @@ create or replace function delete_service(service_id int) returns void as
     $$ language plpgsql security definer;
 
 grant execute on function delete_service(int) to manager;
+
+
+-- va retourner toutes les reservations pending ou confirmed contenues dans un service
+create or replace function reservations_inside_service(service_id int) returns
+    setof reservations as
+    $$
+    declare
+        service services%rowtype;
+    begin
+        select * into service from services where id = service_id;
+        select * from reservations
+                         WHERE restaurant = service.restaurant AND
+                               status in ('pending', 'confirmed') AND
+                               extract(isodow from datetime::date) = service.day_of_week AND
+                               datetime::time between service.start_time and service.end_time;
+    end;
+    $$ language plpgsql security definer;
+
+create or replace function check_reservation_out_of_service(service_id int,_start_time timestamp, _end_time timestamp) returns json as
+    $$
+    declare
+        service services%rowtype;
+        restaurant_id int := (select restaurant from services where id = service_id);
+        number_of_reservations_outside_service int;
+        error text := null;
+    begin
+        -- verification de connexion
+        perform auth.check_logged();
+        if (auth.role() = 'manager') then
+            perform check_manager_works_in_restaurant(auth.id(), restaurant_id);
+            -- on va chercher le service
+            select * into service from services where id = service_id;
+            -- on va chercher le nombre de reservation en dehors du service
+            select coalesce(count(*), 0) from reservations_inside_service(service_id)
+                            where datetime::time < _start_time::time OR datetime::time > _end_time into number_of_reservations_outside_service;
+            if (number_of_reservations_outside_service > 0) then
+                error := format('Modification impossible: %s reservation(s) confirmee(s) ou en attente seraient en dehors des horaires du service.', number_of_reservations_outside_service);
+            end if;
+            return json_build_object('error', error);
+        end if;
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function check_reservation_out_of_service(int, timestamp, timestamp) to manager;
