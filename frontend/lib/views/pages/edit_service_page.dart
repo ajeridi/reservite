@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a07/core/tools/datetime_utils.dart';
-import 'package:prbd_2526_a07/core/tools/validating_text_editing_controller.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/service.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
+import 'package:prbd_2526_a07/providers/current_service_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/views/widgets/data_error_widget.dart';
 
-import '../../providers/current_service_provider.dart';
+import '../../core/tools/datetime_utils.dart';
 
 void main() async {
   await initializeDateFormatting('fr_FR', null);
