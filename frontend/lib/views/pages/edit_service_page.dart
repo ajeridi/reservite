@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/core/tools/datetime_utils.dart';
+import 'package:prbd_2526_a07/core/tools/validating_text_editing_controller.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
 import 'package:prbd_2526_a07/models/service.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
@@ -26,8 +27,20 @@ void main() async {
   );
 }
 
-class EditServicePage extends ConsumerWidget {
+class EditServicePage extends ConsumerStatefulWidget {
   const EditServicePage({super.key});
+
+  @override
+  ConsumerState<EditServicePage> createState() => _EditServicePageState();
+}
+
+
+class _EditServicePageState extends ConsumerState<EditServicePage> {
+
+  late ValidatingTextEditingController _startTimeController;
+  late ValidatingTextEditingController _endTimeController;
+  late ValidatingTextEditingController _dayController;
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,7 +51,7 @@ class EditServicePage extends ConsumerWidget {
     final serviceId = ModalRoute.of(context)?.settings.arguments as int;
     final currentServiceState = ref.watch(currentServiceProvider(serviceId));
     final currentServiceNotifier = ref.read(currentServiceProvider(serviceId).notifier,);
-    
+
 
     return currentServiceState.when(
       data: (service) => data(theme, simulatedTime, service, currentServiceNotifier, currentRestaurant, context),
@@ -50,7 +63,7 @@ class EditServicePage extends ConsumerWidget {
   }
 
   Scaffold data(ThemeData theme, DateTime simulatedTime, Service? service, CurrentServiceNotifier currentServiceNotifier, Restaurant currentRestaurant, BuildContext context) {
-    
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -122,7 +135,7 @@ class EditServicePage extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: 19,
+                        initialValue: service == null ? null : service.startTime.hour,
                         decoration: const InputDecoration(
                           labelText: 'Heure de début (heure)',
                           border: OutlineInputBorder(),
@@ -140,29 +153,12 @@ class EditServicePage extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: 0,
+                        initialValue: service == null ? null : service.startTime.minute,
                         decoration: const InputDecoration(
                           labelText: 'Minutes',
                           border: OutlineInputBorder(),
                         ),
-                        items: [
-                          DropdownMenuItem<int?>(
-                            value: 0,
-                            child: const Text('00 min'),
-                          ),
-                          DropdownMenuItem<int?>(
-                            value: 15,
-                            child: const Text('15 min'),
-                          ),
-                          DropdownMenuItem<int?>(
-                            value: 30,
-                            child: const Text('30 min'),
-                          ),
-                          DropdownMenuItem<int?>(
-                            value: 45,
-                            child: const Text('45 min'),
-                          ),
-                        ],
+                        items: makeMinutesDropdowns(currentRestaurant),
                         onChanged: (_) {},
                       ),
                     ),
@@ -174,7 +170,7 @@ class EditServicePage extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: 22,
+                        initialValue: service?.endTime.hour,
                         decoration: const InputDecoration(
                           labelText: 'Heure de fin (heure)',
                           border: OutlineInputBorder(),
@@ -192,29 +188,12 @@ class EditServicePage extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: 0,
+                        initialValue: service?.endTime.minute,
                         decoration: const InputDecoration(
                           labelText: 'Minutes',
                           border: OutlineInputBorder(),
                         ),
-                        items: [
-                          DropdownMenuItem<int?>(
-                            value: 0,
-                            child: const Text('00 min'),
-                          ),
-                          DropdownMenuItem<int?>(
-                            value: 15,
-                            child: const Text('15 min'),
-                          ),
-                          DropdownMenuItem<int?>(
-                            value: 30,
-                            child: const Text('30 min'),
-                          ),
-                          DropdownMenuItem<int?>(
-                            value: 45,
-                            child: const Text('45 min'),
-                          ),
-                        ],
+                        items: makeMinutesDropdowns(currentRestaurant),
                         onChanged: (_) {},
                       ),
                     ),
@@ -226,5 +205,25 @@ class EditServicePage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  List<DropdownMenuItem<int?>> makeMinutesDropdowns(Restaurant restaurant){
+    List<DropdownMenuItem<int?>> minutes = List.empty(growable: true);
+    final slotDuration = restaurant.slotDuration;
+    for (int min = 0; min < 60; min = min + slotDuration!){
+      minutes.add(
+        DropdownMenuItem<int?>(
+          value: min,
+          child: Text(minutesToString(min)),
+        ),
+      );
+    }
+    return minutes;
+  }
+
+
+  String minutesToString(int minute){
+    if (minute == 0) return "00 min";
+    return '$minute min';
   }
 }
