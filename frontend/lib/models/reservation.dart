@@ -28,6 +28,7 @@ class Reservation  implements Comparable<Reservation>{
   final Status status;
   final String? specialRequests;
   final List<Table> tables;
+  final bool is_vip;
 
 // constructeur
   const Reservation({
@@ -39,6 +40,7 @@ class Reservation  implements Comparable<Reservation>{
     this.status = Status.pending,
     this.specialRequests = null,
     required this.tables,
+    this.is_vip = false
 });
 
   //constructeur from Json
@@ -52,6 +54,7 @@ class Reservation  implements Comparable<Reservation>{
         status: toStatus(json['status']),
         specialRequests: json['special_requests'],
         tables: Table.tablesFromJson(json['tables']),
+        is_vip: json['is_vip'],
     );
   }
 
@@ -124,7 +127,8 @@ class Reservation  implements Comparable<Reservation>{
    int? numberOfGuests,
    Status? status,
     String? specialRequests,
-   List<Table>? tables}){
+   List<Table>? tables,
+    bool? is_vip}){
     return Reservation(
         id: id ?? this.id,
         client: client ?? this.client,
@@ -132,7 +136,8 @@ class Reservation  implements Comparable<Reservation>{
         datetime: datetime ?? this.datetime,
         numberOfGuests: numberOfGuests ?? this.numberOfGuests,
         status: status ?? this.status,
-        tables: tables ?? this.tables);
+        tables: tables ?? this.tables,
+        is_vip: is_vip ?? this.is_vip);
  }
 
 
@@ -223,7 +228,7 @@ class Reservation  implements Comparable<Reservation>{
       }
     }
 
-  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int? reservationId}) async {
+  static Future<Reservation> saveReservation({required int restaurantId, required DateTime date, required String slot, required int numberOfGuests, String? specialRequests, required int? reservationId, bool? is_vip}) async {
     try {
       final dateString = DateFormat('yyyy-MM-dd').format(date);
 
@@ -247,6 +252,7 @@ class Reservation  implements Comparable<Reservation>{
           'number_of_guests_': numberOfGuests,
           'special_requests_': specialRequests,
           'reservation_id' : reservationId,
+          'is_vip' : is_vip
         }),
       );
 

@@ -6,6 +6,7 @@ import 'package:prbd_2526_a07/models/available_slots.dart';
 import 'package:prbd_2526_a07/providers/application_time_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/available_slots_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/current_reservation_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/is_vip_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/number_of_guests_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_date_provider.dart';
@@ -65,6 +66,8 @@ class ReservationFormPage extends ConsumerWidget {
     //notifier du special_request pour les validations
     final specialRequestsNotifier = ref.watch(specialRequestProvider.notifier);
     final specialRequestsState = ref.watch(specialRequestProvider);
+
+    final isVipState = ref.watch(isVipProvider);
 
 
 

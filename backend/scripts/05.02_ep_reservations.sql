@@ -85,6 +85,7 @@ begin
                            'number_of_guests', rsv.number_of_guests,
                            'status', rsv.status,
                            'special_requests', rsv.special_requests,
+                           'is_vip', rsv.is_vip,
                            'tables',
                            (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number, 'capacity',
                                                               t.capacity))
@@ -142,7 +143,8 @@ begin
                                        'datetime', rsv.datetime,
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
-                                       'special_requests', rsv.special_requests
+                                       'special_requests', rsv.special_requests,
+                                       'is_vip', rsv.is_vip
                                )
                                ORDER BY rsv.datetime DESC, rsv.id DESC
                        )
@@ -170,6 +172,7 @@ begin
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
                                        'special_requests', rsv.special_requests,
+                                       'is_vip', rsv.is_vip
                                        'tables',
                                        (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number,
                                                                           'capacity', t.capacity))
@@ -197,7 +200,7 @@ grant execute on function get_reservations(int) to authenticated;
 */
 
 create or replace function save_reservation(restaurant_id int, datetime_ timestamp, number_of_guests_ int,
-                                            special_requests_ text DEFAULT NULL, reservation_id int DEFAULT NULL)
+                                            special_requests_ text DEFAULT NULL, reservation_id int DEFAULT NULL, is_vip_ bool DEFAULT false)
     returns json as
 $$
 declare
@@ -210,8 +213,8 @@ begin
     end if;
     -- si reservation_id est null alors on cree une nouvelle reservation
     if (reservation_id is NULL) then
-        INSERT INTO reservations(client, restaurant, datetime, number_of_guests, special_requests)
-        VALUES (auth.id(), restaurant_id, datetime_, number_of_guests_, special_requests_)
+        INSERT INTO reservations(client, restaurant, datetime, number_of_guests, special_requests, is_vip)
+        VALUES (auth.id(), restaurant_id, datetime_, number_of_guests_, special_requests_, is_vip_)
         returning id into updated_reservation_id;
         -- sinon on update reservation
     else
@@ -229,7 +232,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
-grant execute on function save_reservation(int, timestamp, int, text, int) to client;
+grant execute on function save_reservation(int, timestamp, int, text, int, bool) to client;
 
 -- =====================================================================================================================
 

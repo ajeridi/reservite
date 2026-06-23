@@ -74,7 +74,7 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
   }
 
 
-  Future<Reservation> saveReservation({required DateTime selectedDate, required String selectedSlot, required int numberOfGuests, required bool capacityCheck, String? specialRequest,}) async {
+  Future<Reservation> saveReservation({required DateTime selectedDate, required String selectedSlot, required int numberOfGuests, required bool capacityCheck, String? specialRequest, bool? is_vip}) async {
     // recherche de toutes les donnes entree par l'utilisateur via les providers
     int restaurantId = ref.read(selectedRestaurantProvider);
     final reservationId = ref.read(selectedReservationIdProvider);
@@ -95,6 +95,7 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
       numberOfGuests: numberOfGuests,
       specialRequests: specialRequest!.isEmpty ? null : specialRequest,
       reservationId: reservationId == 0 ? null : reservationId,
+      is_vip: is_vip
     );
 
     state = AsyncData(savedReservation);
