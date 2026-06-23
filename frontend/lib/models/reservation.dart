@@ -288,13 +288,14 @@ class Reservation  implements Comparable<Reservation>{
     return null;
   }
 
-  static Future<Reservation> vip_true({required int? reservationId}) async {
+  static Future<Reservation> vip_true({required int? reservationId, required int? restaurantId}) async {
     try {
 
       final response = await ApiClient.post(
         'vip_true',
         body: json.encode({
           'reservation_id' : reservationId,
+          'restaurant_id' : restaurantId
         }),
       );
 
@@ -311,13 +312,14 @@ class Reservation  implements Comparable<Reservation>{
     }
   }
 
-  static Future<Reservation> vip_false({required int? reservationId}) async {
+  static Future<Reservation> vip_false({required int? reservationId, required int? restaurantId}) async {
     try {
 
       final response = await ApiClient.post(
         'vip_false',
         body: json.encode({
           'reservation_id' : reservationId,
+          'restaurant_id' : restaurantId
         }),
       );
 

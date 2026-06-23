@@ -134,10 +134,11 @@ Future<void> complete() async{
     }
   }
 
-  Future<Reservation> vip_true(int reservationId) async {
+  Future<Reservation> vip_true(int reservationId, int restaurantId) async {
 
     final savedReservation = await Reservation.vip_true(
-        reservationId: reservationId == 0 ? null : reservationId
+        reservationId: reservationId == 0 ? null : reservationId,
+        restaurantId: restaurantId == 0 ? null : restaurantId
     );
 
     state = AsyncData(savedReservation);
@@ -148,10 +149,11 @@ Future<void> complete() async{
     return savedReservation;
   }
 
-  Future<Reservation> vip_false(int reservationId) async {
+  Future<Reservation> vip_false(int reservationId, int restaurantId) async {
 
     final savedReservation = await Reservation.vip_false(
-        reservationId: reservationId == 0 ? null : reservationId
+        reservationId: reservationId == 0 ? null : reservationId,
+        restaurantId: restaurantId == 0 ? null : restaurantId
     );
 
     state = AsyncData(savedReservation);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
 import '../../models/reservation.dart';
@@ -40,6 +41,8 @@ class ReservationCard extends ConsumerWidget {
 
     final notifier = ref.read(currentReservationProvider(reservation.id).notifier);
     final reservationState = ref.watch(currentReservationProvider(reservation.id)).value;
+
+    final selectedRestaurant = ref.read(selectedRestaurantProvider);
 
     return
       Card(
@@ -111,25 +114,27 @@ class ReservationCard extends ConsumerWidget {
                     ],
                   ),
                 ),
+                if (reservationState != null)
+                  if (reservationState!.is_vip == false)
+                    IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                    icon: Icon(Icons.star_border, size: 28, color: Colors.grey),
+                    onPressed: () {
+                      notifier.vip_true(reservation.id, selectedRestaurant);
+                    }
+                    ),
 
-                if (reservationState!.is_vip == false)
-                  IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-                  icon: Icon(Icons.star_border, size: 28, color: Colors.grey),
-                  onPressed: () {
-                    notifier.vip_true(reservation.id);
-                  }
-                  ),
-                if (reservationState.is_vip == true)
-                  IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-                  icon: Icon(Icons.star, size: 28, color: Colors.amber),
-                  onPressed: () {
-                    notifier.vip_false(reservation.id);
-                  },
-                  ),
+                if(reservationState != null)
+                  if (reservationState.is_vip == true)
+                    IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                    icon: Icon(Icons.star, size: 28, color: Colors.amber),
+                    onPressed: () {
+                      notifier.vip_false(reservation.id, selectedRestaurant);
+                    },
+                    ),
                 const Icon(Icons.chevron_right),
               ],
             ),

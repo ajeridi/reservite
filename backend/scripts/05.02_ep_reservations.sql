@@ -511,7 +511,7 @@ grant execute on function get_service_by_datetime(date, time, int) to client;
 grant execute on function get_occupied_tables(date, time, int) to client;
 grant execute on function check_service_tables_capacity(int, date, time, int) to client;
 
-create or replace function vip_true(reservation_id int)
+create or replace function vip_true(reservation_id int, restaurant_id int)
     returns json as
 $$
 declare
@@ -525,15 +525,16 @@ begin
 
         UPDATE reservations
         set is_vip         = true
-        WHERE id = reservation_id;
+        WHERE id = reservation_id
+        AND restaurant = restaurant_id;
     return get_reservation(updated_reservation_id);
 end;
 $$ language plpgsql security definer;
 
-grant execute on function vip_true(int) to manager;
+grant execute on function vip_true(int, int) to manager;
 
 
-create or replace function vip_false(reservation_id int)
+create or replace function vip_false(reservation_id int, restaurant_id int)
     returns json as
 $$
 declare
@@ -547,9 +548,24 @@ begin
 
     UPDATE reservations
     set is_vip         = false
-    WHERE id = reservation_id;
+    WHERE id = reservation_id
+    AND restaurant = restaurant_id;
     return get_reservation(updated_reservation_id);
 end;
 $$ language plpgsql security definer;
 
-grant execute on function vip_false(int) to manager;
+grant execute on function vip_false(int, int) to manager;
+
+
+create or replace function check_is_active(reservation_id int) returns boolean as
+$$
+begin
+    if not exists(select
+                  from restaurant_managers rm
+                  where restaurant = restaurant_id
+                    and manager = manager_id) then
+        raise exception 'Reservation pas active';
+    end if;
+    return true;
+end;
+$$ language plpgsql security definer;
