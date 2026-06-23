@@ -27,6 +27,7 @@ class Reservation  implements Comparable<Reservation>{
   final int numberOfGuests;
   final Status status;
   final String? specialRequests;
+  final bool isVip;
   final List<Table> tables;
 
 // constructeur
@@ -38,6 +39,7 @@ class Reservation  implements Comparable<Reservation>{
     this.numberOfGuests = 0,
     this.status = Status.pending,
     this.specialRequests = null,
+    required this.isVip,
     required this.tables,
 });
 
@@ -51,9 +53,12 @@ class Reservation  implements Comparable<Reservation>{
         numberOfGuests: json['number_of_guests'],
         status: toStatus(json['status']),
         specialRequests: json['special_requests'],
+        isVip: json['is_vip'],
         tables: Table.tablesFromJson(json['tables']),
     );
   }
+
+
 
   static Future<Reservation?> getReservation(int id) async {
     try {
@@ -132,6 +137,7 @@ class Reservation  implements Comparable<Reservation>{
         datetime: datetime ?? this.datetime,
         numberOfGuests: numberOfGuests ?? this.numberOfGuests,
         status: status ?? this.status,
+        isVip: isVip ,
         tables: tables ?? this.tables);
  }
 
@@ -172,6 +178,23 @@ class Reservation  implements Comparable<Reservation>{
     }catch(e){
       print(e);
       throw Exception('Failed to change reservation status to Completed');
+    }
+  }
+
+  Future<Reservation>toggle() async{
+    try{
+      final respose = await ApiClient.post('toggle',
+        body: json.encode({'reservation_id' : id})
+      );
+      print(respose.body);
+      if(respose.statusCode == 200){
+        return Reservation.fromJson(json.decode(respose.body));
+      }else{
+        throw Exception('Failed to toggle isVIP reservation.');
+      }
+    }catch(e){
+
+      throw Exception('Failed to toggle isVIP reservation exception in catch.');
     }
   }
 

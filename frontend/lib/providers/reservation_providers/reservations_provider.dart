@@ -59,6 +59,7 @@ class ReservationsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Reservatio
     reservations.add(newReservation);
     // modification de la liste de l'etat
     state = AsyncData(reservations);
+    print("list updated!!!!!!!!!!!");
   }
 
   Future<void> getAll() async {

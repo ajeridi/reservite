@@ -85,6 +85,7 @@ begin
                            'number_of_guests', rsv.number_of_guests,
                            'status', rsv.status,
                            'special_requests', rsv.special_requests,
+                            'is_vip', rsv.is_vip,
                            'tables',
                            (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number, 'capacity',
                                                               t.capacity))
@@ -170,6 +171,7 @@ begin
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
                                        'special_requests', rsv.special_requests,
+                                        'is_vip', rsv.is_vip,
                                        'tables',
                                        (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number,
                                                                           'capacity', t.capacity))
@@ -232,7 +234,52 @@ $$ language plpgsql security definer;
 grant execute on function save_reservation(int, timestamp, int, text, int) to client;
 
 -- =====================================================================================================================
+ /* Function qui toggle is_vip*/
 
+    create or replace function toggle(reservation_id int) returns json as
+        $$ declare
+        simulated_time timestamp := (select system_time.simulated_time from system_time);
+
+            begin
+
+                -- verification si utilisateur connecte
+                perform auth.check_logged();
+
+                -- user doit être un manager, il faut qu'il soit manager dans le restaurant dans lequel se trouve la reservation
+                if (auth.role() = 'manager' AND not exists(select *
+                                                           from restaurant_managers
+                                                           where manager = auth.id()
+                                                             and restaurant = (select rsv.restaurant
+                                                                               from reservations rsv
+                                                                               where rsv.id = reservation_id))) then
+                    raise exception 'Manager cannot check a reservation inside a restaurant he is not working in';
+                end if;
+
+                --la réservation doit exister
+                if not exists(select 1 from reservations where id = reservation_id )then
+                    raise exception 'The reservation does not exists';
+                end if;
+
+                --le status doit être pending ou confirmed
+                if not exists(Select 1 from reservations where id = reservation_id and (status = 'pending' or status='confirmed'))then
+                    raise exception 'The reservation status must be pending or confirmed';
+                end if;
+
+                --le date/heure doit être dans le futur
+                if not exists(select 1 from reservations where id = reservation_id and datetime> simulated_time)then
+                    raise exception 'Reservation DateTime must be must be after simulatedTime';
+                end if;
+
+                update reservations set is_vip = not (is_vip) where id = reservation_id;
+
+                --retourner la reservation avec is_vip modifié
+                return get_reservation(reservation_id);
+
+            end;
+        $$language plpgsql security definer ;
+
+grant execute on function toggle(int) to manager;
+-- ================================================================================================================
 /*
 Confirmation d'une reservation et assignation des tables pour cette reservation
     recoit un id de reservation et un liste d'id de tables

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/filtered_reservations_provider.dart';
+import 'package:prbd_2526_a07/providers/reservation_providers/reservations_provider.dart';
 import 'package:prbd_2526_a07/providers/reservation_providers/selected_reservation_id_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
@@ -37,6 +39,8 @@ class ReservationCard extends ConsumerWidget {
     final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
     // on doit voir le notifier de l'utilisateur connecte, pour connaitre son role et rediriger vers la bonne page de details
     final userRole = ref.watch(userRoleProvider).value;
+    final reservationProvider = ref.watch(reservationsProvider);
+    final currentReserProviderVal = ref.watch(currentReservationProvider(reservation.id));
     return
       Card(
         margin: const EdgeInsets.only(bottom: 16),
@@ -107,7 +111,14 @@ class ReservationCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right),
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+               icon: reservation.isVip == true ? Icon(Icons.star, size: 28, color: Colors.amber) : Icon(Icons.star_border, size: 28, color: Colors.grey),
+              onPressed: ()async { await currentReserProviderVal.value?.toggle();},
+            ),
+
+            const Icon(Icons.chevron_right),
               ],
             ),
           ),

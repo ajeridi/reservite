@@ -73,6 +73,12 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
     ref.read(reservationsProvider.notifier).updateList(state.value!);
   }
 
+  Future<void> toggle() async{
+    final reservation = await state.value!.toggle();
+
+    ref.read(reservationsProvider.notifier).updateList(reservation);
+  }
+
 
   Future<Reservation> saveReservation({required DateTime selectedDate, required String selectedSlot, required int numberOfGuests, required bool capacityCheck, String? specialRequest,}) async {
     // recherche de toutes les donnes entree par l'utilisateur via les providers
