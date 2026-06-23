@@ -129,6 +129,7 @@ class Reservation  implements Comparable<Reservation>{
    int? numberOfGuests,
    Status? status,
     String? specialRequests,
+   bool? isVip,
    List<Table>? tables}){
     return Reservation(
         id: id ?? this.id,
@@ -137,7 +138,7 @@ class Reservation  implements Comparable<Reservation>{
         datetime: datetime ?? this.datetime,
         numberOfGuests: numberOfGuests ?? this.numberOfGuests,
         status: status ?? this.status,
-        isVip: isVip ,
+        isVip: isVip ?? this.isVip,
         tables: tables ?? this.tables);
  }
 
@@ -181,16 +182,17 @@ class Reservation  implements Comparable<Reservation>{
     }
   }
 
-  Future<Reservation>toggle() async{
+  Future<dynamic>toggle() async{
     try{
-      final respose = await ApiClient.post('toggle',
+      final response = await ApiClient.post('toggle',
         body: json.encode({'reservation_id' : id})
       );
-      print(respose.body);
-      if(respose.statusCode == 200){
-        return Reservation.fromJson(json.decode(respose.body));
+      print(response.body);
+      if(response.statusCode == 200){
+        return Reservation.fromJson(json.decode(response.body));
       }else{
-        throw Exception('Failed to toggle isVIP reservation.');
+        final body = json.decode(response.body);
+        return body['message'];
       }
     }catch(e){
 

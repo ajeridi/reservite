@@ -26,8 +26,9 @@ returns trigger as
 
             if((SELECT count(*) from reservations r where r.restaurant=resto_id
                                                    and r.datetime > v_current_time
+                                                      and (r.status ='pending' or r.status = 'confirmed')
                                                     and r.is_vip is true) > 3)then
-                raise exception 'Le restaurant ne peut pas avoir plus de 3 VIP et pas dans le passé';
+                raise exception 'Le restaurant ne peut pas avoir plus de 3 VIP ';
             end if;
         return new;
         end;

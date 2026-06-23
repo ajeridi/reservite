@@ -8,7 +8,7 @@ import 'package:prbd_2526_a07/providers/auth_provider.dart';
 import '../../core/tools/abstract_async_notifier.dart';
 
 final restaurantProvider = AsyncNotifierProvider<RestaurantsNotifier, SplayTreeSet<Restaurant>>(
-        () => RestaurantsNotifier(),
+        () => RestaurantsNotifier(), //il fourni la valeur modifié par le notifier
 );
 
 class RestaurantsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Restaurant>>{

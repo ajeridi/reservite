@@ -50,7 +50,7 @@ class ReservationsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Reservatio
     for(var reservation in reservations!){
       if(reservation.id == updatedReservation.id){
         // copie de la reservation a modifier avec le nouveau statut
-        newReservation = reservation.copyWith(status: updatedReservation.status);
+        newReservation = reservation.copyWith(status: updatedReservation.status,isVip : updatedReservation.isVip);
       }
     }
     // suppression de la reservation obsolete

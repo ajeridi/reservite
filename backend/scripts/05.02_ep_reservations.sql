@@ -240,6 +240,9 @@ grant execute on function save_reservation(int, timestamp, int, text, int) to cl
     create or replace function toggle(reservation_id int) returns json as
         $$ declare
         simulated_time timestamp := (select system_time.simulated_time from system_time);
+        resto_id int := (select rsv.restaurant
+            from reservations rsv
+            where rsv.id = reservation_id);
 
             begin
 
@@ -250,9 +253,7 @@ grant execute on function save_reservation(int, timestamp, int, text, int) to cl
                 if (auth.role() = 'manager' AND not exists(select *
                                                            from restaurant_managers
                                                            where manager = auth.id()
-                                                             and restaurant = (select rsv.restaurant
-                                                                               from reservations rsv
-                                                                               where rsv.id = reservation_id))) then
+                                                             and restaurant = resto_id)) then
                     raise exception 'Manager cannot check a reservation inside a restaurant he is not working in';
                 end if;
 
@@ -270,6 +271,8 @@ grant execute on function save_reservation(int, timestamp, int, text, int) to cl
                 if not exists(select 1 from reservations where id = reservation_id and datetime> simulated_time)then
                     raise exception 'Reservation DateTime must be must be after simulatedTime';
                 end if;
+
+
 
                 update reservations set is_vip = not (is_vip) where id = reservation_id;
 

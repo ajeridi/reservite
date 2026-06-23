@@ -116,7 +116,9 @@ class ReservationCard extends ConsumerWidget {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                icon: reservation.isVip == true ? Icon(Icons.star, size: 28, color: Colors.amber) : Icon(Icons.star_border, size: 28, color: Colors.grey),
-              onPressed: ()async { await reservNotifier.toggle();},
+              onPressed: ()async { final error = await reservNotifier.toggle();
+                if(error is String)
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));},
             ),
 
             const Icon(Icons.chevron_right),
