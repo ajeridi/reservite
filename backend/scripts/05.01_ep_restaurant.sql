@@ -13,6 +13,7 @@ $$
                              'rating',r.rating,
                              'price_range', r.price_range,
                              'slot_duration',r.slot_duration,
+                              'is_sponsored',r.is_sponsored,
                              'tables',(select json_agg(json_build_object('id',t.id,
                                                                          'restaurant',t.restaurant,
                                                                          'table_number',t.table_number,
@@ -68,7 +69,39 @@ grant execute on function get_restaurant(int) to authenticated;
 --                         'rating',rating,
 --                         'price_range',price_range,
 --                         'slot_duration',slot_duration)) from restaurants where lower(name) like CONCAT('%',NULL,'%');
+--===========================================================================
+--creation d'un toggle pour changer la valeur du is_sponsoring
+create or replace function toggle(resto_id int)  returns json as
+    $$
+        begin
+            -- verifier si user connecte
+            perform auth.check_logged();
+            --le restaurant doit exister
+                if not exists(select 1 from restaurants where id=resto_id)then
+                    raise exception 'The restaurant does not exists';
+                end if;
+            -- on regarde si le manager travaille dans le restaurant de la reservation a confirmer
+            if (auth.id() not in
+                (select rm.manager from restaurant_managers rm where manager = auth.id() and restaurant = resto_id)) then
+                raise exception 'User is not manager at the reservation''s restaurant';
+            end if;
+            if((select restaurants.is_sponsored from restaurants where id=resto_id) is false)then
+            --verifier qu'il y a au moins une reservation completed or pending
+                if not exists(select * from reservations r where r.restaurant = resto_id and (r.status = 'confirmed' or r.status = 'completed'))then
+                    raise exception ' The restaurant must have at least one reservation completed or confirmed';
+                end if;
+            end if;
 
+            --changement
+            update restaurants set is_sponsored = not (is_sponsored) where id = resto_id;
+
+            --retourner le resto modifié
+            return get_restaurant(resto_id);
+        end;
+    $$language plpgsql security definer ;
+
+grant execute on function toggle(int) to manager;
+--============================================================================
 create or replace function get_restaurants(research text default NULL)
 returns json as
     $$
@@ -99,6 +132,7 @@ returns json as
                                                           'rating',r.rating,
                                                           'price_range',r.price_range,
                                                           'slot_duration',r.slot_duration,
+                                                            'is_sponsored',r.is_sponsored,
                                                           'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1),
                                                           'reservations_pending',(select get_pending_reservation_count(r.id))))
                         from restaurants r

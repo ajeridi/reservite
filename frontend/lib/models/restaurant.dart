@@ -16,6 +16,7 @@ class Restaurant implements Comparable<Restaurant>{
   final double? rating;
   final int? priceRange;
   final int? slotDuration;
+  final bool isSponsored;
   final DateTime? date;
   final int? reservPending;
   final SplayTreeSet<Service>? services;
@@ -31,6 +32,7 @@ class Restaurant implements Comparable<Restaurant>{
     this.rating = 0,
     this.priceRange = 0,
     this.slotDuration = 0,
+    required this.isSponsored,
     required this.date ,
     this.reservPending = 0,
     this.services = null,
@@ -75,6 +77,7 @@ class Restaurant implements Comparable<Restaurant>{
       rating: json['rating'],
       priceRange: json['price_range'],
       slotDuration: json['slot_duration'],
+      isSponsored: json['is_sponsored'],
       date: json['last_reservation_date'] != null ? DateTime.parse(json['last_reservation_date']) : null,
       reservPending: json['reservations_pending'] as int?,
       services:  json['services'] == null ? null : Service.servicesFromJson (json ['services' ]),
@@ -89,7 +92,8 @@ class Restaurant implements Comparable<Restaurant>{
         address: json['address'],
         city: json['city'],
         date: null,
-        phone: json['phone']);
+        phone: json['phone'],
+        isSponsored: json['is_sponsored']);
   }
 
   static Future<Restaurant> getRestaurant(int id) async{
@@ -99,6 +103,16 @@ class Restaurant implements Comparable<Restaurant>{
       return Restaurant.fromJson(json.decode(response.body));
     }else{
       throw Exception('Failed to get restaurant');
+    }
+  }
+
+  Future<dynamic>toggle(int restoId) async{
+    final response = await ApiClient.get('toggle?resto_id=$restoId');
+    if(response.statusCode == 200){
+      return Restaurant.fromJson(json.decode(response.body));
+    }else{
+      final body = json.decode(response.body);
+      return body['message'];
     }
   }
 

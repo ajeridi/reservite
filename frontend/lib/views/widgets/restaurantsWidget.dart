@@ -58,6 +58,12 @@ class RestaurantCard extends ConsumerWidget {
                     ),
                 ],
               ),
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+              icon: Icon(Icons.diamond, size: 28, color: restaurant.isSponsored == true ? Colors.amber : Colors.grey),
+              onPressed: () { /* ... */ },
+            ),
               const SizedBox(height: 4),
               if (restaurant.reservPending != 0 &&
                   restaurant.reservPending != null)
@@ -73,7 +79,10 @@ class RestaurantCard extends ConsumerWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+
+
                   ],
+
                 ),
 
           ],

@@ -18,6 +18,7 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/04.12_br_no_reservation_pen_canc_in_reservation_tables.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.13_br_check_res_count_per_day_and_service.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.14_br_no_past_reservation.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.15_br_check_resto_sponsorise.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/05.01_ep_restaurant.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/05.02_ep_reservations.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/05.01_ep_users.sql" />

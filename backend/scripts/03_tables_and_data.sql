@@ -10,7 +10,8 @@ create table restaurants
     description text             default null,
     rating      double precision default null,
     price_range int              default null,
-    slot_duration int           not null default 30
+    slot_duration int           not null default 30,
+    is_sponsored bool           not null default false
 );
 
 create unique index on restaurants (trim(lower(name)), trim(lower(city)));
@@ -300,6 +301,39 @@ begin
             (17, 17),
             (19, 24),
             (20, 1);
+
+    -- Données pour faciliter les tests :
+-- 1 restaurant à Bruxelles, géré par le user 2
+    insert into restaurants
+    (id, name, address, city, phone, description, rating, price_range, slot_duration)
+    values
+        (9, 'Brasserie du Canal', 'Rue du Canal 1', 'Bruxelles', '+32 2 111 22 33',
+         'Restaurant de test sponsoring', 4.3, 2, 30);
+
+    perform setval('restaurants_id_seq', (select max(id) from restaurants));
+
+    insert into restaurant_managers (restaurant, manager)
+    values (9, 2);
+
+-- Au moins une table et un service
+    insert into tables (restaurant, table_number, capacity)
+    values (9, 1, 4);
+
+    insert into services (restaurant, day_of_week, start_time, end_time)
+    values (9, 1, '12:00', '14:00');
+
+-- Réservation confirmée de Bruno (user id 6) sur la Brasserie du Canal
+    insert into reservations (id, client, restaurant, datetime, number_of_guests, status, special_requests)
+    values (23, 6, 9, '2024-12-09 12:30:00', 2, 'confirmed', 'Test sponsoring manager');
+
+    insert into reservation_tables (reservation, "table")
+    select 23, t.id
+    from tables t
+    where t.restaurant = 9
+      and t.table_number = 1;
+
+-- Suppression de la seule réservation du Bistrot Flamand
+    delete from reservations where id = 16;
 
     -- Réactiver tous les triggers sur toutes les tables
     alter table reservations enable trigger all;

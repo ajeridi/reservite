@@ -136,7 +136,7 @@ begin
                                        'client', (select(json_build_object('id', rsv.client))),
                                        'restaurant',
                                        (select json_build_object('id', rsv.id, 'name', rst.name, 'address', rst.address,
-                                                                 'city', rst.city, 'phone', rst.phone)
+                                                                 'city', rst.city, 'phone', rst.phone,'is_sponsored',rst.is_sponsored)
                                         from restaurants rst
                                         where rst.id = rsv.restaurant),
                                        'datetime', rsv.datetime,
@@ -163,7 +163,7 @@ begin
                                         where u.id = rsv.client),
                                        'restaurant',
                                        (select json_build_object('id', rsv.id, 'name', rst.name, 'address', rst.address,
-                                                                 'city', rst.city, 'phone', rst.phone)
+                                                                 'city', rst.city, 'phone', rst.phone,'is_sponsored',rst.is_sponsored)
                                         from restaurants rst
                                         where rst.id = rsv.restaurant),
                                        'datetime', rsv.datetime,

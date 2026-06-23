@@ -18,6 +18,7 @@ class RestaurantsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Restaurant>
     ref.watch(authProvider);
     state = AsyncData(SplayTreeSet<Restaurant>());
     state = AsyncLoading();
+    print("Resto provider -build- avant try");
     try {
       return SplayTreeSet<Restaurant>.from(await Restaurant.getRestaurants());
     }catch(e) {
@@ -26,8 +27,20 @@ class RestaurantsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Restaurant>
     }
   }
 
+  Future<dynamic>toggle() async{
+    state = const AsyncValue.loading();
+    try{
+      final restaurants = SplayTreeSet<Restaurant>.from(await Restaurant.toggle());
+      state = AsyncData(restaurants);
+    }catch (e){
+      print(e);
+      state = AsyncValue.error("Something went really wrong!\nPlease try again later.", StackTrace.current,);
+    }
+  }
+
   Future<void> getRestaurants() async {
     state = const AsyncValue.loading();
+
     try{
       final restaurants = SplayTreeSet<Restaurant>.from(await Restaurant.getRestaurants());
       state = AsyncData(restaurants);
