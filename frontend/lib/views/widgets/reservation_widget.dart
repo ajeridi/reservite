@@ -41,6 +41,7 @@ class ReservationCard extends ConsumerWidget {
     final userRole = ref.watch(userRoleProvider).value;
     final reservationProvider = ref.watch(reservationsProvider);
     final currentReserProviderVal = ref.watch(currentReservationProvider(reservation.id));
+    final reservNotifier = ref.read(currentReservationProvider(reservation.id).notifier);
     return
       Card(
         margin: const EdgeInsets.only(bottom: 16),
@@ -115,7 +116,7 @@ class ReservationCard extends ConsumerWidget {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                icon: reservation.isVip == true ? Icon(Icons.star, size: 28, color: Colors.amber) : Icon(Icons.star_border, size: 28, color: Colors.grey),
-              onPressed: ()async { await currentReserProviderVal.value?.toggle();},
+              onPressed: ()async { await reservNotifier.toggle();},
             ),
 
             const Icon(Icons.chevron_right),

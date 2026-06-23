@@ -75,7 +75,7 @@ class CurrentReservationNotifier extends AbstractAsyncNotifier<Reservation?> {
 
   Future<void> toggle() async{
     final reservation = await state.value!.toggle();
-
+    print("currentREservationNotifier methode toggle");
     ref.read(reservationsProvider.notifier).updateList(reservation);
   }
 

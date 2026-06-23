@@ -143,7 +143,8 @@ begin
                                        'datetime', rsv.datetime,
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
-                                       'special_requests', rsv.special_requests
+                                       'special_requests', rsv.special_requests,
+                                        'is_vip', rsv.is_vip
                                )
                                ORDER BY rsv.datetime DESC, rsv.id DESC
                        )
