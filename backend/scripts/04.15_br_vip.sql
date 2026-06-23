@@ -30,7 +30,7 @@ begin
         AND res.datetime > v_current_time
         AND res.is_vip = true
         group by r.id -- on groupe par restaurant
-        having count(*) >= 3 -- tel que le groupe contient plus de 3 entrees
+        having count(*) > 3 -- tel que le groupe contient plus de 3 entrees
     ) then
         raise exception 'Erreur : Un restaurant ne peut pas avoir plus de 3 réservations VIP actives. ';
     end if;

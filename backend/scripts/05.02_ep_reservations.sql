@@ -519,8 +519,12 @@ declare
 begin
     -- verification si utilisateur connecte
     perform auth.check_logged();
-    if (auth.role() <> 'manager') then
+    if ((auth.role() <> 'manager') OR NOT check_is_active(reservation_id) ) then
         raise exception 'Cannot update a reservation VIP if you are not a manager';
+    end if;
+
+    if (get_vip_count(restaurant_id) >= 3) then
+        raise exception 'Un restaurant ne peut pas avoir plus de 3 réservations VIP actives.';
     end if;
 
         UPDATE reservations
@@ -559,13 +563,30 @@ grant execute on function vip_false(int, int) to manager;
 
 create or replace function check_is_active(reservation_id int) returns boolean as
 $$
+declare
+    v_current_time timestamp;
 begin
-    if not exists(select
-                  from restaurant_managers rm
-                  where restaurant = restaurant_id
-                    and manager = manager_id) then
-        raise exception 'Reservation pas active';
+    -- récupère le temps simulé. s'il n'existe pas (null) -> on prend le temps réel (c'est à ca que ca sert coalesce)
+    v_current_time := coalesce((select simulated_time from system_time limit 1), current_timestamp);
+
+    if not exists(select res.id
+                  from reservations res
+                  where (res.status = 'pending' OR res.status = 'confirmed')
+                    AND res.datetime > v_current_time
+                    AND res.id = reservation_id
+                  ) then
+        return false;
     end if;
     return true;
 end;
 $$ language plpgsql security definer;
+
+
+create or replace function get_vip_count(restaurant_id int) returns integer as
+$$
+begin
+    return (select count(*) from reservations r where r.is_vip = 'true' and r.restaurant = restaurant_id);
+end;
+$$ language plpgsql security definer;
+
+grant execute on function get_vip_count(int) to manager;
