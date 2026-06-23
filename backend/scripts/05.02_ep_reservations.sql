@@ -172,7 +172,7 @@ begin
                                        'number_of_guests', rsv.number_of_guests,
                                        'status', rsv.status,
                                        'special_requests', rsv.special_requests,
-                                       'is_vip', rsv.is_vip
+                                       'is_vip', rsv.is_vip,
                                        'tables',
                                        (select json_agg(json_build_object('id', t.id, 'table_number', t.table_number,
                                                                           'capacity', t.capacity))
@@ -225,6 +225,7 @@ begin
         set datetime         = datetime_,
             number_of_guests = number_of_guests_,
             special_requests = special_requests_,
+            is_vip = is_vip_,
             status = 'pending'::status_type
         WHERE id = reservation_id;
     end if;
@@ -509,3 +510,46 @@ $$ language sql security definer;
 grant execute on function get_service_by_datetime(date, time, int) to client;
 grant execute on function get_occupied_tables(date, time, int) to client;
 grant execute on function check_service_tables_capacity(int, date, time, int) to client;
+
+create or replace function vip_true(reservation_id int)
+    returns json as
+$$
+declare
+    updated_reservation_id int := reservation_id;
+begin
+    -- verification si utilisateur connecte
+    perform auth.check_logged();
+    if (auth.role() <> 'manager') then
+        raise exception 'Cannot update a reservation VIP if you are not a manager';
+    end if;
+
+        UPDATE reservations
+        set is_vip         = true
+        WHERE id = reservation_id;
+    return get_reservation(updated_reservation_id);
+end;
+$$ language plpgsql security definer;
+
+grant execute on function vip_true(int) to manager;
+
+
+create or replace function vip_false(reservation_id int)
+    returns json as
+$$
+declare
+    updated_reservation_id int := reservation_id;
+begin
+    -- verification si utilisateur connecte
+    perform auth.check_logged();
+    if (auth.role() <> 'manager') then
+        raise exception 'Cannot update a reservation VIP if you are not a manager';
+    end if;
+
+    UPDATE reservations
+    set is_vip         = false
+    WHERE id = reservation_id;
+    return get_reservation(updated_reservation_id);
+end;
+$$ language plpgsql security definer;
+
+grant execute on function vip_false(int) to manager;

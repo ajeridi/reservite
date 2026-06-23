@@ -28,6 +28,7 @@ begin
         where res.restaurant = r.id
         AND (res.status = 'pending' OR res.status = 'confirmed')
         AND res.datetime > v_current_time
+        AND res.is_vip = true
         group by r.id -- on groupe par restaurant
         having count(*) > 3 -- tel que le groupe contient plus de 3 entrees
     ) then

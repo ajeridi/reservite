@@ -37,6 +37,10 @@ class ReservationCard extends ConsumerWidget {
     final selectedReservationIdNotifier = ref.read(selectedReservationIdProvider.notifier);
     // on doit voir le notifier de l'utilisateur connecte, pour connaitre son role et rediriger vers la bonne page de details
     final userRole = ref.watch(userRoleProvider).value;
+
+    final notifier = ref.read(currentReservationProvider(reservation.id).notifier);
+    final reservationState = ref.watch(currentReservationProvider(reservation.id)).value;
+
     return
       Card(
         margin: const EdgeInsets.only(bottom: 16),
@@ -107,6 +111,25 @@ class ReservationCard extends ConsumerWidget {
                     ],
                   ),
                 ),
+
+                if (reservationState!.is_vip == false)
+                  IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  icon: Icon(Icons.star_border, size: 28, color: Colors.grey),
+                  onPressed: () {
+                    notifier.vip_true(reservation.id);
+                  }
+                  ),
+                if (reservationState.is_vip == true)
+                  IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  icon: Icon(Icons.star, size: 28, color: Colors.amber),
+                  onPressed: () {
+                    notifier.vip_false(reservation.id);
+                  },
+                  ),
                 const Icon(Icons.chevron_right),
               ],
             ),

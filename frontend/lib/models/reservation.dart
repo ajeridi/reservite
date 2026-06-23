@@ -287,4 +287,52 @@ class Reservation  implements Comparable<Reservation>{
     }
     return null;
   }
+
+  static Future<Reservation> vip_true({required int? reservationId}) async {
+    try {
+
+      final response = await ApiClient.post(
+        'vip_true',
+        body: json.encode({
+          'reservation_id' : reservationId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Reservation.fromJson(body);
+      }
+      throw Exception(
+        'Failed to update vip_true reservation. Status code: ${response.statusCode}\nBody: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to save reservation.');
+    }
+  }
+
+  static Future<Reservation> vip_false({required int? reservationId}) async {
+    try {
+
+      final response = await ApiClient.post(
+        'vip_false',
+        body: json.encode({
+          'reservation_id' : reservationId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Reservation.fromJson(body);
+      }
+      throw Exception(
+        'Failed to update vip_false reservation. Status code: ${response.statusCode}\nBody: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to save reservation.');
+    }
+  }
+
+
 }

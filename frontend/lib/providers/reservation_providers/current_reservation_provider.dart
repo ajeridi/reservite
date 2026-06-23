@@ -134,6 +134,35 @@ Future<void> complete() async{
     }
   }
 
+  Future<Reservation> vip_true(int reservationId) async {
+
+    final savedReservation = await Reservation.vip_true(
+        reservationId: reservationId == 0 ? null : reservationId
+    );
+
+    state = AsyncData(savedReservation);
+
+    // mettre a jour directement la liste soit en ajoutant si nouvelle reseravation, soit en supprimant et en rajoutant la nouvelle
+    ref.read(reservationsProvider.notifier).addOrUpdateReservation(savedReservation);
+
+    return savedReservation;
+  }
+
+  Future<Reservation> vip_false(int reservationId) async {
+
+    final savedReservation = await Reservation.vip_false(
+        reservationId: reservationId == 0 ? null : reservationId
+    );
+
+    state = AsyncData(savedReservation);
+
+    // mettre a jour directement la liste soit en ajoutant si nouvelle reseravation, soit en supprimant et en rajoutant la nouvelle
+    ref.read(reservationsProvider.notifier).addOrUpdateReservation(savedReservation);
+
+    return savedReservation;
+  }
+
+
 }
 
 // a garder pour des raisons pedagogiques
