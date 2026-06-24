@@ -38,6 +38,36 @@ class Restaurant implements Comparable<Restaurant>{
     this.services = null,
   });
 
+  Restaurant copyWith( {
+    int? id,
+    String? name,
+    String? address,
+    String? city,
+    String? phone,
+    String? description,
+    double? rating,
+    int? priceRange,
+    int? slotDuration,
+    bool? isSponsored,
+    DateTime? date,
+    int? reservPending,
+    SplayTreeSet<Service>? services}){
+    return Restaurant(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        address: address ?? this.address,
+        city: city ?? this.city,
+        phone: phone ?? this.phone,
+        description: description ?? this.description,
+        rating: rating ?? this.rating,
+        priceRange: priceRange ?? this.priceRange,
+        slotDuration: slotDuration ?? this.slotDuration,
+        isSponsored: isSponsored ?? this.isSponsored,
+        date: date ?? this.date,
+        reservPending: reservPending ?? this.reservPending,
+        services: services ?? this.services);
+  }
+
   String getLastDate (){
     DateTime? date = this.date;
     if (date == null) return '';
@@ -63,6 +93,8 @@ class Restaurant implements Comparable<Restaurant>{
     if (otherDate == null) return 1;
     return this.date==other.date? this.name.compareTo(other.name) : otherDate.compareTo(date);
   }
+
+
 
 
   // constructeur Json
@@ -106,8 +138,9 @@ class Restaurant implements Comparable<Restaurant>{
     }
   }
 
-  Future<dynamic>toggle(int restoId) async{
-    final response = await ApiClient.get('toggle?resto_id=$restoId');
+  Future<dynamic>toggle() async{
+    final response = await ApiClient.post('toggle',body: json.encode({'resto_id' : id}));
+    print(response.body);
     if(response.statusCode == 200){
       return Restaurant.fromJson(json.decode(response.body));
     }else{

@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
@@ -15,6 +18,10 @@ class RestaurantCard extends ConsumerWidget {
     final selectedRestaurantNotifier = ref.read(
       selectedRestaurantProvider.notifier,
     );
+
+    final currentResto = ref.watch(currentRestaurantProvider(restaurant.id));
+    final currentRestoNotifier = ref.read(currentRestaurantProvider(restaurant.id).notifier);
+
 
     final userRole = ref.watch(userRoleProvider);
 
@@ -62,7 +69,10 @@ class RestaurantCard extends ConsumerWidget {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
               icon: Icon(Icons.diamond, size: 28, color: restaurant.isSponsored == true ? Colors.amber : Colors.grey),
-              onPressed: () { /* ... */ },
+              onPressed: () async { final error =await currentRestoNotifier.toggle();
+                          if(error is String)
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+                          },
             ),
               const SizedBox(height: 4),
               if (restaurant.reservPending != 0 &&

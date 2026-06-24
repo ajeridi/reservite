@@ -27,16 +27,7 @@ class RestaurantsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Restaurant>
     }
   }
 
-  Future<dynamic>toggle() async{
-    state = const AsyncValue.loading();
-    try{
-      final restaurants = SplayTreeSet<Restaurant>.from(await Restaurant.toggle());
-      state = AsyncData(restaurants);
-    }catch (e){
-      print(e);
-      state = AsyncValue.error("Something went really wrong!\nPlease try again later.", StackTrace.current,);
-    }
-  }
+
 
   Future<void> getRestaurants() async {
     state = const AsyncValue.loading();
@@ -54,4 +45,24 @@ class RestaurantsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Restaurant>
   Future<void> refresh() async{
     await getRestaurants();
   }
+
+  void updateResto(Restaurant updatedRestaurant){
+    state = AsyncLoading();
+    final restaurants = state.value; // liste actuelle dans l'etat
+    var newRestaurant; // va contenir la nouvelle copie de la reservation a modifier
+    // on va chercher la reservation a copier
+    for(var restaurant in restaurants!){
+    if(restaurant.id == updatedRestaurant.id){
+    // copie de la reservation a modifier avec le nouveau statut
+    newRestaurant = restaurant.copyWith(isSponsored: updatedRestaurant.isSponsored);
+    }
+    }
+    // suppression de la reservation obsolete
+    restaurants.removeWhere((res) => res.id == updatedRestaurant.id);
+    // rajout de la nouvelle reservation mise a jour
+    restaurants.add(newRestaurant);
+    // modification de la liste de l'etat
+    state = AsyncData(restaurants);
+  }
 }
+
