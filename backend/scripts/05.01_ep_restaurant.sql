@@ -116,6 +116,7 @@ returns json as
                                                       'rating',r.rating,
                                                       'price_range',r.price_range,
                                                       'slot_duration',r.slot_duration,
+
                                                         'last_reservation_date',(select datetime from reservations where auth.role() = 'client' and reservations.restaurant = r.id ORDER BY datetime DESC Limit 1)))
                     from restaurants r where lower(name) like  CONCAT('%',get_restaurants.research,'%')
                                                                                                     or lower(city) like CONCAT('%',get_restaurants.research,'%')

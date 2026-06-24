@@ -109,7 +109,7 @@ class Restaurant implements Comparable<Restaurant>{
       rating: json['rating'],
       priceRange: json['price_range'],
       slotDuration: json['slot_duration'],
-      isSponsored: json['is_sponsored'],
+      isSponsored: json['is_sponsored'] ?? false,
       date: json['last_reservation_date'] != null ? DateTime.parse(json['last_reservation_date']) : null,
       reservPending: json['reservations_pending'] as int?,
       services:  json['services'] == null ? null : Service.servicesFromJson (json ['services' ]),
