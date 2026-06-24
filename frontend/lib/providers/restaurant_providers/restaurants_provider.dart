@@ -41,4 +41,12 @@ class RestaurantsNotifier extends AbstractAsyncNotifier<SplayTreeSet<Restaurant>
   Future<void> refresh() async{
     await getRestaurants();
   }
+
+  void addOrUpdateRestaurant(Restaurant savedRestaurant) {
+    state = AsyncLoading();
+    final restaurants = state.value ?? SplayTreeSet();
+    restaurants.removeWhere((restaurant) => restaurant.id == savedRestaurant.id);
+    restaurants.add(savedRestaurant);
+    state = AsyncData(restaurants);
+  }
 }

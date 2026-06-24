@@ -19,6 +19,7 @@ class Restaurant implements Comparable<Restaurant>{
   final DateTime? date;
   final int? reservPending;
   final SplayTreeSet<Service>? services;
+  final bool is_sponsored;
 
   // constructeur
   const Restaurant({
@@ -34,6 +35,7 @@ class Restaurant implements Comparable<Restaurant>{
     required this.date ,
     this.reservPending = 0,
     this.services = null,
+    this.is_sponsored = false
   });
 
   String getLastDate (){
@@ -78,6 +80,7 @@ class Restaurant implements Comparable<Restaurant>{
       date: json['last_reservation_date'] != null ? DateTime.parse(json['last_reservation_date']) : null,
       reservPending: json['reservations_pending'] as int?,
       services:  json['services'] == null ? null : Service.servicesFromJson (json ['services' ]),
+      is_sponsored: json['is_sponsored']
     );
   }
 
@@ -89,7 +92,8 @@ class Restaurant implements Comparable<Restaurant>{
         address: json['address'],
         city: json['city'],
         date: null,
-        phone: json['phone']);
+        phone: json['phone'],
+        is_sponsored: json['is_sponsored']);
   }
 
   static Future<Restaurant> getRestaurant(int id) async{
@@ -131,4 +135,68 @@ class Restaurant implements Comparable<Restaurant>{
   void deleteService(Service service) {
    services!.removeWhere((serviceToDelete) => serviceToDelete.id == service.id);
   }
+
+  static Future<Restaurant> sponsored_true({required int restaurantId}) async {
+    try {
+      final response = await ApiClient.post(
+        'sponsored_true',
+        body: json.encode({
+          'restaurant_id': restaurantId
+        }),
+      );
+
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Restaurant.fromJson(body);
+      }
+      throw Exception(
+        'Failed to save restaurant. Status code: ${response.statusCode}\nBody: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to save restaurant.');
+    }
+  }
+
+  static Future<Restaurant> sponsored_false({required int restaurantId}) async {
+    try {
+      final response = await ApiClient.post(
+        'sponsored_false',
+        body: json.encode({
+          'restaurant_id': restaurantId
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return Restaurant.fromJson(body);
+      }
+      throw Exception(
+        'Failed to save restaurant. Status code: ${response.statusCode}\nBody: ${response.body}',
+      );
+    } catch (e, st) {
+      print('$e\n$st');
+      throw Exception('Failed to save restaurant.');
+    }
+  }
+
+
+/*  static Future<bool> is_sponsored_restaurant_city_full(String restaurant_city) async {
+    try {
+      final response = await ApiClient.get('is_sponsored_restaurant_city_full?restaurant_city=$restaurant_city');
+      if (response.statusCode == 200){
+        final body = json.decode(response.body);
+        return body;
+      } else {
+        throw Exception('Failed to get is_sponsored_restaurant_city_full from DB.\nResponse: ${response.body}');
+      }
+    } catch(e, st){
+      print('$e\n$st');
+      throw Exception('Failed to get is_sponsored_restaurant_city_full.');
+    }
+  }*/
+
+
 }

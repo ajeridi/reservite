@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a07/models/restaurant.dart';
+import 'package:prbd_2526_a07/providers/restaurant_providers/current_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/restaurant_providers/selected_restaurant_provider.dart';
 import 'package:prbd_2526_a07/providers/user_role_provider.dart';
 
@@ -17,6 +18,9 @@ class RestaurantCard extends ConsumerWidget {
     );
 
     final userRole = ref.watch(userRoleProvider);
+
+    final restaurantState = ref.watch(currentRestaurantProvider(restaurant.id));
+    final restaurantStateNotifier = ref.watch(currentRestaurantProvider(restaurant.id).notifier);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -75,6 +79,29 @@ class RestaurantCard extends ConsumerWidget {
                     ),
                   ],
                 ),
+
+            Row(
+              children: [
+                if (restaurantState.value!.is_sponsored == true && restaurantState.value != null)
+                  IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  icon: Icon(Icons.diamond, size: 28, color: Colors.amber),
+                  onPressed: () {
+                    restaurantStateNotifier.sponsored_false(restaurant.id);
+                  }
+                  ),
+                if (restaurantState.value!.is_sponsored == false && restaurantState.value != null)
+                  IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  icon: Icon(Icons.diamond_outlined, size: 28, color: Colors.grey),
+                  onPressed: () {
+                    restaurantStateNotifier.sponsored_true(restaurant.id);
+                  },
+                  ),
+              ],
+            ),
 
           ],
         ),

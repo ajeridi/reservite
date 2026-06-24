@@ -13,6 +13,7 @@ $$
                              'rating',r.rating,
                              'price_range', r.price_range,
                              'slot_duration',r.slot_duration,
+                             'is_sponsored', r.is_sponsored,
                              'tables',(select json_agg(json_build_object('id',t.id,
                                                                          'restaurant',t.restaurant,
                                                                          'table_number',t.table_number,
@@ -83,6 +84,7 @@ returns json as
                                                       'rating',r.rating,
                                                       'price_range',r.price_range,
                                                       'slot_duration',r.slot_duration,
+                                                      'is_sponsored', r.is_sponsored,
                                                         'last_reservation_date',(select datetime from reservations where auth.role() = 'client' and reservations.restaurant = r.id ORDER BY datetime DESC Limit 1)))
                     from restaurants r where lower(name) like  CONCAT('%',get_restaurants.research,'%')
                                                                                                     or lower(city) like CONCAT('%',get_restaurants.research,'%')
@@ -99,6 +101,7 @@ returns json as
                                                           'rating',r.rating,
                                                           'price_range',r.price_range,
                                                           'slot_duration',r.slot_duration,
+                                                          'is_sponsored', r.is_sponsored,
                                                           'last_reservation_date',(select datetime from reservations where reservations.restaurant = r.id ORDER BY datetime DESC Limit 1),
                                                           'reservations_pending',(select get_pending_reservation_count(r.id))))
                         from restaurants r
@@ -140,4 +143,73 @@ create or replace function get_restaurant_capacity(restaurant_id int) returns js
     $$language plpgsql security definer ;
 
 grant execute on function get_restaurant_capacity(int) to client;
+
+
+create or replace function sponsored_true(restaurant_id int)
+    returns json as
+$$
+declare
+    updated_restaurant_id int := restaurant_id;
+begin
+    -- verification si utilisateur connecte
+    perform auth.check_logged();
+    if (auth.role() <> 'manager') then
+        raise exception 'Tu ne peux pas sponsorisé un restaurant si tu es un client ';
+    end if;
+
+        UPDATE restaurants
+        set is_sponsored         = true
+        WHERE id = restaurant_id;
+
+    return get_restaurant(updated_restaurant_id);
+end;
+$$ language plpgsql security definer;
+
+grant execute on function sponsored_true(int) to manager;
+
+----------------------
+
+create or replace function sponsored_false(restaurant_id int)
+    returns json as
+$$
+declare
+    updated_restaurant_id int := restaurant_id;
+begin
+    -- verification si utilisateur connecte
+    perform auth.check_logged();
+    if (auth.role() <> 'manager') then
+        raise exception 'Tu ne peux pas sponsorisé un restaurant si tu es un client ';
+    end if;
+
+    UPDATE restaurants
+    set is_sponsored         = false
+    WHERE id = restaurant_id;
+
+    return get_restaurant(updated_restaurant_id);
+end;
+$$ language plpgsql security definer;
+
+grant execute on function sponsored_false(int) to manager;
+
+
+-------------------
+
+/*
+    Retourne le nombre de sponsored pour une ville
+*/
+/*create or replace function is_sponsored_restaurant_city_full(restaurant_city text) returns boolean as
+$$
+begin
+    return (-- s'il existe, pour une ville, plus de 3 restaurants sponsorisés, raise exception
+        select res.city
+        from restaurants res
+        where res.is_sponsored = true
+        AND res.city = restaurant_city
+        group by res.city -- on groupe par ville
+        having count(*) >= 3 -- tel que le groupe contient plus de 3 entrees
+    );
+end;
+$$ language plpgsql security definer;
+
+grant execute on function is_sponsored_restaurant_city_full(text) to manager;*/
 
