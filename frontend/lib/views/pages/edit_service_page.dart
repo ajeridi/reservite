@@ -36,13 +36,20 @@ class EditServicePage extends ConsumerStatefulWidget {
 
 class _EditServicePageState extends ConsumerState<EditServicePage> {
 
-  late ValidatingTextEditingController _startTimeController;
-  late ValidatingTextEditingController _endTimeController;
-  late ValidatingTextEditingController _dayController;
+  String? _dayOfWeek;
+  int? _startHour;
+  int? _startMinutes;
+  int? _endHour;
+  int? _endMinutes;
 
+  String? _asyncError;
+  String? _dayOfWeekError;
+  String? _startTimeError;
+  String? _endTimeError;
+  String? _timeError;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final simulatedTime = ref.watch(applicationTimeProvider).value!;
 
@@ -126,8 +133,16 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                       DropdownMenuItem(value: DatetimeUtils.dayOfWeekToString(i), child: Text(DatetimeUtils.dayOfWeekToString(i))),
                     ]
                   ],
-                  onChanged: (_) {},
+                  onChanged: (value) {
+                    setState((){
+                      _dayOfWeek = value;
+                      validateAll();
+                    });
+                  },
                 ),
+                const SizedBox(height: 16),
+                if (_dayOfWeekError!= null)
+                  Text(_dayOfWeekError!, style: TextStyle(color: Colors.red),),
                 const SizedBox(height: 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +161,12 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                               child: Text('${h.toString().padLeft(2, '0')} h'),
                             ),
                         ],
-                        onChanged: (_) {},
+                        onChanged: (hour) {
+                          setState(() {
+                            _startHour = hour;
+                            validateAll();
+                          });
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -158,11 +178,19 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                           border: OutlineInputBorder(),
                         ),
                         items: makeMinutesDropdowns(currentRestaurant),
-                        onChanged: (_) {},
+                        onChanged: (minute) {
+                          setState(() {
+                            _startMinutes = minute;
+                            validateAll();
+                          });
+                        },
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                if (_startTimeError != null)
+                  Text(_startTimeError!, style: TextStyle(color: Colors.red),),
                 const SizedBox(height: 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +209,12 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                               child: Text('${h.toString().padLeft(2, '0')} h'),
                             ),
                         ],
-                        onChanged: (_) {},
+                        onChanged: (hour) {
+                          setState(() {
+                            _endHour = hour;
+                            validateAll();
+                          });
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -193,11 +226,21 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                           border: OutlineInputBorder(),
                         ),
                         items: makeMinutesDropdowns(currentRestaurant),
-                        onChanged: (_) {},
+                        onChanged: (minute) {
+                          setState(() {
+                            _endMinutes = minute;
+                            validateAll();
+                          });
+                        },
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(width: 12),
+                if (_endTimeError != null)
+                  Text(_endTimeError!, style: TextStyle(color: Colors.red),),
+                if (_timeError != null)
+                  Text(_timeError!, style: TextStyle(color: Colors.red),),
               ],
             ),
           ),
@@ -224,5 +267,27 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
   String minutesToString(int minute){
     if (minute == 0) return "00 min";
     return '$minute min';
+  }
+
+  void validateAll() {
+    // verification de l'existance des inputs
+    _dayOfWeekError = (_dayOfWeek == null) ? 'Veuillez selectionner un jour' : null;
+    _startTimeError = (_startHour == null || _startMinutes == null) ?  'Veuillez selectionner une heure/minute de debut' : null;
+    _endTimeError =  (_endHour == null || _endMinutes == null) ?  'Veuillez selectionner une heure/minute de fin' : null;
+    
+    // verification que l'heure de fin est apres l'heure de debut et que la duree du service doit etre d'au moins une heure
+    if (_startTimeError == null && _endTimeError == null){
+      final startTime = TimeOfDay(hour: _startHour!, minute: _startMinutes!);
+      final endTime = TimeOfDay(hour: _endHour!, minute: _endMinutes!);
+      if (startTime.isAfter(endTime)) _timeError = 'L''heure de fin doit etre apres l''heure de debut';
+      else if (differenceInMinutes(startTime, endTime) < 60) _timeError = 'La duree du service doit etre d''au moins une heure';
+      else _timeError = null;
+    }
+  }
+
+  int differenceInMinutes(TimeOfDay startTime, TimeOfDay endTime) {
+    final startTimeInMinutes = startTime.hour * 60 + startTime.minute;
+    final endTimeInMinutes = endTime.hour * 60 + endTime.minute;
+    return endTimeInMinutes - startTimeInMinutes;
   }
 }
