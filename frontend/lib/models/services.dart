@@ -52,4 +52,8 @@ class Services {
   void remove(Service service) {
     services.removeWhere((serviceToDelete) => serviceToDelete.id == service.id);
   }
+
+  bool contains(Service updatedService) {
+    return services.contains(updatedService);
+  }
 }

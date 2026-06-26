@@ -85,7 +85,7 @@ grant execute on function get_service(int, int) to manager;
 
 
 
-create or replace function save_service(service_id int, new_service_day int, new_heure_debut int, new_heure_fin int, restaurant_id int) returns json as
+create or replace function save_service(service_id int, new_service_day int, new_heure_debut time, new_heure_fin time, restaurant_id int) returns json as
 $$
 declare updated_id int := service_id;
 begin
@@ -103,7 +103,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
-grant execute on function save_service(int, int, int, int, int) to manager;
+grant execute on function save_service(int, int, time, time, int) to manager;
 
 create or replace function delete_service(service_id int) returns void as
     $$
@@ -214,7 +214,7 @@ create or replace function validate_service(_restaurant_id int, _service_id int,
         error json;
     begin
         error := (select check_service_overlap(_restaurant_id, _service_id, _dow, _start_time, _end_time));
-        if (error ->> 'error' is null ) then
+        if (error ->> 'error' is null and _service_id <> 0 ) then
             error := (select check_reservation_out_of_service(_service_id, _start_time, _end_time));
         end if;
         return error;

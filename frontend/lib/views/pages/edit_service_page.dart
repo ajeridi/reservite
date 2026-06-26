@@ -116,7 +116,12 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
         actions: [
           IconButton(
             tooltip: 'Enregistrer',
-            onPressed: noErrors() ? () {} : null,
+            onPressed: noErrors()
+                ? () async {
+              await currentServiceNotifier.saveService(currentRestaurant.id, serviceId, DatetimeUtils.stringToDow(_dayOfWeek!), TimeOfDay(hour: _startHour!, minute: _startMinutes!), TimeOfDay(hour: _endHour!, minute: _endMinutes!));
+              Navigator.pop(context);
+            }
+                : null,
             icon: const Icon(Icons.save),
           ),
         ],

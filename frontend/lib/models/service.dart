@@ -96,13 +96,13 @@ const Service({
 
   }
 
-  static Future<Service> save_service(int? newServiceDay, int newHeureDebut, int newHeureFin, int serviceId, int restaurantId) async {
+  static Future<Service> save_service(int? newServiceDay, TimeOfDay newHeureDebut, TimeOfDay newHeureFin, int serviceId, int restaurantId) async {
     final response = await ApiClient.post('save_service',
         body: json.encode({
           'service_id' : serviceId,
           'new_service_day' : newServiceDay,
-          'new_heure_debut' : newHeureDebut,
-          'new_heure_fin'   : newHeureFin,
+          'new_heure_debut' : '${newHeureDebut.hour}:${newHeureDebut.minute}:00',
+          'new_heure_fin'   : '${newHeureFin.hour}:${newHeureFin.minute}:00',
           'restaurant_id' : restaurantId
         })
     );
