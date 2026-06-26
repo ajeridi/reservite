@@ -33,8 +33,9 @@ class EditServicePage extends ConsumerStatefulWidget {
   ConsumerState<EditServicePage> createState() => _EditServicePageState();
 }
 
-
 class _EditServicePageState extends ConsumerState<EditServicePage> {
+
+  bool _initialized = false; // boolean qui va indiquer si la page s'est deja initilisee ou pas, pour eviter de perdre les inputs et d'avoir une reinitialisation des valeurs des fields a chaque validation
 
   String? _dayOfWeek;
   int? _startHour;
@@ -48,19 +49,30 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
   String? _endTimeError;
   String? _timeError;
 
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final simulatedTime = ref.watch(applicationTimeProvider).value!;
 
-    final currentRestaurant = ref.read(currentRestaurantProvider(ref.read(selectedRestaurantProvider))).value!;
+    final currentRestaurant = ref
+        .read(currentRestaurantProvider(ref.read(selectedRestaurantProvider)))
+        .value!;
     final serviceId = ModalRoute.of(context)?.settings.arguments as int;
     final currentServiceState = ref.watch(currentServiceProvider(serviceId));
-    final currentServiceNotifier = ref.read(currentServiceProvider(serviceId).notifier,);
-
+    final currentServiceNotifier = ref.read(
+      currentServiceProvider(serviceId).notifier,
+    );
 
     return currentServiceState.when(
-      data: (service) => data(theme, simulatedTime, service, currentServiceNotifier, currentRestaurant, context),
+      data: (service) => data(
+        theme,
+        simulatedTime,
+        service,
+        currentServiceNotifier,
+        currentRestaurant,
+        context,
+      ),
       error: (e, _) =>
           DataErrorWidget(error: e, notifier: currentServiceNotifier),
       loading: () =>
@@ -68,7 +80,24 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
     );
   }
 
-  Scaffold data(ThemeData theme, DateTime simulatedTime, Service? service, CurrentServiceNotifier currentServiceNotifier, Restaurant currentRestaurant, BuildContext context) {
+  Scaffold data(
+    ThemeData theme,
+    DateTime simulatedTime,
+    Service? service,
+    CurrentServiceNotifier currentServiceNotifier,
+    Restaurant currentRestaurant,
+    BuildContext context,
+  ) {
+
+    // pour eviter de reinitialiser deux fois les valeurs initiales
+    if (!_initialized){{
+      _initialized = true;
+      _dayOfWeek = service == null ? null : DatetimeUtils.dayOfWeekToString(service.dayOfWeek);
+      _startHour = service?.startTime.hour;
+      _startMinutes = service?.startTime.minute;
+      _endHour = service?.endTime.hour;
+      _endMinutes = service?.endTime.minute;
+    }}
 
     return Scaffold(
       appBar: AppBar(
@@ -78,12 +107,14 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
             Navigator.pop(context);
           },
         ),
-        title:  Text( service == null ? 'Ajouter un service' : 'Modifier le service'),
+        title: Text(
+          service == null ? 'Ajouter un service' : 'Modifier le service',
+        ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
             tooltip: 'Enregistrer',
-            onPressed: () {},
+            onPressed: noErrors() ? () {} : null,
             icon: const Icon(Icons.save),
           ),
         ],
@@ -122,34 +153,37 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                 DropdownButtonFormField<String>(
-                  initialValue: service == null ? null : DatetimeUtils.dayOfWeekToString(service.dayOfWeek),
+                DropdownButtonFormField<String>(
+                  initialValue: _dayOfWeek,
                   decoration: const InputDecoration(
                     labelText: 'Jour',
                     border: OutlineInputBorder(),
                   ),
-                  items:  [
-                    for (int i = 1; i < 8; i++) ... [
-                      DropdownMenuItem(value: DatetimeUtils.dayOfWeekToString(i), child: Text(DatetimeUtils.dayOfWeekToString(i))),
-                    ]
+                  items: [
+                    for (int i = 1; i < 8; i++) ...[
+                      DropdownMenuItem(
+                        value: DatetimeUtils.dayOfWeekToString(i),
+                        child: Text(DatetimeUtils.dayOfWeekToString(i)),
+                      ),
+                    ],
                   ],
                   onChanged: (value) {
-                    setState((){
+                    setState(() {
                       _dayOfWeek = value;
                       validateAll();
                     });
                   },
                 ),
                 const SizedBox(height: 16),
-                if (_dayOfWeekError!= null)
-                  Text(_dayOfWeekError!, style: TextStyle(color: Colors.red),),
+                if (_dayOfWeekError != null)
+                  Text(_dayOfWeekError!, style: TextStyle(color: Colors.red)),
                 const SizedBox(height: 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: service == null ? null : service.startTime.hour,
+                        initialValue: _startHour,
                         decoration: const InputDecoration(
                           labelText: 'Heure de début (heure)',
                           border: OutlineInputBorder(),
@@ -172,7 +206,7 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: service == null ? null : service.startTime.minute,
+                        initialValue: _startMinutes,
                         decoration: const InputDecoration(
                           labelText: 'Minutes',
                           border: OutlineInputBorder(),
@@ -190,14 +224,14 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                 ),
                 const SizedBox(height: 16),
                 if (_startTimeError != null)
-                  Text(_startTimeError!, style: TextStyle(color: Colors.red),),
+                  Text(_startTimeError!, style: TextStyle(color: Colors.red)),
                 const SizedBox(height: 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: service?.endTime.hour,
+                        initialValue: _endHour,
                         decoration: const InputDecoration(
                           labelText: 'Heure de fin (heure)',
                           border: OutlineInputBorder(),
@@ -220,7 +254,7 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<int?>(
-                        initialValue: service?.endTime.minute,
+                        initialValue: _endMinutes,
                         decoration: const InputDecoration(
                           labelText: 'Minutes',
                           border: OutlineInputBorder(),
@@ -238,9 +272,9 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                 ),
                 const SizedBox(width: 12),
                 if (_endTimeError != null)
-                  Text(_endTimeError!, style: TextStyle(color: Colors.red),),
+                  Text(_endTimeError!, style: TextStyle(color: Colors.red)),
                 if (_timeError != null)
-                  Text(_timeError!, style: TextStyle(color: Colors.red),),
+                  Text(_timeError!, style: TextStyle(color: Colors.red)),
               ],
             ),
           ),
@@ -249,39 +283,54 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
     );
   }
 
-  List<DropdownMenuItem<int?>> makeMinutesDropdowns(Restaurant restaurant){
+  List<DropdownMenuItem<int?>> makeMinutesDropdowns(Restaurant restaurant) {
     List<DropdownMenuItem<int?>> minutes = List.empty(growable: true);
     final slotDuration = restaurant.slotDuration;
-    for (int min = 0; min < 60; min = min + slotDuration!){
+    for (int min = 0; min < 60; min = min + slotDuration!) {
       minutes.add(
-        DropdownMenuItem<int?>(
-          value: min,
-          child: Text(minutesToString(min)),
-        ),
+        DropdownMenuItem<int?>(value: min, child: Text(minutesToString(min))),
       );
     }
     return minutes;
   }
 
-
-  String minutesToString(int minute){
+  String minutesToString(int minute) {
     if (minute == 0) return "00 min";
     return '$minute min';
   }
 
   void validateAll() {
+    print(_dayOfWeek);
+    print(_startHour);
+    print(_startMinutes);
+    print(_endHour);
+    print(_endMinutes);
     // verification de l'existance des inputs
-    _dayOfWeekError = (_dayOfWeek == null) ? 'Veuillez selectionner un jour' : null;
-    _startTimeError = (_startHour == null || _startMinutes == null) ?  'Veuillez selectionner une heure/minute de debut' : null;
-    _endTimeError =  (_endHour == null || _endMinutes == null) ?  'Veuillez selectionner une heure/minute de fin' : null;
-    
+    _dayOfWeekError = (_dayOfWeek == null)
+        ? 'Veuillez selectionner un jour'
+        : null;
+    _startTimeError = (_startHour == null || _startMinutes == null)
+        ? 'Veuillez selectionner une heure/minute de debut'
+        : null;
+    _endTimeError = (_endHour == null || _endMinutes == null)
+        ? 'Veuillez selectionner une heure/minute de fin'
+        : null;
+
     // verification que l'heure de fin est apres l'heure de debut et que la duree du service doit etre d'au moins une heure
-    if (_startTimeError == null && _endTimeError == null){
+    if (_startTimeError == null && _endTimeError == null) {
       final startTime = TimeOfDay(hour: _startHour!, minute: _startMinutes!);
       final endTime = TimeOfDay(hour: _endHour!, minute: _endMinutes!);
-      if (startTime.isAfter(endTime)) _timeError = 'L''heure de fin doit etre apres l''heure de debut';
-      else if (differenceInMinutes(startTime, endTime) < 60) _timeError = 'La duree du service doit etre d''au moins une heure';
-      else _timeError = null;
+      if (startTime.isAfter(endTime))
+        _timeError =
+            'L'
+            'heure de fin doit etre apres l'
+            'heure de debut';
+      else if (differenceInMinutes(startTime, endTime) < 60)
+        _timeError =
+            'La duree du service doit etre d'
+            'au moins une heure';
+      else
+        _timeError = null;
     }
   }
 
@@ -289,5 +338,18 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
     final startTimeInMinutes = startTime.hour * 60 + startTime.minute;
     final endTimeInMinutes = endTime.hour * 60 + endTime.minute;
     return endTimeInMinutes - startTimeInMinutes;
+  }
+
+  bool noErrors() {
+    return _dayOfWeek != null &&
+        _startHour != null &&
+        _startMinutes != null &&
+        _endHour != null &&
+        _endMinutes != null &&
+        _startTimeError == null &&
+        _endTimeError == null &&
+        _dayOfWeekError == null &&
+        _timeError == null &&
+        _asyncError == null;
   }
 }
