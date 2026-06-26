@@ -135,15 +135,15 @@ create or replace function reservations_inside_service(service_id int) returns
         service services%rowtype;
     begin
         select * into service from services where id = service_id;
-        select * from reservations
+        return query (select * from reservations
                          WHERE restaurant = service.restaurant AND
                                status in ('pending', 'confirmed') AND
                                extract(isodow from datetime::date) = service.day_of_week AND
-                               datetime::time between service.start_time and service.end_time;
+                               datetime::time between service.start_time and service.end_time);
     end;
     $$ language plpgsql security definer;
 
-create or replace function check_reservation_out_of_service(service_id int,_start_time timestamp, _end_time timestamp) returns json as
+create or replace function check_reservation_out_of_service(service_id int,_start_time time, _end_time time) returns json as
     $$
     declare
         service services%rowtype;
@@ -159,7 +159,7 @@ create or replace function check_reservation_out_of_service(service_id int,_star
             select * into service from services where id = service_id;
             -- on va chercher le nombre de reservation en dehors du service
             select coalesce(count(*), 0) from reservations_inside_service(service_id)
-                            where datetime::time < _start_time::time OR datetime::time > _end_time into number_of_reservations_outside_service;
+                            where datetime::time < _start_time::time OR datetime::time >= _end_time into number_of_reservations_outside_service;
             if (number_of_reservations_outside_service > 0) then
                 error := format('Modification impossible: %s reservation(s) confirmee(s) ou en attente seraient en dehors des horaires du service.', number_of_reservations_outside_service);
             end if;
@@ -168,4 +168,57 @@ create or replace function check_reservation_out_of_service(service_id int,_star
     end;
     $$ language plpgsql security definer;
 
-grant execute on function check_reservation_out_of_service(int, timestamp, timestamp) to manager;
+grant execute on function check_reservation_out_of_service(int, time, time) to manager;
+
+-- va verifier si le service chevauche d'autres services le meme jour
+create or replace function check_service_overlap(_restaurant_id int, _service_id int, _dow int, _start_time time, _end_time time) returns json as
+    $$
+    declare
+        error text := null;
+    begin
+        perform auth.check_logged();
+        if (auth.role() = 'manager') then
+            perform check_manager_works_in_restaurant(auth.id(), _restaurant_id);
+            -- si au meme dow, start et end time, on a le meme service que celui de l'id, on retourne null
+/*            if ((select s.id from services s where day_of_week = _dow and start_time = _start_time and end_time = _end_time and restaurant = _restaurant_id) = _service_id) then
+                return json_build_object('error', null);
+            end if;
+*/            if (exists(select s.id from services s where id <> _service_id and  day_of_week = _dow and restaurant = _restaurant_id and start_time < _end_time and _start_time < end_time)) then
+                return json_build_object('error', format('Le service chevauche avec un service existant le %s', dowToDayName(_dow)));
+            end if;
+            return json_build_object('error', error);
+        end if;
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function check_service_overlap(int, int, int, time, time) to manager;
+
+create or replace function dowToDayName(dow int) returns varchar as
+    $$
+    begin
+        RETURN CASE dow WHEN 1 THEN 'Lundi'
+                        WHEN 2 THEN 'Mardi'
+                        WHEN 3 THEN 'Mercredi'
+                        WHEN 4 THEN 'Jeudi'
+                        WHEN 5 THEN 'Vendredi'
+                        WHEN 6 THEN 'Samedi'
+                        WHEN 7 THEN 'Dimanche'
+        END;
+    end;
+    $$ language plpgsql security definer;
+
+
+create or replace function validate_service(_restaurant_id int, _service_id int, _dow int, _start_time time, _end_time time) returns json as
+    $$
+    declare
+        error json;
+    begin
+        error := (select check_service_overlap(_restaurant_id, _service_id, _dow, _start_time, _end_time));
+        if (error ->> 'error' is null ) then
+            error := (select check_reservation_out_of_service(_service_id, _start_time, _end_time));
+        end if;
+        return error;
+    end;
+    $$ language plpgsql security definer;
+
+grant execute on function validate_service(int, int, int, time, time) to manager;

@@ -37,6 +37,8 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
 
   bool _initialized = false; // boolean qui va indiquer si la page s'est deja initilisee ou pas, pour eviter de perdre les inputs et d'avoir une reinitialisation des valeurs des fields a chaque validation
 
+  late int serviceId;
+
   String? _dayOfWeek;
   int? _startHour;
   int? _startMinutes;
@@ -58,7 +60,7 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
     final currentRestaurant = ref
         .read(currentRestaurantProvider(ref.read(selectedRestaurantProvider)))
         .value!;
-    final serviceId = ModalRoute.of(context)?.settings.arguments as int;
+    serviceId = ModalRoute.of(context)?.settings.arguments as int;
     final currentServiceState = ref.watch(currentServiceProvider(serviceId));
     final currentServiceNotifier = ref.read(
       currentServiceProvider(serviceId).notifier,
@@ -168,15 +170,15 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                     ],
                   ],
                   onChanged: (value) {
-                    setState(() {
                       _dayOfWeek = value;
                       validateAll();
-                    });
                   },
                 ),
                 const SizedBox(height: 16),
                 if (_dayOfWeekError != null)
                   Text(_dayOfWeekError!, style: TextStyle(color: Colors.red)),
+                if (_asyncError != null)
+                  Text(_asyncError!, style: TextStyle(color: Colors.red)),
                 const SizedBox(height: 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,10 +198,8 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                             ),
                         ],
                         onChanged: (hour) {
-                          setState(() {
                             _startHour = hour;
                             validateAll();
-                          });
                         },
                       ),
                     ),
@@ -213,10 +213,8 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                         ),
                         items: makeMinutesDropdowns(currentRestaurant),
                         onChanged: (minute) {
-                          setState(() {
                             _startMinutes = minute;
                             validateAll();
-                          });
                         },
                       ),
                     ),
@@ -243,11 +241,9 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                               child: Text('${h.toString().padLeft(2, '0')} h'),
                             ),
                         ],
-                        onChanged: (hour) {
-                          setState(() {
-                            _endHour = hour;
-                            validateAll();
-                          });
+                        onChanged: (hour)  {
+                          _endHour = hour;
+                           validateAll();
                         },
                       ),
                     ),
@@ -261,10 +257,8 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
                         ),
                         items: makeMinutesDropdowns(currentRestaurant),
                         onChanged: (minute) {
-                          setState(() {
                             _endMinutes = minute;
                             validateAll();
-                          });
                         },
                       ),
                     ),
@@ -299,39 +293,28 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
     return '$minute min';
   }
 
-  void validateAll() {
-    print(_dayOfWeek);
-    print(_startHour);
-    print(_startMinutes);
-    print(_endHour);
-    print(_endMinutes);
+  void validateAll() async {
     // verification de l'existance des inputs
-    _dayOfWeekError = (_dayOfWeek == null)
-        ? 'Veuillez selectionner un jour'
-        : null;
-    _startTimeError = (_startHour == null || _startMinutes == null)
-        ? 'Veuillez selectionner une heure/minute de debut'
-        : null;
-    _endTimeError = (_endHour == null || _endMinutes == null)
-        ? 'Veuillez selectionner une heure/minute de fin'
-        : null;
+    _dayOfWeekError = (_dayOfWeek == null) ? 'Veuillez selectionner un jour' : null;
+    _startTimeError = (_startHour == null || _startMinutes == null) ? 'Veuillez selectionner une heure/minute de debut' : null;
+    _endTimeError = (_endHour == null || _endMinutes == null) ? 'Veuillez selectionner une heure/minute de fin' : null;
 
     // verification que l'heure de fin est apres l'heure de debut et que la duree du service doit etre d'au moins une heure
     if (_startTimeError == null && _endTimeError == null) {
       final startTime = TimeOfDay(hour: _startHour!, minute: _startMinutes!);
       final endTime = TimeOfDay(hour: _endHour!, minute: _endMinutes!);
-      if (startTime.isAfter(endTime))
-        _timeError =
-            'L'
-            'heure de fin doit etre apres l'
-            'heure de debut';
-      else if (differenceInMinutes(startTime, endTime) < 60)
-        _timeError =
-            'La duree du service doit etre d'
-            'au moins une heure';
-      else
-        _timeError = null;
+      _timeError = validateServiceDuration(startTime, endTime);
+
+      // validations asynchrones
+      if (_timeError == null){
+        final restaurantId = ref.read(selectedRestaurantProvider);
+        _asyncError = await Service.asyncValidateService(restaurantId, serviceId, _dayOfWeek!, startTime, endTime);
+        print(_asyncError);
+      }
     }
+    // rebuild du widget pour que les erreurs soient prise en compte
+    setState(() {
+    });
   }
 
   int differenceInMinutes(TimeOfDay startTime, TimeOfDay endTime) {
@@ -351,5 +334,14 @@ class _EditServicePageState extends ConsumerState<EditServicePage> {
         _dayOfWeekError == null &&
         _timeError == null &&
         _asyncError == null;
+  }
+
+  String? validateServiceDuration(TimeOfDay startTime, TimeOfDay endTime) {
+    if (startTime.isAfter(endTime)) {
+      return "L'heure de fin doit etre apres l'heure de debut";
+    } else if (differenceInMinutes(startTime, endTime) < 60) {
+      return "La duree du service doit etre d'au moins une heure";
+    }
+    return null;
   }
 }

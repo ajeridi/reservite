@@ -3,7 +3,9 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:flutter/src/material/time.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a07/core/tools/datetime_utils.dart';
 import 'package:prbd_2526_a07/models/services.dart';
 
 import '../core/services/api_client.dart';
@@ -172,6 +174,26 @@ const Service({
       }
       throw Exception('Service deletion unsuccessful. \nBody: ${response.body}');
     } catch (e, st) {
+      throw Exception('$e\n$st');
+    }
+  }
+
+  static Future<String?> asyncValidateService(int restaurantId, int serviceId, String dayOfWeek, TimeOfDay startTime, TimeOfDay endTime) async {
+    // verifier si le service chevauche avec d'autre services du meme jour
+    // verifier, si le service existe, si des reservations se trouvent en dehors du nouveau creneau
+    try {
+      int dow = DatetimeUtils.stringToDow(dayOfWeek);
+      final startTimeString = '${startTime.hour}:${startTime.minute}:00';
+      final endTimeString = '${endTime.hour}:${endTime.minute}:00';
+      print('validate_service?_restaurant_id=$restaurantId&_service_id=$serviceId&_dow=$dow&_start_time=$startTimeString&_end_time=$endTimeString');
+      final response = await ApiClient.get('validate_service?_restaurant_id=$restaurantId&_service_id=$serviceId&_dow=$dow&_start_time=$startTimeString&_end_time=$endTimeString');
+      print(response.body);
+      if (response.statusCode == 200){
+        final body = json.decode(response.body);
+        return body['error'];
+      }
+      return null;
+    }catch(e, st){
       throw Exception('$e\n$st');
     }
   }
