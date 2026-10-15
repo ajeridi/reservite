@@ -1,0 +1,16 @@
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "boverhaegen@reservite.com",
+  "password" : "Password1,"
+}
+
+### (c'est occupé, donc true)
+GET http://localhost:3000/rpc/is_occupee?table_id=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODA1OTQzNDR9.P6dFT8-LG6PD2E-zzL-LoWSPtCpz4GIj9FlwBN8gopk
+
+###
+
+GET http://localhost:3000/rpc/is_occupee?table_id=2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3ODA1OTQzNDR9.P6dFT8-LG6PD2E-zzL-LoWSPtCpz4GIj9FlwBN8gopk

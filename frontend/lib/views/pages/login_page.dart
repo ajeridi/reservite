@@ -1,0 +1,322 @@
+import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a07/providers/application_time_provider.dart';
+import 'package:prbd_2526_a07/providers/auth_provider.dart';
+
+import '../../core/tools/pick_date_time.dart';
+
+class LoginMockupScreen extends ConsumerStatefulWidget {
+  const LoginMockupScreen({super.key});
+
+  @override
+  ConsumerState<LoginMockupScreen> createState() => _LoginMockupScreenState();
+}
+
+class _LoginMockupScreenState extends ConsumerState<LoginMockupScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm(BuildContext context) {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez remplir tous les champs')),
+      );
+      return;
+    }
+    _login(context, email, password: password);
+  }
+
+  void _login(BuildContext context, String email, {String? password}) async {
+    await ref.read(authProvider.notifier).login(email, password ?? '');
+    final authState = ref.watch(authProvider);
+    final authNotifier = ref.read(authProvider.notifier);
+
+    if (!context.mounted) return;
+
+    authState.when(
+      data: (token) async {
+        if (token != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Connecté !'), duration: Duration(milliseconds: 800),));
+
+          if (await authNotifier.isClient()) {
+            Navigator.pushReplacementNamed(context, '/home_client_page');
+            debugPrint("C'est un client");
+          }
+
+          if (await authNotifier.isManager()) {
+            Navigator.pushReplacementNamed(context, '/my_restaurants_page');
+            debugPrint("C'est un Manager");
+          }
+        }
+      },
+      error: (error, _) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur: $error'))),
+      loading: () {},
+    );
+  }
+
+  void _resetDatabase(BuildContext context) async {
+    await ref.read(authProvider.notifier).resetDatabase();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Base de données réinitialisée')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final simulatedTime = ref.watch(applicationTimeProvider).value;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Connexion'),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Rafraîchir les données',
+            onPressed: () {},
+          ),
+        ],
+        elevation: 2,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        surfaceTintColor: Colors.transparent,
+        flexibleSpace: Align(
+          alignment: Alignment.topCenter,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2.0),
+              //GestureDetector pour detecter la touche
+              child: GestureDetector(
+                onTap: () async {
+                  final newDatetime = await pickDateTime(
+                    context,
+                    initialDate: simulatedTime,
+                  );
+                  if (newDatetime != null) {
+                    //on met à jour le provider avec la nouvelle date
+                    ref
+                        .read(applicationTimeProvider.notifier)
+                        .setTime(newDatetime);
+                  }
+                },
+                child: Tooltip(
+                  message:
+                      'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                  child: Text(
+                    DateFormat(
+                      'EEEE dd/MM/yyyy HH:mm',
+                      'fr_FR',
+                    ).format(simulatedTime!),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                child: Form(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 32),
+                      const Icon(
+                        Icons.restaurant,
+                        size: 80,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Connectez-vous',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.email),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: const InputDecoration(
+                          labelText: 'Mot de passe',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.lock),
+                        ),
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: ref.watch(authProvider).isLoading
+                            ? null
+                            : () => _submitForm(context),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text('Se connecter'),
+                      ),
+                      const SizedBox(height: 6),
+                      TextButton(
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/signup'),
+                        child: const Text('Pas encore de compte ? S\'inscrire'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Raccourcis de débogage',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Se connecter directement en tant que :',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _login(
+                            context,
+                            'brlacroix@reservite.com',
+                            password: 'Password1,',
+                          ),
+                          icon: const Icon(Icons.person),
+                          label: const Text('Client (Bruno)'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _login(
+                            context,
+                            'mamichel@reservite.com',
+                            password: 'Password1,',
+                          ),
+                          icon: const Icon(Icons.person),
+                          label: const Text('Client (Marc)'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _login(
+                            context,
+                            'bepenelle@reservite.com',
+                            password: 'Password1,',
+                          ),
+                          icon: const Icon(Icons.manage_accounts),
+                          label: const Text('Manager (Benoît)'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _login(
+                            context,
+                            'gedielman@reservite.com',
+                            password: 'Password1,',
+                          ),
+                          icon: const Icon(Icons.manage_accounts),
+                          label: const Text('Manager (Geoffrey)'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _resetDatabase(context),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Réinitialiser la base de données'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        foregroundColor: Colors.red,
+                        side: const BorderSide(color: Colors.red),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

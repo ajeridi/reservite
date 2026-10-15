@@ -1,0 +1,59 @@
+### connection d'un manager
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "boverhaegen@reservite.com",
+  "password" : "Password1,"
+}
+
+### connection d'un client
+POST http://localhost:3000/rpc/login
+Content-Type: application/json
+
+{
+  "email" : "brlacroix@reservite.com",
+  "password" : "Password1,"
+}
+
+
+### creation d'une nouvelle reservation par un client
+POST http://localhost:3000/rpc/save_reservation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoiYnJsYWNyb2l4QGVwZmMuZXUiLCJuYW1lIjoiQnJ1bm8iLCJ1c2VyX2lkIjo2LCJleHAiOjE3Nzk1NDMzMTZ9.jkzlLyOXQ2D3uVtbeF0s2YjMxSDV81kVMcBIoe6g6Uw
+
+{
+  "restaurant_id" : 3,
+  "datetime_" : "2024-12-06 18:30:00",
+  "number_of_guests_" : 2,
+  "special_requests_" : "xxxxxxxxxxxxxxxxxxxx"
+}
+
+### creation d'une reservation par un manager (KO)
+POST http://localhost:3000/rpc/save_reservation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoibWFuYWdlciIsInN1YiI6ImJvdmVyaGFlZ2VuQGVwZmMuZXUiLCJuYW1lIjoiQm9yaXMiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzkwMTkxNjJ9.oMWo-oUzTdKczT_VPGrf1Jp0Uyft2-96aCbX_KMU3is
+
+{
+"restaurant_id" : 3,
+"datetime_" : "2024-12-04 18:00:00",
+"number_of_guests_" : 4,
+"special_requests_" : "xxxxxxxxxxxxxxxxxxxx"
+}
+
+### update d'une reservation par un client
+POST http://localhost:3000/rpc/save_reservation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoieGFwaWdlb2xldEBlcGZjLmV1IiwibmFtZSI6IlhhdmllciIsInVzZXJfaWQiOjMsImV4cCI6MTc3OTAyNDQwNH0.JskNHbQGrFm5dijySlyIeICatqK5Gh8GgoIgm1YUJ78
+
+{
+  "restaurant_id" : 3,
+  "datetime_" : "2024-12-11 18:00:00",
+  "number_of_guests_" : 3,
+  "special_requests_" : "updated reservation",
+  "reservation_id" : 23
+}
+### si reservation_id = 0, ne doit pas afficher le service du soir (18:00 - 23:00), si reservation=22, doit afficher le service du soir
+GET http://localhost:3000/rpc/get_available_slots?restaurant_id=4&date_of_reservation=2024-12-06&reservation_id=0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50Iiwic3ViIjoiYnJsYWNyb2l4QGVwZmMuZXUiLCJuYW1lIjoiQnJ1bm8iLCJ1c2VyX2lkIjo2LCJleHAiOjE3ODA5MzIxNDN9.qZpuwUbal973mXivsNIJqmdXkKlU3xScjJuwz_gQjXg
+
