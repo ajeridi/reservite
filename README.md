@@ -7,9 +7,9 @@
 [![Riverpod](https://img.shields.io/badge/State_Management-Riverpod-blueviolet)](https://riverpod.dev/)
 [![Team Project](https://img.shields.io/badge/Collaboration-Team_of_3-success)](https://git-scm.com/)
 
-A full-stack, cross-platform reservation and table allocation platform built on an enterprise-grade decoupled 3-tier architecture.
+A full-stack, cross-platform reservation and table allocation platform built on a 3-tier architecture (Flutter client, PostgREST API, PostgreSQL database).
 
-Instead of delegating validation and transactional consistency to an intermediate application layer or ORM, **ReserVite enforces all critical business logic, concurrency locks, state machines, and access control policies directly inside PostgreSQL**. An automated REST/JSON API is exposed through **PostgREST**, consumed by a cross-platform **Flutter** client structured with **Riverpod** for declarative, reactive state management.
+Instead of delegating validation and transactional consistency to an intermediate application layer or ORM, **ReserVite enforces its business rules, concurrency checks, status transitions and access control directly inside PostgreSQL**. An automated REST/JSON API is exposed through **PostgREST**, consumed by a cross-platform **Flutter** client structured with **Riverpod** for declarative, reactive state management.
 
 ---
 
@@ -42,7 +42,7 @@ Instead of delegating validation and transactional consistency to an intermediat
 
 ## 🏛️ Software Architecture
 
-ReserVite is built on a **Decoupled 3-Tier Architecture** that enforces transactional data integrity and multi-role access control directly at the database engine level.
+ReserVite is built on a **3-tier architecture** in which data integrity and multi-role access control are enforced at the database level.
 
 The system combines a cross-platform **Flutter** client using **Riverpod** for declarative state management, a stateless **PostgREST** gateway exposing HTTP/REST and RPC endpoints, and a **PostgreSQL** relational database executing transactions, triggers, and constraint checks.
 
@@ -85,8 +85,8 @@ flowchart TD
 
 The client application is developed in **Flutter** (Dart 3.x) to deliver a responsive interface across Web, Desktop (macOS, Windows), and Mobile platforms from a single codebase.
 
-* **Reactive State Management (`AsyncNotifier`)**: Data streams and UI updates are structured with Riverpod `AsyncNotifierProvider` instances (`AuthNotifier`, `ReservationsNotifier`, `TablesNotifier`). This pattern guarantees deterministic lifecycle transitions across `AsyncLoading`, `AsyncData`, and `AsyncError` states.
-* **Telemetry & Debugging (`MyProviderObserver`)**: Extends Riverpod's `ProviderObserver` to track provider initialization, monitor mutations, and log errors along with their execution stack traces during development.
+* **Reactive State Management (`AsyncNotifier`)**: Data streams and UI updates are structured with Riverpod `AsyncNotifierProvider` instances (`AuthNotifier`, `ReservationsNotifier`, `TablesNotifier`), each exposing explicit loading, data and error states (`AsyncLoading`, `AsyncData`, `AsyncError`).
+* **Debug Logging (`MyProviderObserver`)**: Extends Riverpod's `ProviderObserver` to log provider initialization, state changes and errors (with stack traces) during development.
 * **Network Client (`ApiClient`)**:
   * Resolves base URLs dynamically based on target platforms (`http://localhost:3000/rpc` for Web/Desktop/macOS and `http://10.0.2.2:3000/rpc` for Android emulators).
   * Injects active Bearer JWT session tokens into HTTP authorization headers.
@@ -114,7 +114,7 @@ The client application is developed in **Flutter** (Dart 3.x) to deliver a respo
 
 ### 3. Persistence & Database Logic Layer (PostgreSQL 16)
 
-The database layer serves as the central authority for business rules, concurrency management, and data consistency.
+The database layer is where business rules, concurrency checks and data consistency are enforced.
 
 * **Authentication & Cryptography (`auth` schema)**:
   * Passwords are encrypted before write operations using Blowfish crypt hashing (`auth.crypt` with `auth.gen_salt('bf')`) through an `AFTER INSERT OR UPDATE` trigger on the `users` table.
@@ -133,7 +133,7 @@ The database layer serves as the central authority for business rules, concurren
 
 ## 🛡️ Database-Driven Integrity & Business Logic
 
-ReserVite relies on a declarative and procedural relational design where 100% of the operational rules are enforced by PostgreSQL check constraints, functions, and triggers. Invalid states are rejected at the database level regardless of API-level access.
+ReserVite relies on a relational design where the business rules (BR-01 to BR-14) are enforced by PostgreSQL check constraints, functions, and triggers. Invalid states are rejected at the database level regardless of API-level access.
 
 ### 1. Temporal Integrity & Slot Arithmetic (`BR-04`, `BR-05`, `BR-08`, `BR-14`)
 * **Slot Alignment (`BR-05`)**: Booking start times must strictly align with the restaurant's operational slot duration (10, 15, 20, 30, or 60 minutes). The total elapsed minutes from midnight modulo the venue slot duration must equal zero.
@@ -214,7 +214,7 @@ The interface highlights the multi-role capabilities of the platform while provi
 
 ### 3. Manager Table Allocation & Concurrency Guard (`assign_tables.png`)
 * **Live Seat Aggregation (`BR-02`)**: Dynamically computes total seating capacity as the manager selects tables, asserting that total capacity matches or exceeds guest count. The confirmation button remains locked if total capacity is insufficient for the party size.
-* **Double-Booking Shield (`BR-06`)**: Tables already occupied during the requested service window appear greyed out and struck-through (`Occupée pour ce service`), eliminating conflicting assignments at the UI level prior to database transaction validation.
+* **Double-Booking Prevention (`BR-06`)**: Tables already occupied during the requested service window appear greyed out and struck-through (`Occupée pour ce service`), so conflicting assignments are blocked in the UI before the database validates the transaction.
 
 ---
 
@@ -226,7 +226,7 @@ ReserVite applies a two-tiered testing strategy: isolated transactional integrat
 
 ### 1. Database-Level Integration Testing (`backend/tests/*.sql`)
 
-All database test scripts run inside isolated transactions terminated with an explicit `ROLLBACK`, guaranteeing zero residual test data.
+All database test scripts run inside isolated transactions terminated with an explicit `ROLLBACK`, so they leave no test data behind.
 
 * **Negative Testing Harness (`should_fail`)**: Business invariants and constraint triggers are asserted using `should_fail()`, ensuring illegal operations raise expected PostgreSQL exceptions (e.g., `'unique_violation'`, `'raise_exception'`).
 * **Session Impersonation (`test_02_impersonation.sql`)**: Test helpers (`auth.login_for_test`, `auth.login_anonymously_for_test`) verify dynamic role switching and JWT claims decoding (`auth.id()`, `auth.role()`) directly within transaction scopes.
@@ -236,7 +236,7 @@ All database test scripts run inside isolated transactions terminated with an ex
 | `test_01_login.sql` | Cryptographic password matching via `auth.crypt` and invalid credential rejection |
 | `test_02_impersonation.sql` | Session role impersonation and dynamic JWT claim extraction |
 | `test_03_reset_database.sql` | Cascade schema reset, sequences re-indexing, and deterministic re-seeding |
-| `test_04.00_br_*` to `test_04.14_br_*` | Full business invariant suite: capacity checks (`BR-02`), double-booking prevention (`BR-06`), slot modulos (`BR-05`), lifecycle FSM (`BR-09`, `BR-11`), and anti-past guards (`BR-14`) |
+| `test_04.00_br_*` to `test_04.14_br_*` | Business rule tests: capacity checks (`BR-02`), double-booking prevention (`BR-06`), slot modulos (`BR-05`), lifecycle FSM (`BR-09`, `BR-11`), and anti-past guards (`BR-14`) |
 
 ---
 
@@ -252,12 +252,12 @@ REST and RPC endpoints are verified across active role scopes using structured H
 
 ## 👥 Team Collaboration & Contribution Matrix
 
-ReserVite was developed collaboratively by a team of three software engineering students based on a provided architectural baseline (PostgreSQL init, PostgREST configuration, and JWT security scaffolding).
+ReserVite was developed by a team of three students based on a provided architectural baseline (PostgreSQL init, PostgREST configuration, and JWT security scaffolding).
 
 ### 1. Collaborative Git Workflow
 * **Branching Strategy**: Development was coordinated using Git feature branching (`git-flow`), isolating functional increments (`feat/...`, `fix/...`, `refactor/...`) before integration into a central `develop` staging branch.
 * **Semantic Commits**: Adherence to Conventional Commit guidelines to ensure clear commit histories and traceability across schema migrations, backend endpoints, and Flutter widgets.
-* **Continuous Integration**: Peer reviews and conflict resolution sessions on `develop` before cutting milestone deliveries.
+* **Code Reviews**: Peer reviews and conflict resolution on `develop` before each milestone delivery.
 
 ### 2. Responsibilities & Contribution Matrix
 
@@ -277,7 +277,7 @@ This repository is a **personal portfolio showcase and mirror** of the original 
 * **Constantin Gabor** — *Academic co-contributor*
 * **Anass Adahchour** — *Academic co-contributor*
 
-> **Note on Repository & Collaboration**: While the underlying codebase was built in a 3-person team, this repository serves as my individual technical showcase. The structural documentation, architecture diagrams, and comprehensive README were prepared independently to demonstrate the system's design and technical depth for my final-year internship portfolio.
+> **Note on Repository & Collaboration**: While the underlying codebase was built in a 3-person team, this repository serves as my individual technical showcase. The documentation, architecture diagram and this README were written by me to present the project's design for my final-year internship portfolio.
 
 ---
 
