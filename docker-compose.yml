@@ -1,0 +1,45 @@
+services:
+  # PostgreSQL : au premier démarrage, exécute backend/scripts/*.sql dans l'ordre (01_init → 05.05)
+  db:
+    image: postgres:16
+    command: postgres -c timezone=Europe/Brussels
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dummy123
+      POSTGRES_DB: prbd-2526-a07
+      POSTGRES_INITDB_ARGS: "--locale=C --encoding=UTF8"
+      TZ: Europe/Brussels
+    volumes:
+      - ./backend/scripts:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"   # pour se connecter depuis IntelliJ / psql (facultatif)
+    healthcheck:
+      # en TCP : le serveur temporaire de l'initialisation n'écoute que sur le socket local
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d prbd-2526-a07"]
+      interval: 3s
+      retries: 30
+
+  # PostgREST : mêmes réglages que postgrest.conf, mais avec l'hôte "db"
+  api:
+    image: postgrest/postgrest
+    environment:
+      PGRST_DB_URI: postgres://authenticator:mysecretpassword@db:5432/prbd-2526-a07
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: 94VEF6BGSV4MHACYQYWYZZXILQR7412Z
+      PGRST_DB_CHANNEL_ENABLED: "true"
+      PGRST_DB_CHANNEL: pgrst
+      PGRST_LOG_LEVEL: info
+    ports:
+      - "3000:3000"   # le frontend appelle http://localhost:3000/rpc
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Frontend Flutter compilé pour le web, servi par Nginx
+  web:
+    build: ./frontend
+    ports:
+      - "8081:80"     # http://localhost:8081 (8080 est pris par EPayFC)
+    depends_on:
+      - api
